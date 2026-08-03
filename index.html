@@ -13981,7 +13981,8 @@ function renderExamCaseItem(q,wrap){
   const scenBox=document.createElement('div');scenBox.style.cssText='background:rgba(44,58,85,.08);border:1px solid rgba(44,58,85,.25);border-radius:10px;padding:14px 16px;margin-bottom:14px;';
   const label=document.createElement('div');label.style.cssText='display:flex;justify-content:space-between;gap:8px;font-family:Space Mono,monospace;font-size:9px;color:#1A4A8A;letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px;font-weight:700;';
   label.innerHTML='<span>CASE '+(q.caseGroupOrder||1)+' · '+(q.caseTitle||'Scenario')+'</span><span>'+q.casePosition+'/'+q.caseTotal+'</span>';scenBox.appendChild(label);
-  const txt=document.createElement('div');txt.style.cssText='font-size:12.8px;color:#20243A;line-height:1.62;white-space:pre-wrap;';txt.textContent=q.scenario||'';scenBox.appendChild(txt);wrap.appendChild(scenBox);
+  const scenario=(typeof ecoResolveCaseScenario==='function'?ecoResolveCaseScenario(q):String(q.scenario||q.caseText||'').trim());
+  const txt=document.createElement('div');txt.style.cssText='font-size:12.8px;color:#20243A;line-height:1.62;white-space:pre-wrap;';txt.textContent=scenario||'Case study context is unavailable. Please create a new set.';scenBox.appendChild(txt);wrap.appendChild(scenBox);
   const qt=document.createElement('div');qt.style.cssText='font-family:"Source Serif 4",serif;font-size:16px;color:#11182B;line-height:1.55;margin:2px 0 12px;font-weight:600;';qt.textContent=q.q||'';wrap.appendChild(qt);renderExamSingle(q,wrap);
 }
 

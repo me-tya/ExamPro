@@ -14,3 +14,9 @@ PMP Exam blueprint implemented:
 - Predictive 40% / Adaptive-Agile + Hybrid 60%
 - 4 case studies / 20 questions in the first section
 - all 26 ECO tasks represented
+
+CASE STUDY FIX:
+- Added full narratives for Case Study 2 and Case Study 3.
+- Empty case studies are rejected by the generator.
+- Old saved sessions resolve the narrative from the updated case bank.
+- Replace index.html and data/exam-bank-eco2026.js on GitHub.

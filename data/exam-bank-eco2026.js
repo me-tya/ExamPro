@@ -39,12 +39,26 @@ function inferEcoTask(q){const t=ecoText(q),d=canonicalDomain(q);
 }
 function taskDomain(task){return task.startsWith('P')&&!task.startsWith('PR')?'People':task.startsWith('PR')?'Process':'Business Environment';}
 
+const ECO2026_CASE_TEXT_FALLBACKS={"Case Study 2: Agile Adoption":"A mid-sized logistics company with a long history of predictive project management has launched a pilot program to modernize its software delivery practices. A new customer-facing software product has been selected as the pilot project and assigned to an experienced project manager with an extensive background in predictive methodologies.\n\nThe software product's requirements have not been fully defined, as customer needs are expected to evolve throughout development. A Product Owner has been assigned to manage the product backlog, and the team operates in two-week sprints. Early in the project, the team struggled to self-organize during sprint planning. The project manager responded by assigning specific tasks to team members at the start of each sprint.\n\nMidway through the project, the project manager reprioritized several backlog items, moving lower-priority items to the end of the backlog to reduce near-term scope and meet a delivery deadline.\n\nAs the project continues, team members have begun waiting for direction at the start of each sprint rather than coordinating among themselves, and several team members have expressed discomfort with the lack of visibility into work beyond the current sprint.","Case Study 3: Office Building Construction":"A project manager is overseeing the construction of a new five-story office building for a commercial real estate developer. Early in the planning phase, the project manager identified several risks, including soil instability, equipment failure, and supply chain disruptions, logging each in the risk register with probability ratings and potential impact assessments.\n\nThe project manager ran thousands of iterative calculations using probability distributions for each risk variable to forecast a range of possible project outcomes and their likelihood. The project manager then examined which individual risk variables had the greatest potential effect on the project by varying each factor independently while holding others constant. Based on this analysis, the project manager developed risk response plans for each identified risk and established mandatory weekly safety meetings as a site-wide risk mitigation measure.\n\nAttendance at the safety meetings was inconsistent, with several team members missing sessions due to competing work demands.\n\nAs construction progressed, an updated geotechnical assessment revealed changes in soil composition in the northwestern section of the site. Upon reviewing the findings, a site supervisor mentioned to the project manager that the soil readings seemed unusual and expressed some concern about whether conditions were safe for the crew working in that area. The project manager logged the updated findings in the risk register and arranged for more frequent visual inspections of the northwestern section by the site safety officer.\n\nSeveral weeks later, a scheduling conflict resulted in multiple crews and heavy equipment operating simultaneously in the northwestern section. The ground gave way beneath the added weight, opening a sinkhole that injured a worker and damaged a partially completed section of the foundation. The incident prompted a regulatory investigation, and the developer is now facing potential litigation."};
+function ecoPublishedCaseText(raw){
+  const direct=String((raw&&raw.caseText)||'').trim();
+  if(direct)return direct;
+  return String(ECO2026_CASE_TEXT_FALLBACKS[(raw&&raw.caseTitle)||'']||'').trim();
+}
+function ecoResolveCaseScenario(q){
+  const direct=String((q&&q.scenario)||(q&&q.caseText)||'').trim();
+  if(direct)return direct;
+  const gid=q&&q.caseGroupId;
+  if(typeof EXAM_CASE_GROUPS!=='undefined'&&gid){const g=EXAM_CASE_GROUPS.find(x=>x.id===gid);if(g&&String(g.scenario||'').trim())return String(g.scenario).trim();}
+  return String(ECO2026_CASE_TEXT_FALLBACKS[(q&&q.caseTitle)||'']||'').trim();
+}
+
 
 // Enrich the normalized 550-question bank with July 2026 ECO metadata.
 const _ECO_MOCK_RAW_BY_N=new Map((PMP_MOCK_RAW||[]).map(q=>[String(q.n),q]));
 EXAM_FULL_BANK.forEach((q,i)=>{
   const raw=(q.bankId&&q.bankId.indexOf('book-mock-')===0)?_ECO_MOCK_RAW_BY_N.get(String(q.n)):null;
-  if(raw&&raw.caseTitle){q.caseGroupId='published-'+raw.caseTitle.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');q.caseTitle=raw.caseTitle;q.caseText=raw.caseText;q.isCaseLinked=true;}
+  if(raw&&raw.caseTitle){q.caseGroupId='published-'+raw.caseTitle.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');q.caseTitle=raw.caseTitle;q.caseText=ecoPublishedCaseText(raw);q.isCaseLinked=true;}
   q.domain=canonicalDomain(q);
   q.approach=ecoApproach(q);
   q.approachGroup=q.approach==='Predictive'?'Predictive':'Adaptive';
@@ -66,18 +80,18 @@ EXAM_FULL_BANK.filter(q=>q.type==='casestudy').forEach(parent=>{
     const task=inferEcoTask(temp),app=ecoApproach(temp);
     return {bankId:temp.bankId,source:parent.source,n:parent.n,type:'caseitem',caseGroupId:gid,caseTitle:'Case Study',scenario:parent.scenario,casePosition:si+1,caseTotal:(parent.questions||[]).length,q:sq.q,opts:sq.opts||{},ans:sq.ans,exp:sq.exp||parent.exp||'',domain:canonicalDomain(parent),approach:app,approachGroup:app==='Predictive'?'Predictive':'Adaptive',ecoTask:task,ecoTaskName:ECO2026_TASKS[task],ecoTopics:{ai:false,sustainability:false,value:false}};
   });
-  EXAM_CASE_GROUPS.push({id:gid,title:'Case Study',scenario:parent.scenario,source:parent.source,items});
+  {const scenario=String(parent.scenario||'').trim();items.forEach(x=>x.scenario=scenario);EXAM_CASE_GROUPS.push({id:gid,title:'Case Study',scenario,source:parent.source,items});}
 });
 const _publishedGroups={};
 (PMP_MOCK_RAW||[]).forEach(raw=>{
   if(!raw.caseTitle)return;
   const gid='published-'+raw.caseTitle.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-  if(!_publishedGroups[gid])_publishedGroups[gid]={id:gid,title:raw.caseTitle,scenario:raw.caseText,source:'PMP Exam Prep Simplified (2026) - Full Length Mock',items:[]};
+  if(!_publishedGroups[gid])_publishedGroups[gid]={id:gid,title:raw.caseTitle,scenario:ecoPublishedCaseText(raw),source:'PMP Exam Prep Simplified (2026) - Full Length Mock',items:[]};
   const norm=EXAM_FULL_BANK.find(q=>q.bankId==='book-mock-'+raw.n);
   if(!norm)return;
-  _publishedGroups[gid].items.push(Object.assign({},norm,{type:'caseitem',caseGroupId:gid,caseTitle:raw.caseTitle,scenario:raw.caseText,casePosition:_publishedGroups[gid].items.length+1,caseTotal:6,q:raw.q,opts:raw.opts||{},ans:raw.ans,exp:raw.exp||''}));
+  _publishedGroups[gid].items.push(Object.assign({},norm,{type:'caseitem',caseGroupId:gid,caseTitle:raw.caseTitle,scenario:ecoPublishedCaseText(raw),casePosition:_publishedGroups[gid].items.length+1,caseTotal:6,q:raw.q,opts:raw.opts||{},ans:raw.ans,exp:raw.exp||''}));
 });
-Object.values(_publishedGroups).forEach(g=>EXAM_CASE_GROUPS.push(g));
+Object.values(_publishedGroups).forEach(g=>{g.scenario=String(g.scenario||'').trim();g.items.forEach(x=>x.scenario=g.scenario);if(g.scenario.length>=80&&g.items.length>=5)EXAM_CASE_GROUPS.push(g);});
 const EXAM_INDEPENDENT_BANK=EXAM_FULL_BANK.filter(q=>q.type!=='casestudy'&&!q.isCaseLinked);
 
 const ECO2026_BLUEPRINT={
@@ -96,7 +110,7 @@ function ecoCloneCells(){return {People:{Predictive:14,Adaptive:45},Process:{Pre
 function ecoCanTake(q,remain){return remain[q.domain]&&remain[q.domain][q.approachGroup]>0;}
 function ecoTake(q,remain,chosen,ids){if(!ecoCanTake(q,remain)||ids.has(q.bankId))return false;remain[q.domain][q.approachGroup]--;chosen.push(Object.assign({},q));ids.add(q.bankId);return true;}
 function ecoStats(set){const out={total:set.length,types:{},domains:{},approachGroups:{},approaches:{},tasks:{},pretest:0,scored:0,sections:{},caseGroups:new Set(),duplicateIds:0};const ids=new Set();for(const q of set){out.types[q.type||'single']=(out.types[q.type||'single']||0)+1;out.domains[q.domain]=(out.domains[q.domain]||0)+1;out.approachGroups[q.approachGroup]=(out.approachGroups[q.approachGroup]||0)+1;out.approaches[q.approach]=(out.approaches[q.approach]||0)+1;out.tasks[q.ecoTask]=(out.tasks[q.ecoTask]||0)+1;if(q.pretest)out.pretest++;else out.scored++;out.sections[q.section]=(out.sections[q.section]||0)+1;if(q.caseGroupId)out.caseGroups.add(q.caseGroupId);if(ids.has(q.bankId))out.duplicateIds++;ids.add(q.bankId);}out.caseGroups=out.caseGroups.size;return out;}
-function validateEco2026ExamSet(set){const s=ecoStats(set),errors=[];if(s.total!==180)errors.push('total');for(const [k,v] of Object.entries(ECO2026_BLUEPRINT.types))if((s.types[k]||0)!==v)errors.push('type:'+k);for(const [k,v] of Object.entries(ECO2026_BLUEPRINT.domains))if((s.domains[k]||0)!==v)errors.push('domain:'+k);for(const [k,v] of Object.entries(ECO2026_BLUEPRINT.approachGroups))if((s.approachGroups[k]||0)!==v)errors.push('approach:'+k);if(s.pretest!==10||s.scored!==170)errors.push('pretest');if((s.sections[1]||0)!==20||(s.sections[2]||0)!==80||(s.sections[3]||0)!==80)errors.push('sections');if(set.slice(0,20).some(q=>q.type!=='caseitem')||set.slice(20).some(q=>q.type==='caseitem'))errors.push('case-section');if(s.caseGroups!==4)errors.push('case-groups');if(s.duplicateIds)errors.push('duplicate');for(const task of Object.keys(ECO2026_TASKS))if(!s.tasks[task])errors.push('task:'+task);return {ok:errors.length===0,errors,stats:s};}
+function validateEco2026ExamSet(set){const s=ecoStats(set),errors=[];if(s.total!==180)errors.push('total');for(const [k,v] of Object.entries(ECO2026_BLUEPRINT.types))if((s.types[k]||0)!==v)errors.push('type:'+k);for(const [k,v] of Object.entries(ECO2026_BLUEPRINT.domains))if((s.domains[k]||0)!==v)errors.push('domain:'+k);for(const [k,v] of Object.entries(ECO2026_BLUEPRINT.approachGroups))if((s.approachGroups[k]||0)!==v)errors.push('approach:'+k);if(s.pretest!==10||s.scored!==170)errors.push('pretest');if((s.sections[1]||0)!==20||(s.sections[2]||0)!==80||(s.sections[3]||0)!==80)errors.push('sections');if(set.slice(0,20).some(q=>q.type!=='caseitem')||set.slice(20).some(q=>q.type==='caseitem'))errors.push('case-section');if(set.slice(0,20).some(q=>ecoResolveCaseScenario(q).length<80))errors.push('case-scenario');if(s.caseGroups!==4)errors.push('case-groups');if(s.duplicateIds)errors.push('duplicate');for(const task of Object.keys(ECO2026_TASKS))if(!s.tasks[task])errors.push('task:'+task);return {ok:errors.length===0,errors,stats:s};}
 function createEco2026ExamSet(options={}){
   const rng=options.rng||Math.random,recentSet=new Set(options.recentIds||[]),specialTarget={multi:15,matching:6,sequence:4,artifact:6};
   for(let attempt=0;attempt<600;attempt++){
@@ -105,7 +119,9 @@ function createEco2026ExamSet(options={}){
     const selectedGroups=[];
     for(const g of groups){
       if(selectedGroups.length===4)break;
-      const itemChoices=ecoFreshOrder(g.items,recentSet,rng);
+      const groupScenario=String(g.scenario||'').trim();
+      if(groupScenario.length<80||!Array.isArray(g.items)||g.items.length<5)continue;
+      const itemChoices=ecoFreshOrder(g.items.map(q=>Object.assign({},q,{scenario:groupScenario})),recentSet,rng);
       // For six-question published groups, use a different five-question subset across sets.
       const candidates=itemChoices.slice(0,5);
       const tmp=JSON.parse(JSON.stringify(remain));let valid=true;
