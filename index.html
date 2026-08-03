@@ -763,6 +763,173 @@
   overflow-wrap: break-word;
 }
 
+
+/* ===== Cheatsheet Search ===== */
+.cs-top-toolbar{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:12px;
+}
+.cs-cheatsheet-switcher{
+  display:flex;
+  gap:8px;
+  flex:0 0 auto;
+  margin:0;
+}
+.cs-search-shell{
+  width:min(360px,42vw);
+  min-width:280px;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+.cs-search-input-wrap{
+  min-height:42px;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:0 8px 0 11px;
+  border:1px solid #385789;
+  border-radius:12px;
+  background:#111f3d;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+  transition:border-color .16s ease,box-shadow .16s ease,background .16s ease;
+}
+.cs-search-input-wrap:focus-within{
+  border-color:var(--teal);
+  background:#142545;
+  box-shadow:0 0 0 3px rgba(63,182,138,.13);
+}
+.cs-search-icon{
+  flex:0 0 auto;
+  font-size:14px;
+  filter:saturate(.9);
+}
+.cs-search-input{
+  flex:1 1 auto;
+  min-width:0;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:var(--paper);
+  font-family:'Inter',sans-serif;
+  font-size:12.5px;
+  line-height:1.2;
+}
+.cs-search-input::placeholder{color:#7f91bd}
+.cs-search-input::-webkit-search-cancel-button{display:none}
+.cs-search-clear{
+  width:27px;
+  height:27px;
+  flex:0 0 27px;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  border:0;
+  border-radius:8px;
+  background:rgba(148,160,194,.12);
+  color:#9fb0d9;
+  cursor:pointer;
+  font-size:19px;
+  line-height:1;
+}
+.cs-search-clear.visible{display:flex}
+.cs-search-clear:hover{background:rgba(226,96,79,.18);color:#ff8d7d}
+.cs-search-feedback{
+  min-height:18px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  color:var(--muted);
+  font-family:'Space Mono',monospace;
+  font-size:9.5px;
+}
+.cs-search-count.has-results{color:var(--teal)}
+.cs-search-count.no-results{color:var(--coral)}
+.cs-search-nav{
+  display:none;
+  align-items:center;
+  gap:4px;
+}
+.cs-search-nav.visible{display:flex}
+.cs-search-nav button{
+  width:24px;
+  height:21px;
+  border:1px solid #385789;
+  border-radius:6px;
+  background:#182748;
+  color:#a9bcf0;
+  cursor:pointer;
+  font-size:11px;
+  line-height:1;
+}
+.cs-search-nav button:hover:not(:disabled){
+  border-color:var(--teal);
+  color:var(--paper);
+}
+.cs-search-nav button:disabled{opacity:.35;cursor:not-allowed}
+#tab-cheatsheet mark.cs-search-mark{
+  background:#ffe28a;
+  color:#14203a;
+  border-radius:3px;
+  padding:0 .08em;
+  box-shadow:0 0 0 1px rgba(154,105,0,.12);
+}
+#tab-cheatsheet mark.cs-search-mark.current{
+  background:#f0a500;
+  color:#071828;
+  box-shadow:0 0 0 3px rgba(240,165,0,.25);
+}
+#tab-cheatsheet .uc-block.cs-search-hidden{display:none!important}
+#tab-cheatsheet .cs-search-match{
+  box-shadow:0 0 0 1px rgba(63,182,138,.28);
+  border-radius:12px;
+}
+#tab-cheatsheet.cs-search-active .uc-section-title{
+  opacity:.92;
+}
+@media(max-width:860px){
+  .cs-top-toolbar{
+    align-items:stretch;
+    flex-wrap:wrap;
+  }
+  .cs-search-shell{
+    width:100%;
+    min-width:0;
+    flex-direction:row;
+    align-items:center;
+    gap:8px;
+  }
+  .cs-search-input-wrap{flex:1 1 auto}
+  .cs-search-feedback{
+    flex:0 0 auto;
+    min-width:112px;
+    justify-content:flex-end;
+  }
+}
+@media(max-width:560px){
+  .cs-top-toolbar{gap:9px}
+  .cs-cheatsheet-switcher{
+    width:100%;
+    overflow-x:auto;
+    padding-bottom:2px;
+  }
+  .cs-search-shell{
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:4px;
+  }
+  .cs-search-feedback{
+    min-width:0;
+    justify-content:space-between;
+  }
+  .cs-search-input-wrap{min-height:40px}
+}
+
 </style>
 <!-- Firebase (cloud progress sync) -->
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
@@ -1114,14 +1281,33 @@
 </section>
 <!-- CHEATSHEET TAB -->
 <section class="tab-content" id="tab-cheatsheet">
-<div class="subtab-nav" style="margin-bottom:12px;">
+<div class="cs-top-toolbar">
+<div class="subtab-nav cs-cheatsheet-switcher">
 <button class="subtab-btn active" onclick="switchCheatsheetView('pmp')">📘 PMP Cheatsheet</button>
 <button class="subtab-btn" onclick="switchCheatsheetView('capm')">📗 CAPM Cheatsheet</button>
+</div>
+<div class="cs-search-shell" id="cs-search-shell">
+<div class="cs-search-input-wrap">
+<span class="cs-search-icon" aria-hidden="true">🔍</span>
+<input id="cs-search-input" class="cs-search-input" type="search" autocomplete="off"
+       aria-label="Cari di Cheatsheet" placeholder="Cari di PMP Cheatsheet…">
+<button id="cs-search-clear" class="cs-search-clear" type="button"
+        aria-label="Hapus pencarian" title="Hapus pencarian">×</button>
+</div>
+<div class="cs-search-feedback" aria-live="polite">
+<span id="cs-search-count" class="cs-search-count">Ketik minimal 2 karakter</span>
+<div class="cs-search-nav" id="cs-search-nav">
+<button id="cs-search-prev" type="button" aria-label="Hasil sebelumnya" title="Hasil sebelumnya">↑</button>
+<button id="cs-search-next" type="button" aria-label="Hasil berikutnya" title="Hasil berikutnya">↓</button>
+</div>
+</div>
+</div>
 </div>
 <div class="subtab-content active" id="cs-pmp">
 <div id="cs-compact-nav" style="position:sticky;top:56px;z-index:60;background:var(--navy);padding:8px 14px 9px;margin:-22px -16px 14px;border-bottom:1px solid var(--line);box-shadow:0 8px 18px rgba(0,0,0,.15);">
 <div aria-label="Cheatsheet categories" class="cs-nav-primary" role="tablist">
 <button class="cs-group-btn active" data-cs-group="mindset" onclick="switchCSNavGroup('mindset',this)">🧠 Mindset</button>
+<button class="cs-group-btn" data-cs-group="tips" onclick="switchCSNavGroup('tips',this)">💡 Tips &amp; Tricks</button>
 <button class="cs-group-btn" data-cs-group="principles" onclick="switchCSNavGroup('principles',this)">⭐ Principles</button>
 <button class="cs-group-btn" data-cs-group="domains" onclick="switchCSNavGroup('domains',this)">🧭 Domains</button>
 <button class="cs-group-btn" data-cs-group="focus" onclick="switchCSNavGroup('focus',this)">🔁 Focus Areas</button>
@@ -1135,10 +1321,13 @@
 <button class="cs-mini-btn" onclick="jumpAndOpen('04')">📊 Delivery</button>
 <button class="cs-mini-btn" onclick="jumpAndOpen('05')">❓ First/Next</button>
 <button class="cs-mini-btn" onclick="jumpAndOpen('06')">👥 Involve</button>
+</div>
+<div class="cs-subnav" id="cs-subnav-tips">
 <button class="cs-mini-btn" onclick="jumpAndOpen('07')">🗑️ Elimination</button>
 <button class="cs-mini-btn" onclick="jumpAndOpen('08')">🔤 Keywords</button>
 <button class="cs-mini-btn" onclick="jumpAndOpen('09')">🧭 First Action</button>
 <button class="cs-mini-btn" onclick="jumpAndOpen('10')">🪤 Traps</button>
+<button class="cs-mini-btn" onclick="jumpAndOpen('p8-tips')">🎓 Exam Tips</button>
 </div>
 <div class="cs-subnav" id="cs-subnav-principles">
 <button class="cs-mini-btn" onclick="jumpAndOpen('p8-structure')">🗺️ Structure</button>
@@ -1164,7 +1353,6 @@
 <div class="cs-subnav" id="cs-subnav-exam">
 <button class="cs-mini-btn" onclick="jumpAndOpen('p8-eco')">🎯 ECO</button>
 <button class="cs-mini-btn" onclick="jumpAndOpen('p8-ai')">🤖 AI &amp; Value</button>
-<button class="cs-mini-btn" onclick="jumpAndOpen('p8-tips')">🎓 Tips &amp; Tricks</button>
 </div>
 </div>
 <div style="margin-bottom:18px;">
@@ -1370,7 +1558,7 @@
 </div>
 </div>
 <!-- 4. RISK vs ISSUE vs CHANGE -->
-<div class="uc-section-title" style="margin-top:16px;">💡 Tips &amp; Tricks</div>
+<div class="uc-section-title" id="cs-tips-heading" style="margin-top:24px;">💡 Tips &amp; Tricks</div>
 <div class="uc-block">
 <div class="uc-header" onclick="toggleUC('07')">
 <div class="uc-header-title">🗑️ Cara Eliminasi Pilihan + Mantra Sebelum Jawab</div>
@@ -11030,6 +11218,9 @@ function jumpToKA(id){
 }
 
 function jumpAndOpen(id){
+  if(typeof ExamProCheatsheetSearch!=='undefined'&&ExamProCheatsheetSearch.hasQuery()){
+    ExamProCheatsheetSearch.clear({focus:false});
+  }
   // Open the UC block if collapsed, then scroll to it
   const body=document.getElementById('uc-body-'+id);
   const icon=document.getElementById('uc-icon-'+id);
@@ -11066,6 +11257,276 @@ function toggleUC(id){
   if(icon)icon.classList.toggle('open',!isOpen);
 }
 
+
+// ─── CHEATSHEET SEARCH ──────────────────────────────────────────────────────
+const ExamProCheatsheetSearch=(function(){
+  let marks=[];
+  let currentIndex=0;
+  let debounceTimer=null;
+
+  const byId=id=>document.getElementById(id);
+  const queryInput=()=>byId('cs-search-input');
+  const roots=()=>['cs-pmp','cs-capm'].map(byId).filter(Boolean);
+  const activeRoot=()=>{
+    const wrap=byId('tab-cheatsheet');
+    return wrap?wrap.querySelector('.subtab-content.active'):null;
+  };
+  const escapeRegex=value=>value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+
+  function normalizeWhitespace(value){
+    return String(value||'').replace(/\s+/g,' ').trim();
+  }
+
+  function rememberAccordionState(root){
+    if(!root||root.dataset.searchSnapshot==='1')return;
+    root.querySelectorAll('.uc-body').forEach(body=>{
+      body.dataset.searchWasOpen=body.classList.contains('open')?'1':'0';
+    });
+    root.dataset.searchSnapshot='1';
+  }
+
+  function restoreAccordionState(root){
+    if(!root)return;
+    root.querySelectorAll('.uc-body').forEach(body=>{
+      if(body.dataset.searchWasOpen===undefined)return;
+      const shouldOpen=body.dataset.searchWasOpen==='1';
+      body.classList.toggle('open',shouldOpen);
+      const suffix=body.id&&body.id.startsWith('uc-body-')?body.id.slice(8):'';
+      const icon=suffix?byId('uc-icon-'+suffix):null;
+      if(icon)icon.classList.toggle('open',shouldOpen);
+      delete body.dataset.searchWasOpen;
+    });
+    delete root.dataset.searchSnapshot;
+  }
+
+  function removeHighlights(root){
+    if(!root)return;
+    root.querySelectorAll('mark.cs-search-mark').forEach(mark=>{
+      mark.replaceWith(document.createTextNode(mark.textContent||''));
+    });
+    root.normalize();
+  }
+
+  function resetRoot(root,restoreState){
+    if(!root)return;
+    removeHighlights(root);
+    root.querySelectorAll('.uc-block').forEach(block=>{
+      block.classList.remove('cs-search-hidden','cs-search-match');
+    });
+    if(restoreState)restoreAccordionState(root);
+  }
+
+  function setCurrent(index,scroll){
+    if(!marks.length){
+      currentIndex=0;
+      return;
+    }
+    marks.forEach(mark=>mark.classList.remove('current'));
+    currentIndex=((index%marks.length)+marks.length)%marks.length;
+    const current=marks[currentIndex];
+    current.classList.add('current');
+    if(scroll){
+      current.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+    updateFeedback();
+  }
+
+  function updateFeedback(matchBlocks){
+    const count=byId('cs-search-count');
+    const nav=byId('cs-search-nav');
+    const prev=byId('cs-search-prev');
+    const next=byId('cs-search-next');
+    const input=queryInput();
+    const query=normalizeWhitespace(input?input.value:'');
+    if(!count||!nav)return;
+
+    count.classList.remove('has-results','no-results');
+    if(query.length<2){
+      count.textContent='Ketik minimal 2 karakter';
+      nav.classList.remove('visible');
+      return;
+    }
+    if(!marks.length){
+      count.textContent='Tidak ada hasil';
+      count.classList.add('no-results');
+      nav.classList.remove('visible');
+      return;
+    }
+    const blocks=Number.isFinite(matchBlocks)?matchBlocks:
+      new Set(marks.map(mark=>mark.closest('.uc-block')).filter(Boolean)).size;
+    count.textContent=(currentIndex+1)+'/'+marks.length+' hasil · '+blocks+' bagian';
+    count.classList.add('has-results');
+    nav.classList.add('visible');
+    if(prev)prev.disabled=marks.length<2;
+    if(next)next.disabled=marks.length<2;
+  }
+
+  function highlightWithin(block,regex){
+    const walker=document.createTreeWalker(
+      block,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode(node){
+          const parent=node.parentElement;
+          if(!parent||!node.nodeValue||!node.nodeValue.trim())return NodeFilter.FILTER_REJECT;
+          if(parent.closest('script,style,noscript,textarea,input,select,option,mark'))return NodeFilter.FILTER_REJECT;
+          regex.lastIndex=0;
+          const matched=regex.test(node.nodeValue);
+          regex.lastIndex=0;
+          return matched?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT;
+        }
+      }
+    );
+    const textNodes=[];
+    while(walker.nextNode())textNodes.push(walker.currentNode);
+
+    textNodes.forEach(node=>{
+      const text=node.nodeValue;
+      regex.lastIndex=0;
+      let match,last=0;
+      const frag=document.createDocumentFragment();
+      while((match=regex.exec(text))!==null){
+        if(match.index>last)frag.appendChild(document.createTextNode(text.slice(last,match.index)));
+        const mark=document.createElement('mark');
+        mark.className='cs-search-mark';
+        mark.textContent=match[0];
+        frag.appendChild(mark);
+        marks.push(mark);
+        last=match.index+match[0].length;
+        if(match[0].length===0)regex.lastIndex++;
+      }
+      if(last<text.length)frag.appendChild(document.createTextNode(text.slice(last)));
+      node.replaceWith(frag);
+    });
+  }
+
+  function run(){
+    clearTimeout(debounceTimer);
+    const input=queryInput();
+    const query=normalizeWhitespace(input?input.value:'');
+    const clearBtn=byId('cs-search-clear');
+    const wrap=byId('tab-cheatsheet');
+    if(clearBtn)clearBtn.classList.toggle('visible',query.length>0);
+
+    marks=[];
+    currentIndex=0;
+    roots().forEach(root=>resetRoot(root,false));
+
+    if(query.length<2){
+      roots().forEach(root=>restoreAccordionState(root));
+      if(wrap)wrap.classList.remove('cs-search-active');
+      updateFeedback();
+      return;
+    }
+
+    const root=activeRoot();
+    if(!root){
+      updateFeedback();
+      return;
+    }
+    if(wrap)wrap.classList.add('cs-search-active');
+    rememberAccordionState(root);
+
+    const regex=new RegExp(escapeRegex(query),'gi');
+    let matchedBlocks=0;
+    root.querySelectorAll('.uc-block').forEach(block=>{
+      const matches=normalizeWhitespace(block.textContent).toLocaleLowerCase()
+        .includes(query.toLocaleLowerCase());
+      block.classList.toggle('cs-search-hidden',!matches);
+      block.classList.toggle('cs-search-match',matches);
+      if(!matches)return;
+
+      matchedBlocks++;
+      const body=block.querySelector('.uc-body');
+      const icon=block.querySelector('.uc-icon');
+      if(body)body.classList.add('open');
+      if(icon)icon.classList.add('open');
+      regex.lastIndex=0;
+      highlightWithin(block,regex);
+    });
+
+    if(marks.length)setCurrent(0,false);
+    updateFeedback(matchedBlocks);
+  }
+
+  function schedule(){
+    clearTimeout(debounceTimer);
+    debounceTimer=setTimeout(run,130);
+  }
+
+  function clear(options){
+    const opts=options||{};
+    clearTimeout(debounceTimer);
+    const input=queryInput();
+    if(input)input.value='';
+    roots().forEach(root=>resetRoot(root,true));
+    marks=[];
+    currentIndex=0;
+    const wrap=byId('tab-cheatsheet');
+    if(wrap)wrap.classList.remove('cs-search-active');
+    const clearBtn=byId('cs-search-clear');
+    if(clearBtn)clearBtn.classList.remove('visible');
+    updateFeedback();
+    if(opts.focus!==false&&input)input.focus();
+  }
+
+  function next(){if(marks.length)setCurrent(currentIndex+1,true)}
+  function previous(){if(marks.length)setCurrent(currentIndex-1,true)}
+
+  function updatePlaceholder(view){
+    const input=queryInput();
+    if(input)input.placeholder=view==='capm'?'Cari di CAPM Cheatsheet…':'Cari di PMP Cheatsheet…';
+  }
+
+  function onViewChange(view){
+    updatePlaceholder(view);
+    const input=queryInput();
+    if(input&&normalizeWhitespace(input.value).length>=2)run();
+    else updateFeedback();
+  }
+
+  function hasQuery(){
+    const input=queryInput();
+    return !!(input&&normalizeWhitespace(input.value).length);
+  }
+
+  function init(){
+    const input=queryInput();
+    const clearBtn=byId('cs-search-clear');
+    const prev=byId('cs-search-prev');
+    const nextBtn=byId('cs-search-next');
+    if(!input)return;
+
+    input.addEventListener('input',schedule);
+    input.addEventListener('keydown',event=>{
+      if(event.key==='Escape'){
+        event.preventDefault();
+        clear();
+      }else if(event.key==='Enter'){
+        event.preventDefault();
+        event.shiftKey?previous():next();
+      }
+    });
+    if(clearBtn)clearBtn.addEventListener('click',()=>clear());
+    if(prev)prev.addEventListener('click',previous);
+    if(nextBtn)nextBtn.addEventListener('click',next);
+    updatePlaceholder('pmp');
+    updateFeedback();
+  }
+
+  return Object.freeze({
+    init,
+    run,
+    clear,
+    next,
+    previous,
+    onViewChange,
+    hasQuery
+  });
+})();
+
+document.addEventListener('DOMContentLoaded',()=>ExamProCheatsheetSearch.init());
+
 function switchCheatsheetView(view){
   const wrap=document.getElementById('tab-cheatsheet');
   if(!wrap)return;
@@ -11076,6 +11537,7 @@ function switchCheatsheetView(view){
   const idx=view==='pmp'?0:1;
   const btns=wrap.querySelectorAll('.subtab-btn');
   if(btns[idx])btns[idx].classList.add('active');
+  if(typeof ExamProCheatsheetSearch!=='undefined')ExamProCheatsheetSearch.onViewChange(view);
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
