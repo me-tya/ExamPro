@@ -12175,6 +12175,103 @@ function categorizeQ(q){
 }
 
 
+// ── PMBOK 8 PERFORMANCE DOMAIN MAPPING FOR PMP REVIEW ───────────────────────
+// Legacy question metadata is mapped to the seven PMBOK 8 Performance Domains.
+// CAPM Review intentionally continues to use the classic Knowledge Areas.
+const PMP_PD_ORDER=['Governance','Scope','Schedule','Finance','Stakeholders','Resources','Risk'];
+const PMP_PD_EMOJI={
+  Governance:'🏛️',
+  Scope:'📋',
+  Schedule:'📅',
+  Finance:'💰',
+  Stakeholders:'🤝',
+  Resources:'👥',
+  Risk:'⚠️'
+};
+const PMP_KA_TO_PD={
+  Integration:'Governance',
+  Quality:'Governance',
+  Procurement:'Governance',
+  Scope:'Scope',
+  Schedule:'Schedule',
+  Cost:'Finance',
+  Stakeholder:'Stakeholders',
+  Communications:'Stakeholders',
+  HR:'Resources',
+  Risk:'Risk'
+};
+
+function categorizePerformanceDomain(q){
+  // Future-proofing: use explicit metadata when a question already has it.
+  const explicit=q&&(q.performanceDomain||q.pmbok8Domain);
+  if(PMP_PD_ORDER.includes(explicit))return explicit;
+
+  // Current decks mostly carry classic topic signals, so map their primary
+  // Knowledge Area to the corresponding PMBOK 8 Performance Domain.
+  const legacy=categorizeQ(q).ka;
+  return PMP_KA_TO_PD[legacy]||'Governance';
+}
+
+const PMP_PD_STUDY_TIPS={
+  Governance:{
+    pattern:'Pola salah umum: melewati tata kelola perubahan, salah menangani quality/procurement, atau tidak menjaga keselarasan rencana dan nilai proyek.',
+    focus:[
+      'Perubahan terhadap baseline harus melalui mekanisme change control dan dokumentasi yang sesuai.',
+      'Gunakan governance untuk memastikan keputusan, eskalasi, quality assurance, sourcing, dan penutupan proyek memiliki pemilik serta kriteria yang jelas.',
+      'Saat beberapa rencana bertentangan, integrasikan kembali keputusan berdasarkan tujuan, nilai, risiko, dan otoritas yang tepat.'
+    ]
+  },
+  Scope:{
+    pattern:'Pola salah umum: membiarkan scope creep, gold plating, atau tidak menelusuri kebutuhan ke acceptance criteria.',
+    focus:[
+      'Fitur tambahan tanpa persetujuan bukan nilai tambah otomatis; evaluasi melalui backlog atau change control.',
+      'Gunakan requirement, scope statement, WBS, RTM, dan acceptance criteria sesuai konteks pertanyaan.',
+      'Ketika kebutuhan berubah, nilai dampaknya terhadap value, schedule, finance, risk, dan stakeholder.'
+    ]
+  },
+  Schedule:{
+    pattern:'Pola salah umum: salah membaca critical path, estimasi, velocity, atau memilih teknik compression yang tidak tepat.',
+    focus:[
+      'Bedakan fast tracking, crashing, float, critical path, milestone, iteration, dan release planning.',
+      'Pada agile, gunakan velocity, burndown/burnup, dan kapasitas tim—bukan memaksakan baseline predictive tanpa tailoring.',
+      'Analisis penyebab deviasi jadwal sebelum memilih tindakan korektif.'
+    ]
+  },
+  Finance:{
+    pattern:'Pola salah umum: salah membaca CPI/SPI, memilih rumus EAC, atau membedakan contingency dan management reserve.',
+    focus:[
+      'Pahami makna angka, bukan hanya rumus: CPI < 1 berarti biaya tidak efisien; SPI < 1 berarti tertinggal dalam nilai pekerjaan.',
+      'Pilih formula forecast sesuai asumsi apakah kinerja biaya saat ini akan berlanjut.',
+      'Hubungkan keputusan ke total value, funding, reserve, cash flow, dan governance keuangan.'
+    ]
+  },
+  Stakeholders:{
+    pattern:'Pola salah umum: memakai komunikasi satu arah untuk masalah engagement, mengabaikan stakeholder baru, atau langsung eskalasi tanpa memahami kebutuhan.',
+    focus:[
+      'Identifikasi dan analisis stakeholder berlangsung sepanjang proyek, bukan hanya saat initiating.',
+      'Tailor komunikasi berdasarkan kebutuhan, pengaruh, tingkat engagement, dan konteks budaya.',
+      'Bangun keselarasan lewat dialog, feedback loop, transparansi, dan pengelolaan ekspektasi.'
+    ]
+  },
+  Resources:{
+    pattern:'Pola salah umum: mengambil alih pekerjaan tim, salah memilih gaya kepemimpinan, atau mengatasi konflik tanpa mencari akar masalah.',
+    focus:[
+      'Pemimpin proyek membangun kemampuan tim: coaching, mentoring, empowerment, dan penghilangan impediment.',
+      'Sesuaikan leadership style dengan kematangan, pengalaman, dan kebutuhan tim.',
+      'Kelola resource availability, beban kerja, konflik, motivasi, dan lingkungan kerja secara proaktif.'
+    ]
+  },
+  Risk:{
+    pattern:'Pola salah umum: tertukar antara risk dan issue, salah memilih response, atau berhenti memantau setelah respons diterapkan.',
+    focus:[
+      'Risk belum terjadi; issue sudah terjadi. Gunakan register/log dan tindakan yang sesuai.',
+      'Pilih respons berdasarkan jenis ancaman atau peluang, ownership, urgency, dan residual/secondary risk.',
+      'Risk management berlangsung terus-menerus, termasuk risiko keamanan, compliance, sustainability, dan external environment.'
+    ]
+  }
+};
+
+
 // ── REVIEW: per-set improvement tips (targeted study guide, NOT cheatsheet) ────
 const KA_STUDY_TIPS = {
   Integration:{
@@ -12374,19 +12471,20 @@ function refreshReview(){
     const setStatus=setAns===0?'<span class="rv-ka-badge badge-na">Not Started</span>':setPct>=70?'<span class="rv-ka-badge badge-strong">✅ Passed</span>':'<span class="rv-ka-badge badge-weak">❌ Not Passed</span>';
     const isFirst=setIdx===0;
 
-    // Group by KA
-    const kaMap={};
+    // Group PMP questions by the seven PMBOK 8 Performance Domains.
+    const pdMap={};
     const ecoMap={People:{t:0,c:0},Process:{t:0,c:0},Business:{t:0,c:0}};
     items.forEach(x=>{
       const cat=categorizeQ(x.question);
-      if(!kaMap[cat.ka])kaMap[cat.ka]={t:0,c:0};
-      kaMap[cat.ka].t++;if(x.isEffectiveCorrect)kaMap[cat.ka].c++;
+      const pd=categorizePerformanceDomain(x.question);
+      if(!pdMap[pd])pdMap[pd]={t:0,c:0};
+      pdMap[pd].t++;if(x.isEffectiveCorrect)pdMap[pd].c++;
       if(ecoMap[cat.eco]){ecoMap[cat.eco].t++;if(x.isEffectiveCorrect)ecoMap[cat.eco].c++;}
     });
 
-    // Strengths (>=70%) and Weaknesses (<70%)
-    const withPct=KA_ORDER.filter(ka=>kaMap[ka]&&kaMap[ka].t>0).map(ka=>{
-      const d=kaMap[ka],p=Math.round(d.c/d.t*100);return{ka,pct:p,c:d.c,t:d.t};
+    // Strengths (>=70%) and Weaknesses (<70%) by Performance Domain.
+    const withPct=PMP_PD_ORDER.filter(pd=>pdMap[pd]&&pdMap[pd].t>0).map(pd=>{
+      const d=pdMap[pd],p=Math.round(d.c/d.t*100);return{pd,pct:p,c:d.c,t:d.t};
     });
     const strong=withPct.filter(x=>x.pct>=70).sort((a,b)=>b.pct-a.pct);
     const weak=withPct.filter(x=>x.pct<70).sort((a,b)=>a.pct-b.pct);
@@ -12396,16 +12494,18 @@ function refreshReview(){
     if(setAns===0){
       body='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">No questions answered yet di set ini.</div>';
     } else {
-      // KA bars
-      body+=`<div class="rv-section"><div class="rv-title">📚 Accuracy by Knowledge Area</div><div class="rv-card">`;
-      KA_ORDER.forEach(ka=>{
-        const d=kaMap[ka];
+      // PMBOK 8 Performance Domain bars
+      body+=`<div class="rv-section"><div class="rv-title">📚 Akurasi berdasarkan Performance Domain PMBOK 8</div>
+        <div style="font-size:11px;color:var(--muted);margin:-5px 0 9px;">Setiap soal ditempatkan pada domain utama yang paling dominan; satu skenario tetap dapat menyentuh beberapa domain.</div>
+        <div class="rv-card">`;
+      PMP_PD_ORDER.forEach(pd=>{
+        const d=pdMap[pd];
         if(!d){
-          body+=`<div class="rv-ka-row"><div class="rv-ka-name">${KA_EMOJI[ka]||'•'} ${ka}</div><div class="rv-ka-bar-wrap"><div class="rv-ka-bar" style="width:0%;background:rgba(148,160,194,.2);"></div></div><div class="rv-ka-pct" style="color:var(--muted);">—</div><div class="rv-ka-count" style="color:var(--muted);">0 soal</div><span class="rv-ka-badge badge-na">—</span></div>`;
+          body+=`<div class="rv-ka-row"><div class="rv-ka-name">${PMP_PD_EMOJI[pd]||'•'} ${pd}</div><div class="rv-ka-bar-wrap"><div class="rv-ka-bar" style="width:0%;background:rgba(148,160,194,.2);"></div></div><div class="rv-ka-pct" style="color:var(--muted);">—</div><div class="rv-ka-count" style="color:var(--muted);">0 soal</div><span class="rv-ka-badge badge-na">—</span></div>`;
           return;
         }
         const p=Math.round(d.c/d.t*100);
-        body+=`<div class="rv-ka-row"><div class="rv-ka-name">${KA_EMOJI[ka]||'•'} ${ka}</div><div class="rv-ka-bar-wrap"><div class="rv-ka-bar" style="width:${p}%;background:${COL(p)};"></div></div><div class="rv-ka-pct" style="color:${COL(p)};">${p}%</div><div class="rv-ka-count">${d.c}/${d.t}</div>${BADGE(p)}</div>`;
+        body+=`<div class="rv-ka-row"><div class="rv-ka-name">${PMP_PD_EMOJI[pd]||'•'} ${pd}</div><div class="rv-ka-bar-wrap"><div class="rv-ka-bar" style="width:${p}%;background:${COL(p)};"></div></div><div class="rv-ka-pct" style="color:${COL(p)};">${p}%</div><div class="rv-ka-count">${d.c}/${d.t}</div>${BADGE(p)}</div>`;
       });
       body+=`</div></div>`;
 
@@ -12422,23 +12522,23 @@ function refreshReview(){
       body+=`<div class="rv-highlight-row">
         <div class="rv-hl-card">
           <div class="rv-hl-title" style="color:var(--teal);">🏆 Area Terkuat</div>
-          ${strong.length>0?strong.slice(0,4).map(x=>`<div class="rv-hl-item"><span style="color:var(--teal);font-family:Space Mono,monospace;font-size:11px;">${x.pct}%</span> ${KA_EMOJI[x.ka]||''} ${x.ka} <span style="color:var(--muted);font-size:11px;">(${x.c}/${x.t})</span></div>`).join(''):'<div class="rv-hl-item" style="color:var(--muted);">No areas passed yet</div>'}
+          ${strong.length>0?strong.slice(0,4).map(x=>`<div class="rv-hl-item"><span style="color:var(--teal);font-family:Space Mono,monospace;font-size:11px;">${x.pct}%</span> ${PMP_PD_EMOJI[x.pd]||''} ${x.pd} <span style="color:var(--muted);font-size:11px;">(${x.c}/${x.t})</span></div>`).join(''):'<div class="rv-hl-item" style="color:var(--muted);">Belum ada domain yang mencapai 70%</div>'}
         </div>
         <div class="rv-hl-card">
           <div class="rv-hl-title" style="color:var(--coral);">⚠️ Perlu Ditingkatkan</div>
-          ${weak.length>0?weak.slice(0,4).map(x=>`<div class="rv-hl-item"><span style="color:var(--coral);font-family:Space Mono,monospace;font-size:11px;">${x.pct}%</span> ${KA_EMOJI[x.ka]||''} ${x.ka} <span style="color:var(--muted);font-size:11px;">(${x.c}/${x.t})</span></div>`).join(''):'<div class="rv-hl-item" style="color:var(--teal);">Semua area sudah ≥70%! 🎉</div>'}
+          ${weak.length>0?weak.slice(0,4).map(x=>`<div class="rv-hl-item"><span style="color:var(--coral);font-family:Space Mono,monospace;font-size:11px;">${x.pct}%</span> ${PMP_PD_EMOJI[x.pd]||''} ${x.pd} <span style="color:var(--muted);font-size:11px;">(${x.c}/${x.t})</span></div>`).join(''):'<div class="rv-hl-item" style="color:var(--teal);">Semua Performance Domain sudah ≥70%! 🎉</div>'}
         </div>
       </div>`;
 
-      // Improvement tips (only for weak KAs)
+      // Improvement tips for weak PMBOK 8 Performance Domains.
       if(weak.length>0){
-        body+=`<div class="rv-section"><div class="rv-title">🎯 Tips Perbaikan Untuk Area yang Lemah</div>`;
-        weak.forEach(({ka,pct,c,t})=>{
-          const tips=KA_STUDY_TIPS[ka]; if(!tips)return;
+        body+=`<div class="rv-section"><div class="rv-title">🎯 Tips Perbaikan Performance Domain</div>`;
+        weak.forEach(({pd,pct,c,t})=>{
+          const tips=PMP_PD_STUDY_TIPS[pd]; if(!tips)return;
           body+=`<div class="rv-tip-block rv-card" style="margin-bottom:10px;">
             <div class="rv-tip-header">
               <div>
-                <div class="rv-tip-title">${KA_EMOJI[ka]||'•'} ${ka} &nbsp;<span style="font-family:Space Mono,monospace;font-size:11px;color:var(--coral);">${pct}% (${c}/${t})</span></div>
+                <div class="rv-tip-title">${PMP_PD_EMOJI[pd]||'•'} ${pd} &nbsp;<span style="font-family:Space Mono,monospace;font-size:11px;color:var(--coral);">${pct}% (${c}/${t})</span></div>
                 <div class="rv-tip-sub" style="color:var(--coral);">${tips.pattern}</div>
               </div>
             </div>
@@ -12456,7 +12556,7 @@ function refreshReview(){
             body+=`<div class="rv-tip-block rv-card" style="margin-bottom:10px;">
               <div class="rv-tip-header">
                 <div>
-                  <div class="rv-tip-title">${eco==='People'?'👤':'eco'==='Process'?'⚙️':'🏢'} ${eco} &nbsp;<span style="font-family:Space Mono,monospace;font-size:11px;color:var(--coral);">${p}% (${d.c}/${d.t})</span></div>
+                  <div class="rv-tip-title">${eco==='People'?'👤':eco==='Process'?'⚙️':'🏢'} ${eco} &nbsp;<span style="font-family:Space Mono,monospace;font-size:11px;color:var(--coral);">${p}% (${d.c}/${d.t})</span></div>
                   <div class="rv-tip-sub" style="color:var(--coral);">${tips.pattern}</div>
                 </div>
               </div>
@@ -12467,7 +12567,7 @@ function refreshReview(){
         }
       } else {
         body+=`<div style="padding:14px 16px;background:rgba(63,182,138,.1);border:1px solid var(--teal);border-radius:10px;font-size:13.5px;color:var(--teal);">
-          🎉 Semua Knowledge Area di set ini sudah ≥70%! Fokus berikutnya: <b>perkuat akurasi ke 90%+</b> di area yang masih di bawah 90%, atau lanjut ke set soal berikutnya.
+          🎉 Semua Performance Domain di set ini sudah ≥70%! Fokus berikutnya: <b>perkuat akurasi ke 90%+</b> pada domain yang masih di bawah 90%, atau lanjut ke set soal berikutnya.
         </div>`;
       }
     }
