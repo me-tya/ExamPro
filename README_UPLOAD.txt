@@ -1,8 +1,16 @@
-ExamPro GitHub Pages package
+ExamPro — PMP ECO July 2026
 
-Upload the CONTENTS of this folder to the repository root:
+Upload every item in this folder to the repository root:
 - index.html
 - .nojekyll
-- data/ (with all three JavaScript files)
+- data/ (all four JavaScript files)
 
-Do not upload only index.html. The Exam tab requires the data folder.
+Do not rename or move the data folder.
+
+PMP Exam blueprint implemented:
+- 180 total questions
+- 170 scored + 10 hidden pretest
+- People 33% / Process 41% / Business Environment 26%
+- Predictive 40% / Adaptive-Agile + Hybrid 60%
+- 4 case studies / 20 questions in the first section
+- all 26 ECO tasks represented
