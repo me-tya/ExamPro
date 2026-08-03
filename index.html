@@ -753,6 +753,16 @@
   }
 }
 
+
+/* PMP 8: display extracted question text as a normal flowing paragraph.
+   Content remains unchanged; only source PDF line breaks are collapsed by CSS. */
+#tab-pmp8 .q-text{
+  white-space: normal;
+  width: 100%;
+  max-width: none;
+  overflow-wrap: break-word;
+}
+
 </style>
 <!-- Firebase (cloud progress sync) -->
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
