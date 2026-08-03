@@ -1,22 +1,21 @@
-ExamPro — PMP ECO July 2026
+ExamPro PMP ECO 2026 — Step 1: Question Quality Gate
 
-Upload every item in this folder to the repository root:
-- index.html
-- .nojekyll
-- data/ (all four JavaScript files)
+UPLOAD ALL FILES/FOLDERS TO THE ROOT OF THE GITHUB REPOSITORY:
 
-Do not rename or move the data folder.
+index.html
+.nojekyll
+data/
+  exam-bank-core.js
+  exam-bank-qbank.js
+  exam-bank-pmbok8.js
+  exam-bank-eco2026.js
+  question-quality-gate.js
 
-PMP Exam blueprint implemented:
-- 180 total questions
-- 170 scored + 10 hidden pretest
-- People 33% / Process 41% / Business Environment 26%
-- Predictive 40% / Adaptive-Agile + Hybrid 60%
-- 4 case studies / 20 questions in the first section
-- all 26 ECO tasks represented
+IMPORTANT:
+- The new file data/question-quality-gate.js is required.
+- Replace index.html with this version.
+- Keep every existing bank file in the data folder.
+- GitHub Pages source: main branch / root.
+- After deployment, press Ctrl+F5 to bypass the old browser cache.
 
-CASE STUDY FIX:
-- Added full narratives for Case Study 2 and Case Study 3.
-- Empty case studies are rejected by the generator.
-- Old saved sessions resolve the narrative from the updated case bank.
-- Replace index.html and data/exam-bank-eco2026.js on GitHub.
+The Quality Gate runs automatically and blocks Start Exam/New Set only when a critical bank or generator problem is detected.

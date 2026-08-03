@@ -72,13 +72,22 @@ EXAM_FULL_BANK.forEach((q,i)=>{
   };
 });
 
+function ecoNormalizeCaseAnswer(ans){
+  if(Array.isArray(ans))return ans.map(String);
+  if(typeof ans==='string'&&ans.includes(','))return ans.split(',').map(x=>x.trim()).filter(Boolean);
+  return ans;
+}
+function ecoCaseResponseType(ans){
+  return Array.isArray(ecoNormalizeCaseAnswer(ans))?'multi':'single';
+}
 const EXAM_CASE_GROUPS=[];
 EXAM_FULL_BANK.filter(q=>q.type==='casestudy').forEach(parent=>{
   const gid='core-case-'+parent.bankId;
   const items=(parent.questions||[]).map((sq,si)=>{
     const temp={domain:parent.domain,approach:parent.approach,q:sq.q,exp:(sq.exp||parent.exp||''),scenario:parent.scenario,source:parent.source,bankId:parent.bankId+'::'+(si+1)};
     const task=inferEcoTask(temp),app=ecoApproach(temp);
-    return {bankId:temp.bankId,source:parent.source,n:parent.n,type:'caseitem',caseGroupId:gid,caseTitle:'Case Study',scenario:parent.scenario,casePosition:si+1,caseTotal:(parent.questions||[]).length,q:sq.q,opts:sq.opts||{},ans:sq.ans,exp:sq.exp||parent.exp||'',domain:canonicalDomain(parent),approach:app,approachGroup:app==='Predictive'?'Predictive':'Adaptive',ecoTask:task,ecoTaskName:ECO2026_TASKS[task],ecoTopics:{ai:false,sustainability:false,value:false}};
+    const normalizedAns=ecoNormalizeCaseAnswer(sq.ans),responseType=ecoCaseResponseType(sq.ans);
+    return {bankId:temp.bankId,source:parent.source,n:parent.n,type:'caseitem',responseType:responseType,pick:responseType==='multi'?normalizedAns.length:undefined,caseGroupId:gid,caseTitle:'Case Study',scenario:parent.scenario,casePosition:si+1,caseTotal:(parent.questions||[]).length,q:sq.q,opts:sq.opts||{},ans:normalizedAns,exp:sq.exp||parent.exp||'',domain:canonicalDomain(parent),approach:app,approachGroup:app==='Predictive'?'Predictive':'Adaptive',ecoTask:task,ecoTaskName:ECO2026_TASKS[task],ecoTopics:{ai:false,sustainability:false,value:false}};
   });
   {const scenario=String(parent.scenario||'').trim();items.forEach(x=>x.scenario=scenario);EXAM_CASE_GROUPS.push({id:gid,title:'Case Study',scenario,source:parent.source,items});}
 });
@@ -89,7 +98,8 @@ const _publishedGroups={};
   if(!_publishedGroups[gid])_publishedGroups[gid]={id:gid,title:raw.caseTitle,scenario:ecoPublishedCaseText(raw),source:'PMP Exam Prep Simplified (2026) - Full Length Mock',items:[]};
   const norm=EXAM_FULL_BANK.find(q=>q.bankId==='book-mock-'+raw.n);
   if(!norm)return;
-  _publishedGroups[gid].items.push(Object.assign({},norm,{type:'caseitem',caseGroupId:gid,caseTitle:raw.caseTitle,scenario:ecoPublishedCaseText(raw),casePosition:_publishedGroups[gid].items.length+1,caseTotal:6,q:raw.q,opts:raw.opts||{},ans:raw.ans,exp:raw.exp||''}));
+  {const normalizedAns=ecoNormalizeCaseAnswer(raw.ans),responseType=ecoCaseResponseType(raw.ans);
+  _publishedGroups[gid].items.push(Object.assign({},norm,{type:'caseitem',responseType:responseType,pick:responseType==='multi'?normalizedAns.length:undefined,caseGroupId:gid,caseTitle:raw.caseTitle,scenario:ecoPublishedCaseText(raw),casePosition:_publishedGroups[gid].items.length+1,caseTotal:6,q:raw.q,opts:raw.opts||{},ans:normalizedAns,exp:raw.exp||''}));}
 });
 Object.values(_publishedGroups).forEach(g=>{g.scenario=String(g.scenario||'').trim();g.items.forEach(x=>x.scenario=g.scenario);if(g.scenario.length>=80&&g.items.length>=5)EXAM_CASE_GROUPS.push(g);});
 const EXAM_INDEPENDENT_BANK=EXAM_FULL_BANK.filter(q=>q.type!=='casestudy'&&!q.isCaseLinked);

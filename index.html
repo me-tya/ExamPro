@@ -2006,7 +2006,10 @@
 <div style="font-size:13px;color:var(--muted);line-height:1.6;">
             Sesuai PMP Examination Content Outline PMI · July 2026<br/>
 <span style="color:var(--amber);">People 33%</span>  ·  <span style="color:var(--teal);">Process 41%</span>  ·  <span style="color:var(--coral);">Business Env 26%</span>
-<div id="exam-bank-summary" style="margin-top:9px;padding-top:9px;border-top:1px solid rgba(255,255,255,.08);font-size:12px;color:var(--ink);line-height:1.5;">🎲 Dynamic source bank: 550 questions + 7 case-study groups. Each New Set builds a validated 180-question exam with all 26 ECO tasks, 40% predictive, 60% adaptive/agile + hybrid, and 10 hidden pretest questions.</div></div>
+<div id="exam-bank-summary" style="margin-top:9px;padding-top:9px;border-top:1px solid rgba(255,255,255,.08);font-size:12px;color:var(--ink);line-height:1.5;">
+🎲 Dynamic source bank: 550 questions + 7 case-study groups. Each New Set builds a validated 180-question exam with all 26 ECO tasks, 40% predictive, 60% adaptive/agile + hybrid, and 10 hidden pretest questions.
+<div id="exam-quality-gate-status" role="status" aria-live="polite" style="margin-top:7px;color:var(--muted);font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.02em;">⏳ Memvalidasi question bank...</div>
+</div></div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
 <div style="background:var(--navy-2);border:1px solid var(--line);border-radius:10px;padding:13px;text-align:center;">
@@ -12615,6 +12618,7 @@ function refreshReview(){
 <script src="./data/exam-bank-qbank.js"></script>
 <script src="./data/exam-bank-pmbok8.js"></script>
 <script src="./data/exam-bank-eco2026.js"></script>
+<script src="./data/question-quality-gate.js"></script>
 <script>
 
 if(typeof EXAM_FULL_BANK==='undefined'||!Array.isArray(EXAM_FULL_BANK)||EXAM_FULL_BANK.length!==550||typeof EXAM_ECO_BANK_STATS==='undefined'||EXAM_ECO_BANK_STATS.tasks!==26){
@@ -13529,7 +13533,7 @@ ans:'A',exp:`Setelah solusi diverifikasi memenuhi acceptance criteria, business 
 
 // ─── PMP EXAM ENGINE v4 — ECO JULY 2026 ────────────────────────────────────
 const EXAM_STORAGE_KEY='pmp_exam_session';
-const EXAM_SCHEMA_VERSION=4;
+const EXAM_SCHEMA_VERSION=5;
 const EXAM_TOTAL=180,EXAM_SCORED_TOTAL=170,EXAM_PRETEST_TOTAL=10;
 const EXAM_SLOW=90,EXAM_SECTION_LIMITS=[80*60,80*60,80*60];
 const EXAM_SECTION_STARTS=[0,20,100],EXAM_SECTION_ENDS=[19,99,179];
@@ -13625,7 +13629,10 @@ function toggleExamPause(){
 // ── Session ────────────────────────────────────────────────────────────────
 function migrateExamSession(s){
   if(!s||s.schemaVersion!==EXAM_SCHEMA_VERSION||!Array.isArray(s.examQuestions)||s.examQuestions.length!==EXAM_TOTAL)return null;
-  const check=typeof validateEco2026ExamSet==='function'?validateEco2026ExamSet(s.examQuestions):{ok:true};if(!check.ok)return null;
+  const check=typeof ExamProQualityGate!=='undefined'
+    ?ExamProQualityGate.validateSavedExamSet(s.examQuestions)
+    :(typeof validateEco2026ExamSet==='function'?validateEco2026ExamSet(s.examQuestions):{ok:true});
+  if(!check.ok)return null;
   return s;
 }
 function saveExamSession(){
@@ -13641,7 +13648,7 @@ function clearExamSession(){try{localStorage.removeItem(EXAM_STORAGE_KEY);}catch
 // ── Scoring ────────────────────────────────────────────────────────────────
 function examScoreQuestion(q,ans){
   if(ans===null||ans===undefined)return null;
-  if(q.type==='multi'){const arr=Array.isArray(ans)?ans:[ans];return arr.slice().sort().join(',')===(q.ans||[]).slice().sort().join(',');}
+  if(q.type==='multi'||q.responseType==='multi'){const arr=Array.isArray(ans)?ans:[ans];return arr.slice().sort().join(',')===(q.ans||[]).slice().sort().join(',');}
   if(q.type==='matching'){if(typeof ans!=='object'||Array.isArray(ans))return false;return Object.keys(q.ans||{}).every(k=>String(ans[k])===String(q.ans[k]));}
   if(q.type==='sequence'){return Array.isArray(ans)&&ans.join(',')===(q.ans||[]).join(',');}
   return ans===q.ans;
@@ -13669,6 +13676,7 @@ function _initExamState(){
   examPendingToggles=[];examMatchPending={};examMatchSelected=null;examSeqOrder=[];
 }
 function startExam(resume){
+  if(typeof ExamProQualityGate!=='undefined'&&!ExamProQualityGate.ensureReady({generatorRuns:1}))return;
   stopAllTimers();
   if(!resume){examQuestions=shuffleExam();_initExamState();}
   else{
@@ -13682,6 +13690,7 @@ function startExam(resume){
   examSectionStartedAt[examGetSection(examCurrent)]=Date.now();startSectionTimer();startAutoSave();buildExamJumpGrid();renderExam();
 }
 function generateNewExam(){
+  if(typeof ExamProQualityGate!=='undefined'&&!ExamProQualityGate.ensureReady({generatorRuns:1}))return;
   if(!confirm('Create a new ECO 2026 question set? Current progress will be lost.'))return;
   let candidate;try{candidate=shuffleExam();}catch(e){console.error(e);alert('Failed to generate a valid ECO 2026 set. Please reload and try again.');return;}
   clearExamSession();stopAllTimers();examQuestions=candidate;_initExamState();examActive=true;examIsPaused=false;
@@ -13704,7 +13713,7 @@ function renderExam(){
   const accum=examQAccum[examCurrent]||0,qm=Math.floor(accum/60),qs=accum%60;el('exam-q-timer').textContent=qm+':'+(qs<10?'0':'')+qs;
   el('exam-prev-btn').disabled=examCurrent<=examLockedBefore;
   if(examCurrent===19)el('exam-next-btn').textContent='End Case Section ›';else if(examCurrent===99)el('exam-next-btn').textContent='End Section 2 ›';else if(examCurrent===179)el('exam-next-btn').textContent='View Results';else el('exam-next-btn').textContent='Next ›';
-  if(q.type==='multi')examPendingToggles=Array.isArray(examAnswers[examCurrent])?[...examAnswers[examCurrent]]:[];
+  if(q.type==='multi'||q.responseType==='multi')examPendingToggles=Array.isArray(examAnswers[examCurrent])?[...examAnswers[examCurrent]]:[];
   else if(q.type==='matching'){examMatchPending=examAnswers[examCurrent]&&typeof examAnswers[examCurrent]==='object'&&!Array.isArray(examAnswers[examCurrent])?{...examAnswers[examCurrent]}:{};examMatchSelected=null;}
   else if(q.type==='sequence')examSeqOrder=Array.isArray(examAnswers[examCurrent])?[...examAnswers[examCurrent]]:[];
   else examPendingToggles=[];
@@ -13983,7 +13992,8 @@ function renderExamCaseItem(q,wrap){
   label.innerHTML='<span>CASE '+(q.caseGroupOrder||1)+' · '+(q.caseTitle||'Scenario')+'</span><span>'+q.casePosition+'/'+q.caseTotal+'</span>';scenBox.appendChild(label);
   const scenario=(typeof ecoResolveCaseScenario==='function'?ecoResolveCaseScenario(q):String(q.scenario||q.caseText||'').trim());
   const txt=document.createElement('div');txt.style.cssText='font-size:12.8px;color:#20243A;line-height:1.62;white-space:pre-wrap;';txt.textContent=scenario||'Case study context is unavailable. Please create a new set.';scenBox.appendChild(txt);wrap.appendChild(scenBox);
-  const qt=document.createElement('div');qt.style.cssText='font-family:"Source Serif 4",serif;font-size:16px;color:#11182B;line-height:1.55;margin:2px 0 12px;font-weight:600;';qt.textContent=q.q||'';wrap.appendChild(qt);renderExamSingle(q,wrap);
+  const qt=document.createElement('div');qt.style.cssText='font-family:"Source Serif 4",serif;font-size:16px;color:#11182B;line-height:1.55;margin:2px 0 12px;font-weight:600;';qt.textContent=q.q||'';wrap.appendChild(qt);
+  if(q.responseType==='multi')renderExamMulti(q,wrap);else renderExamSingle(q,wrap);
 }
 
 // ── Feedback ───────────────────────────────────────────────────────────────
@@ -13993,7 +14003,7 @@ function renderExamFeedback(){
   const ok=examScoreQuestion(q,chosen);fb.classList.add('show');fb.classList.toggle('correct',ok);fb.classList.toggle('wrong',!ok);
   if(q.type==='matching')fbt.innerHTML=ok?'✅ All pairs correct!':'❌ Some pairs are incorrect.';
   else if(q.type==='sequence')fbt.innerHTML=ok?'✅ Correct sequence!':'❌ Incorrect — correct order: <u>'+(q.ans||[]).join(' → ')+'</u>';
-  else{const correctDisplay=q.type==='multi'?(q.ans||[]).join(' & '):q.ans;fbt.innerHTML=ok?'✅ Correct!'+(examSlowFlags[examCurrent]?' <span style="color:var(--warn);font-size:11px;">Answered slowly</span>':''):'❌ Incorrect — correct answer: <u>'+correctDisplay+'</u>';}
+  else{const isMulti=q.type==='multi'||q.responseType==='multi',correctDisplay=isMulti?(q.ans||[]).join(' & '):q.ans;fbt.innerHTML=ok?'✅ Correct!'+(examSlowFlags[examCurrent]?' <span style="color:var(--warn);font-size:11px;">Answered slowly</span>':''):'❌ Incorrect — correct answer: <u>'+correctDisplay+'</u>';}
   fbe.innerHTML=q.exp||'';
 }
 
