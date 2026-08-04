@@ -142,6 +142,14 @@
   @media(max-width:520px){.dash-grid{grid-template-columns:1fr;}}
   .set-card{background:var(--navy-2);border:1px solid var(--line);border-radius:var(--radius);padding:15px;cursor:pointer;transition:border-color .2s;}
   .set-card:hover{border-color:var(--amber);}
+  .set-card-wide{grid-column:1 / -1;padding:16px 18px;}
+  .set-card-wide .set-card-wide-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(210px,.65fr);gap:18px;align-items:center;}
+  .set-card-wide .set-card-top{margin-bottom:6px;}
+  .set-card-wide .prog-bar-wrap{margin-top:0;height:8px;}
+  .set-card-wide-note{font-size:11px;color:var(--muted);margin-top:5px;}
+  @media(max-width:620px){
+    .set-card-wide .set-card-wide-row{grid-template-columns:1fr;gap:10px;}
+  }
   .set-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;}
   .set-card-label{font-family:'Space Mono',monospace;font-size:11px;color:var(--amber);letter-spacing:.1em;text-transform:uppercase;}
   .set-badge{font-size:11px;padding:3px 8px;border-radius:999px;font-weight:600;}
@@ -367,6 +375,8 @@
 
 
   .rv-set-panel{margin-bottom:12px;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
+  .rv-set-panel[data-set-id="pmpsims"]{border-color:rgba(232,163,61,.45);}
+  .rv-set-panel[data-set-id="pmpsims"] .rv-set-header{background:linear-gradient(90deg,rgba(232,163,61,.11),var(--navy-2) 55%);}
   .rv-set-header{background:var(--navy-2);padding:12px 14px;cursor:pointer;
     display:flex;justify-content:space-between;align-items:center;gap:8px;
     transition:background .15s;user-select:none;flex-wrap:wrap;}
@@ -1039,6 +1049,19 @@
 <div class="set-card-sub" id="dash-sub-pmp8">No questions answered yet</div>
 <div class="prog-bar-wrap"><div class="prog-bar" id="dash-bar-pmp8" style="width:0%;background:var(--coral);"></div></div>
 </div>
+<div class="set-card set-card-wide" onclick="switchTab('pmpsims')">
+<div class="set-card-wide-row">
+<div>
+<div class="set-card-top"><div class="set-card-label">PMP SIMS · FULL-LENGTH MOCK</div><span class="set-badge badge-none" id="dash-badge-pmpsims">⏳ Not Started</span></div>
+<div class="set-card-score" id="dash-score-pmpsims">0/180</div>
+<div class="set-card-sub" id="dash-sub-pmpsims">No questions answered yet</div>
+</div>
+<div>
+<div class="prog-bar-wrap"><div class="prog-bar" id="dash-bar-pmpsims" style="width:0%;background:var(--coral);"></div></div>
+<div class="set-card-wide-note">180 questions · full mock simulation · case study and special question types</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 <!-- Key Metrics -->
@@ -1054,7 +1077,7 @@
 </div>
 <div class="dash-stat"><div class="dash-stat-num" id="dash-total-accuracy">—</div><div class="dash-stat-label">Avg. Accuracy</div></div>
 <div class="dash-stat"><div class="dash-stat-num" id="dash-total-coverage">0%</div><div class="dash-stat-label" id="dash-coverage-label">Coverage (all PMP sets)</div></div>
-<div class="dash-stat"><div class="dash-stat-num" id="dash-sets-pass">0/8</div><div class="dash-stat-label">Sets Passed (≥70%)</div></div>
+<div class="dash-stat"><div class="dash-stat-num" id="dash-sets-pass">0/9</div><div class="dash-stat-label">Sets Passed (≥70%)</div></div>
 </div>
 </div>
 <!-- Accuracy comparison -->
@@ -1069,6 +1092,7 @@
 <div class="acc-row"><div class="acc-label">PMP 6</div><div class="acc-bar-outer"><div class="acc-bar-inner" id="acc-bar-pmp6" style="width:0%;"></div></div><div class="acc-pct" id="acc-pct-pmp6">—</div></div>
 <div class="acc-row"><div class="acc-label">PMP 7</div><div class="acc-bar-outer"><div class="acc-bar-inner" id="acc-bar-pmp7" style="width:0%;"></div></div><div class="acc-pct" id="acc-pct-pmp7">—</div></div>
 <div class="acc-row"><div class="acc-label">PMP 8</div><div class="acc-bar-outer"><div class="acc-bar-inner" id="acc-bar-pmp8" style="width:0%;"></div></div><div class="acc-pct" id="acc-pct-pmp8">—</div></div>
+<div class="acc-row"><div class="acc-label">PMP Sims</div><div class="acc-bar-outer"><div class="acc-bar-inner" id="acc-bar-pmpsims" style="width:0%;"></div></div><div class="acc-pct" id="acc-pct-pmpsims">—</div></div>
 </div>
 </div>
 <!-- Recommendations -->
@@ -1094,7 +1118,7 @@
 <div class="milestone locked" id="ms-pass2">🥈 Pass 2 Sets</div>
 <div class="milestone locked" id="ms-pass4">🥇 Pass 4 Sets</div>
 <div class="milestone locked" id="ms-pass6">🏅 Pass 6 Sets</div>
-<div class="milestone locked" id="ms-passall">🏆 All 8 Sets Passed</div>
+<div class="milestone locked" id="ms-passall">🏆 All 9 Sets Passed</div>
 </div>
 </div>
 </div><!-- /ov-pmp -->
@@ -11166,7 +11190,10 @@ const SET_CONFIG=[
   {id:'pmp7',label:'PMP 7',title:'PMP Topic Questions 7',storageKey:'pmp_q1_125_7',range:' / 125',footnote:'Second and final batch (125 questions) rewritten from the same published exercise deck as PMP 6, completing that set. Includes a mix of situational judgment and EVM/formula-based questions, with extra emphasis on AI, sustainability, and value-delivery topics reflecting the 2026 PMP Exam Content Outline.'},
   {id:'pmp8',label:'PMP 8',title:'PMP Exam Preparation Exercises',storageKey:'pmp_q1_256_8',range:' / 256',footnote:'256 questions extracted from the uploaded PMP Exam Preparation Exercises PDF. Every question includes a Show Hint / Hide Hint toggle.'},
 ];
-const PMP_OVERVIEW_IDS=['q1','q2','q3','q4','pmpmock16','pmp6','pmp7','pmp8'];
+const ALL_PRACTICE_CONFIG=[...SET_CONFIG,PMP_SIMS_CONFIG];
+const PRACTICE_CONFIG_BY_ID=Object.fromEntries(ALL_PRACTICE_CONFIG.map(c=>[c.id,c]));
+const PMP_OVERVIEW_IDS=['q1','q2','q3','q4','pmpmock16','pmp6','pmp7','pmp8','pmpsims'];
+const PMP_RETRY_IDS=PMP_OVERVIEW_IDS.filter(id=>!(PRACTICE_CONFIG_BY_ID[id]&&PRACTICE_CONFIG_BY_ID[id].disableRetry));
 const CAPM_OVERVIEW_IDS=['capm1','capm2','capm3','capm4'];
 const quizInstances={};
 
@@ -11610,7 +11637,7 @@ function switchSubTab(group,subId){
   activeSubTab[group]=subId;
   // Lazy-init quiz instance on first visit to this sub-tab
   if(!quizInstances[subId]){
-    const cfg=subId==='pmpsims'?PMP_SIMS_CONFIG:SET_CONFIG.find(c=>c.id===subId);
+    const cfg=PRACTICE_CONFIG_BY_ID[subId];
     if(cfg)quizInstances[subId]=createPMPQuiz(cfg);
   } else {
     quizInstances[subId].refreshDisplay();
@@ -12191,10 +12218,15 @@ let gRetry=null;
 
 function startGlobalRetry(filterSetId){
   // Ensure all quiz instances are initialized before accessing stats
-  SET_CONFIG.forEach(cfg=>{if(!quizInstances[cfg.id])quizInstances[cfg.id]=createPMPQuiz(cfg);});
+  ALL_PRACTICE_CONFIG.forEach(cfg=>{if(!quizInstances[cfg.id])quizInstances[cfg.id]=createPMPQuiz(cfg);});
   // filterSetId: optional — a single set id, an array of set ids, or omitted (defaults to all PMP sets)
   const allWrong=[];
-  const sids=Array.isArray(filterSetId)?filterSetId:(filterSetId?[filterSetId]:PMP_OVERVIEW_IDS);
+  const requested=Array.isArray(filterSetId)?filterSetId:(filterSetId?[filterSetId]:PMP_RETRY_IDS);
+  const sids=requested.filter(sid=>PRACTICE_CONFIG_BY_ID[sid]&&!PRACTICE_CONFIG_BY_ID[sid].disableRetry);
+  if(requested.length>0&&sids.length===0){
+    alert('Retry otomatis tidak tersedia untuk PMP Sims karena set ini memuat case study, matching, dan tipe soal khusus. Buka tab PMP Sims untuk meninjau jawaban langsung.');
+    return;
+  }
   sids.forEach(sid=>{
     const inst=quizInstances[sid];
     if(!inst)return;
@@ -12211,10 +12243,11 @@ function startGlobalRetry(filterSetId){
     hint:new Array(allWrong.length).fill(false),
   };
   const cnt=allWrong.length;
-  const sets=[...new Set(allWrong.map(x=>x.setId))].map(s=>s.replace('q','Q').replace('capm','CAPM ')).join(', ');
+  const labelForSet=sid=>(PRACTICE_CONFIG_BY_ID[sid]&&PRACTICE_CONFIG_BY_ID[sid].label)||sid.toUpperCase();
+  const sets=[...new Set(allWrong.map(x=>x.setId))].map(labelForSet).join(', ');
   const isSingle=typeof filterSetId==='string';
   const headerLabel=isSingle
-    ?'🔁 Retry '+filterSetId.replace('q','Q')+' — '+cnt+' Incorrect'
+    ?'🔁 Retry '+labelForSet(filterSetId)+' — '+cnt+' Incorrect'
     :'🔁 Cross-Set Retry — '+cnt+' Incorrect (from: '+sets+')';
   document.getElementById('gr-header').textContent=headerLabel;
   document.getElementById('gr-stat-total').textContent=cnt;
@@ -12230,7 +12263,7 @@ function buildGRJumpGrid(){
   gRetry.items.forEach((item,i)=>{
     const d=document.createElement('div');d.className='gr-jump-dot';
     d.title='Q'+item.question.n+' ('+item.setId.toUpperCase()+')';
-    d.innerHTML='<span>'+item.question.n+'</span><span class="gr-jump-set">'+item.setId.replace('q','Q')+'</span>';
+    d.innerHTML='<span>'+item.question.n+'</span><span class="gr-jump-set">'+((PRACTICE_CONFIG_BY_ID[item.setId]&&PRACTICE_CONFIG_BY_ID[item.setId].label)||item.setId.toUpperCase())+'</span>';
     d.id='gr-dot-'+i;d.onclick=()=>{gRetry.cur=i;renderGR();};
     grid.appendChild(d);
   });updateGRJumpGrid();
@@ -12267,7 +12300,7 @@ function renderGR(){
   const i=gRetry.cur,item=gRetry.items[i],q=item.question;
   document.getElementById('gr-pos').textContent=(i+1)+'/'+gRetry.items.length;
   document.getElementById('gr-q-meta').textContent='Question #'+q.n;
-  document.getElementById('gr-set-badge').textContent=item.setId.replace('q','Q')+' · #'+q.n;
+  document.getElementById('gr-set-badge').textContent=((PRACTICE_CONFIG_BY_ID[item.setId]&&PRACTICE_CONFIG_BY_ID[item.setId].label)||item.setId.toUpperCase())+' · #'+q.n;
   const mt=document.getElementById('gr-multi-tag');
   if(q.multi){mt.style.display='inline-block';mt.textContent='SELECT '+(q.pick===2?'TWO':'THREE')+' ANSWERS';}
   else mt.style.display='none';
@@ -12398,8 +12431,8 @@ function closeGRSession(){
   document.getElementById('gr-card').style.display='block';
   document.getElementById('gr-summary').classList.remove('show');
   // Refresh all quiz tabs (PMP & CAPM) so their summaries/scores are up to date
-  ['q1','q2','q3','q4','capm1','capm2','capm3','capm4'].forEach(sid=>{
-    if(quizInstances[sid]) quizInstances[sid].refreshDisplay();
+  ALL_PRACTICE_CONFIG.forEach(cfg=>{
+    if(quizInstances[cfg.id]) quizInstances[cfg.id].refreshDisplay();
   });
   gRetry=null;refreshDashboard();
 }
@@ -12407,7 +12440,7 @@ function closeGRSession(){
 // ─── DASHBOARD ─────────────────────────────────────────────────────────────
 function refreshDashboard(){
   // Init any missing quiz instances needed for dashboard stats
-  SET_CONFIG.forEach(cfg=>{
+  ALL_PRACTICE_CONFIG.forEach(cfg=>{
     if(!quizInstances[cfg.id])quizInstances[cfg.id]=createPMPQuiz(cfg);
   });
   const stats=PMP_OVERVIEW_IDS.map(k=>quizInstances[k].getStats());
@@ -12415,6 +12448,11 @@ function refreshDashboard(){
   const totAnswered=stats.reduce((s,x)=>s+x.answered,0);
   const totCorrect=stats.reduce((s,x)=>s+x.correct,0);
   const totWrong=totAnswered-totCorrect;
+  const retryableWrong=PMP_RETRY_IDS.reduce((sum,sid)=>{
+    const inst=quizInstances[sid];
+    return sum+(inst?inst.getWrongQuestions().length:0);
+  },0);
+  const simsWrong=totWrong-retryableWrong;
   const el=id=>document.getElementById(id);
 
   // Update "Total Salah" card
@@ -12423,7 +12461,26 @@ function refreshDashboard(){
     el('dash-total-wrong').style.color=totWrong>0?'var(--coral)':'var(--teal)';
   }
   if(el('dash-wrong-hint')){
-    el('dash-wrong-hint').textContent=totWrong>0?'↑ klik untuk ulangi '+totWrong+' soal':'✓ tidak ada yang salah';
+    if(retryableWrong>0){
+      el('dash-wrong-hint').textContent='↑ ulangi '+retryableWrong+' soal'+(simsWrong>0?' · '+simsWrong+' PMP Sims ditinjau di tab':'');
+    }else if(simsWrong>0){
+      el('dash-wrong-hint').textContent=simsWrong+' salah di PMP Sims · tinjau langsung di tab';
+    }else{
+      el('dash-wrong-hint').textContent='✓ tidak ada yang salah';
+    }
+  }
+  if(el('dash-wrong-card')){
+    const card=el('dash-wrong-card');
+    if(retryableWrong>0){
+      card.onclick=()=>startGlobalRetry();
+      card.title='Retry incorrect questions from supported practice sets';
+    }else if(simsWrong>0){
+      card.onclick=()=>switchTab('pmpsims');
+      card.title='Open PMP Sims to review incorrect answers';
+    }else{
+      card.onclick=null;
+      card.title='No incorrect questions';
+    }
   }
 
   let passCount=0;
@@ -12532,13 +12589,18 @@ function refreshDashboard(){
     const recos=[];
     if(totAnswered===0){recos.push({icon:'📝',text:'Start with <b>PMP 1</b> to build your PMP concept foundation.'});}
     else{
-      if(totWrong>0)recos.push({icon:'🔁',text:'Ada <b>'+totWrong+' soal yang masih salah</b> dari semua set. Klik kartu "<b>Incorrect</b>" di atas untuk mengerjakan ulang semuanya sekarang.'});
+      if(retryableWrong>0)recos.push({icon:'🔁',text:'Ada <b>'+retryableWrong+' soal yang masih salah</b> pada set yang mendukung retry lintas-set. Klik kartu "<b>Incorrect</b>" untuk mengerjakannya ulang.'});
+      if(simsWrong>0)recos.push({icon:'🧪',text:'Ada <b>'+simsWrong+' jawaban salah di PMP Sims</b>. Tinjau melalui tab PMP Sims karena set simulasi memuat tipe soal khusus.'});
       const sorted=[...stats].filter(s=>s.answered>0).sort((a,b)=>(a.correct/a.answered)-(b.correct/b.answered));
       if(sorted.length>0){const w=sorted[0];const wA=Math.round(w.correct/w.answered*100);
-        if(wA<70)recos.push({icon:'🎯',text:'Weakest set: <b>'+w.label+'</b> (accuracy '+wA+'%). Use "Retry Incorrect" in that tab for targeted practice.'});}
+        if(wA<70){
+          const wCfg=PRACTICE_CONFIG_BY_ID[w.id];
+          const action=wCfg&&wCfg.disableRetry?'Review the explanations directly in that simulation tab.':'Use "Retry Incorrect" in that tab for targeted practice.';
+          recos.push({icon:'🎯',text:'Weakest set: <b>'+w.label+'</b> (accuracy '+wA+'%). '+action});
+        }}
       const unattempted=stats.filter(s=>s.answered===0);
       if(unattempted.length>0)recos.push({icon:'🆕',text:'Not started: <b>'+unattempted.map(s=>s.label).join(', ')+'</b>. Begin with the first question in those sets.'});
-      if(avgAcc!==null&&avgAcc>=70&&passCount===PMP_OVERVIEW_IDS.length)recos.push({icon:'🏆',text:'Luar biasa! Semua set sudah lulus. Pertimbangkan <b>mock exam</b> full 180 soal dalam kondisi ujian sesungguhnya sebagai persiapan terakhir.'});
+      if(avgAcc!==null&&avgAcc>=70&&passCount===PMP_OVERVIEW_IDS.length)recos.push({icon:'🏆',text:'Luar biasa! Seluruh practice set termasuk <b>PMP Sims</b> sudah lulus. Gunakan menu <b>Exam</b> untuk simulasi sesi ujian dengan set soal yang dihasilkan ulang.'});
       else if(totAnswered>=200&&avgAcc>=60)recos.push({icon:'⏱️',text:'Latih <b>time management</b> — ujian PMP memberikan sekitar 1.5 menit per soal. Kerjakan soal dengan timer.'});
       if(recos.length===0)recos.push({icon:'✅',text:'Semua area terlihat baik. Tetap pertahankan latihan rutin!'});
     }
@@ -12875,7 +12937,7 @@ function refreshReview(){
   const BADGE=p=>p>=80?'<span class="rv-ka-badge badge-strong">Kuat</span>':p>=60?'<span class="rv-ka-badge badge-avg">Rata-rata</span>':p>0?'<span class="rv-ka-badge badge-weak">Lemah</span>':'<span class="rv-ka-badge badge-na">—</span>';
   const KA_ORDER=['Integration','Scope','Schedule','Cost','Quality','HR','Communications','Risk','Procurement','Stakeholder'];
   const KA_EMOJI={Integration:'🔗',Scope:'📋',Schedule:'📅',Cost:'💰',Quality:'✅',HR:'👥',Communications:'📢',Risk:'⚠️',Procurement:'📝',Stakeholder:'🤝'};
-  const SET_INFO=Object.fromEntries(SET_CONFIG.map(c=>[c.id,{label:c.label,title:c.title}]));
+  const SET_INFO=Object.fromEntries(ALL_PRACTICE_CONFIG.map(c=>[c.id,{label:c.label,title:c.title}]));
   const PMP_IDS=PMP_OVERVIEW_IDS;
   const CAPM_IDS=CAPM_OVERVIEW_IDS;
 
@@ -12917,7 +12979,7 @@ function refreshReview(){
   </div>`;
 
   // ── Per-set collapsible panels (PMP cluster, then CAPM cluster) ─────────
-  html+='<div class="rv-cluster-title" style="font-family:Space Mono,monospace;font-size:12px;letter-spacing:.1em;color:var(--muted);margin:18px 0 8px;">📘 PMP PRACTICE SETS</div>';
+  html+='<div class="rv-cluster-title" style="font-family:Space Mono,monospace;font-size:12px;letter-spacing:.1em;color:var(--muted);margin:18px 0 8px;">📘 PMP PRACTICE SETS &amp; SIMULATION</div>';
   PMP_IDS.forEach((sid,setIdx)=>{
     const inst=quizInstances[sid]; if(!inst)return;
     const info=SET_INFO[sid];
@@ -13031,7 +13093,7 @@ function refreshReview(){
     }
 
     html+=`
-    <div class="rv-set-panel">
+    <div class="rv-set-panel" data-set-id="${sid}">
       <div class="rv-set-header" onclick="toggleSetPanel('${sid}')">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <span class="rv-set-label">${info.label}</span>
@@ -13150,7 +13212,7 @@ function refreshReview(){
     }
 
     html+=`
-    <div class="rv-set-panel">
+    <div class="rv-set-panel" data-set-id="${sid}">
       <div class="rv-set-header" onclick="toggleSetPanel('${sid}')">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <span class="rv-set-label">${info.label}</span>
@@ -15310,11 +15372,13 @@ function pgmRestoreCode(){
     // Refresh relevant UI
     if(result.tabId==='exam'){
       initExamTab();
+    } else if(result.tabId==='examcapm'){
+      initCapmExamTab();
     } else {
       // Force quiz instance to re-init from localStorage on next visit
       quizInstances[result.tabId]=null;
       // Re-init immediately and switch to the tab
-      const cfg=SET_CONFIG.find(s=>s.id===result.tabId);
+      const cfg=PRACTICE_CONFIG_BY_ID[result.tabId];
       if(cfg){
         quizInstances[result.tabId]=createPMPQuiz(cfg);
         switchTab(result.tabId);
@@ -15330,15 +15394,12 @@ function saveProgressBackup(){
 }
 
 function gatherAllProgress(){
-  const data={version:1,ts:new Date().toISOString(),sets:{},exam:null};
-  const SET_KEYS_MAP=[
-    {id:'q1',key:'pmp_q1_100'},{id:'q2',key:'pmp_q101_200'},
-    {id:'q3',key:'pmp_q201_300'},{id:'q4',key:'pmp_q301_400'},
-  ];
-  SET_KEYS_MAP.forEach(({id,key})=>{
-    try{data.sets[key]=JSON.parse(localStorage.getItem(key)||'null');}catch(e){}
+  const data={version:2,ts:new Date().toISOString(),sets:{},exam:null,capmExam:null};
+  ALL_PRACTICE_CONFIG.forEach(cfg=>{
+    try{data.sets[cfg.storageKey]=JSON.parse(localStorage.getItem(cfg.storageKey)||'null');}catch(e){}
   });
   try{data.exam=JSON.parse(localStorage.getItem('pmp_exam_session')||'null');}catch(e){}
+  try{data.capmExam=JSON.parse(localStorage.getItem('capm_exam_session')||'null');}catch(e){}
   return data;
 }
 
@@ -15348,17 +15409,18 @@ function restoreProgressBackup(event){
   reader.onload=function(e){
     try{
       const data=JSON.parse(e.target.result);
-      if(!data||data.version!==1||!data.ts){showToast('❌ File tidak valid.',true);return;}
+      if(!data||![1,2].includes(data.version)||!data.ts){showToast('❌ File tidak valid.',true);return;}
       const d=new Date(data.ts);
       const dateStr=d.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})
                    +' pukul '+d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
       if(!confirm('Pulihkan cadangan dari '+dateStr+'? Progres saat ini akan diganti.'))return;
-      const SKEYS=SET_CONFIG.map(c=>c.storageKey);
+      const SKEYS=ALL_PRACTICE_CONFIG.map(c=>c.storageKey);
       SKEYS.forEach(key=>{
         if(data.sets[key]!==undefined&&data.sets[key]!==null)
           localStorage.setItem(key,JSON.stringify(data.sets[key]));
       });
       if(data.exam)localStorage.setItem('pmp_exam_session',JSON.stringify(data.exam));
+      if(data.capmExam)localStorage.setItem('capm_exam_session',JSON.stringify(data.capmExam));
       localStorage.setItem(BACKUP_META_KEY,JSON.stringify({ts:data.ts}));
       updateBackupLabel();
       showToast('✅ Progres dipulihkan! Memuat ulang...',false);
@@ -15389,7 +15451,11 @@ document.addEventListener('DOMContentLoaded',()=>{
 <div class="pgm-tab" onclick="pgmSelectTab('q2')">PMP 2</div>
 <div class="pgm-tab" onclick="pgmSelectTab('q3')">PMP 3</div>
 <div class="pgm-tab" onclick="pgmSelectTab('q4')">PMP 4</div>
+<div class="pgm-tab" onclick="pgmSelectTab('pmpmock16')">PMP 5</div>
+<div class="pgm-tab" onclick="pgmSelectTab('pmp6')">PMP 6</div>
+<div class="pgm-tab" onclick="pgmSelectTab('pmp7')">PMP 7</div>
 <div class="pgm-tab" onclick="pgmSelectTab('pmp8')">PMP 8</div>
+<div class="pgm-tab" onclick="pgmSelectTab('pmpsims')">PMP Sims</div>
 <div class="pgm-tab" onclick="pgmSelectTab('capm1')">CAPM 1</div>
 <div class="pgm-tab" onclick="pgmSelectTab('capm2')">CAPM 2</div>
 <div class="pgm-tab" onclick="pgmSelectTab('capm3')">CAPM 3</div>
