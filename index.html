@@ -779,11 +779,9 @@
   margin:0;
 }
 .cs-search-shell{
-  width:min(360px,42vw);
-  min-width:280px;
-  display:flex;
-  flex-direction:column;
-  gap:5px;
+  width:min(460px,48vw);
+  min-width:320px;
+  display:block;
 }
 .cs-search-input-wrap{
   min-height:42px;
@@ -838,15 +836,24 @@
 .cs-search-clear.visible{display:flex}
 .cs-search-clear:hover{background:rgba(226,96,79,.18);color:#ff8d7d}
 .cs-search-feedback{
-  min-height:18px;
+  flex:0 0 auto;
   display:flex;
   align-items:center;
   justify-content:flex-end;
-  gap:8px;
+  gap:5px;
+  min-width:0;
   color:var(--muted);
   font-family:'Space Mono',monospace;
-  font-size:9.5px;
+  font-size:9px;
+  white-space:nowrap;
 }
+.cs-search-count{
+  display:none;
+  max-width:112px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.cs-search-count.visible{display:inline-block}
 .cs-search-count.has-results{color:var(--teal)}
 .cs-search-count.no-results{color:var(--coral)}
 .cs-search-nav{
@@ -856,8 +863,8 @@
 }
 .cs-search-nav.visible{display:flex}
 .cs-search-nav button{
-  width:24px;
-  height:21px;
+  width:23px;
+  height:23px;
   border:1px solid #385789;
   border-radius:6px;
   background:#182748;
@@ -899,15 +906,6 @@
   .cs-search-shell{
     width:100%;
     min-width:0;
-    flex-direction:row;
-    align-items:center;
-    gap:8px;
-  }
-  .cs-search-input-wrap{flex:1 1 auto}
-  .cs-search-feedback{
-    flex:0 0 auto;
-    min-width:112px;
-    justify-content:flex-end;
   }
 }
 @media(max-width:560px){
@@ -917,17 +915,15 @@
     overflow-x:auto;
     padding-bottom:2px;
   }
-  .cs-search-shell{
-    display:flex;
-    flex-direction:column;
-    align-items:stretch;
-    gap:4px;
+  .cs-search-input-wrap{
+    min-height:40px;
+    gap:5px;
+    padding-right:6px;
   }
-  .cs-search-feedback{
-    min-width:0;
-    justify-content:space-between;
-  }
-  .cs-search-input-wrap{min-height:40px}
+  .cs-search-count{max-width:70px;font-size:8.5px}
+  .cs-search-nav{gap:3px}
+  .cs-search-nav button{width:22px;height:22px}
+  .cs-search-clear{width:25px;height:25px;flex-basis:25px}
 }
 
 </style>
@@ -1291,15 +1287,15 @@
 <span class="cs-search-icon" aria-hidden="true">🔍</span>
 <input id="cs-search-input" class="cs-search-input" type="search" autocomplete="off"
        aria-label="Cari di Cheatsheet" placeholder="Cari di PMP Cheatsheet…">
-<button id="cs-search-clear" class="cs-search-clear" type="button"
-        aria-label="Hapus pencarian" title="Hapus pencarian">×</button>
-</div>
 <div class="cs-search-feedback" aria-live="polite">
-<span id="cs-search-count" class="cs-search-count">Ketik minimal 2 karakter</span>
+<span id="cs-search-count" class="cs-search-count"></span>
 <div class="cs-search-nav" id="cs-search-nav">
 <button id="cs-search-prev" type="button" aria-label="Hasil sebelumnya" title="Hasil sebelumnya">↑</button>
 <button id="cs-search-next" type="button" aria-label="Hasil berikutnya" title="Hasil berikutnya">↓</button>
 </div>
+</div>
+<button id="cs-search-clear" class="cs-search-clear" type="button"
+        aria-label="Hapus pencarian" title="Hapus pencarian">×</button>
 </div>
 </div>
 </div>
@@ -11340,22 +11336,22 @@ const ExamProCheatsheetSearch=(function(){
     const query=normalizeWhitespace(input?input.value:'');
     if(!count||!nav)return;
 
-    count.classList.remove('has-results','no-results');
+    count.classList.remove('visible','has-results','no-results');
     if(query.length<2){
-      count.textContent='Ketik minimal 2 karakter';
+      count.textContent='';
       nav.classList.remove('visible');
       return;
     }
     if(!marks.length){
-      count.textContent='Tidak ada hasil';
-      count.classList.add('no-results');
+      count.textContent='0 hasil';
+      count.classList.add('visible','no-results');
       nav.classList.remove('visible');
       return;
     }
     const blocks=Number.isFinite(matchBlocks)?matchBlocks:
       new Set(marks.map(mark=>mark.closest('.uc-block')).filter(Boolean)).size;
-    count.textContent=(currentIndex+1)+'/'+marks.length+' hasil · '+blocks+' bagian';
-    count.classList.add('has-results');
+    count.textContent=(currentIndex+1)+'/'+marks.length+' · '+blocks+' bagian';
+    count.classList.add('visible','has-results');
     nav.classList.add('visible');
     if(prev)prev.disabled=marks.length<2;
     if(next)next.disabled=marks.length<2;
