@@ -777,10 +777,10 @@
 /* ===== Cheatsheet Search ===== */
 .cs-top-toolbar{
   display:flex;
-  align-items:flex-start;
+  align-items:center;
   justify-content:space-between;
-  gap:14px;
-  margin-bottom:12px;
+  gap:12px;
+  margin-bottom:8px;
 }
 .cs-cheatsheet-switcher{
   display:flex;
@@ -794,13 +794,14 @@
   display:block;
 }
 .cs-search-input-wrap{
-  min-height:42px;
+  height:34px;
+  min-height:34px;
   display:flex;
   align-items:center;
-  gap:7px;
-  padding:0 8px 0 11px;
+  gap:6px;
+  padding:0 7px 0 10px;
   border:1px solid #385789;
-  border-radius:12px;
+  border-radius:10px;
   background:#111f3d;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
   transition:border-color .16s ease,box-shadow .16s ease,background .16s ease;
@@ -812,7 +813,7 @@
 }
 .cs-search-icon{
   flex:0 0 auto;
-  font-size:14px;
+  font-size:13px;
   filter:saturate(.9);
 }
 .cs-search-input{
@@ -823,15 +824,15 @@
   background:transparent;
   color:var(--paper);
   font-family:'Inter',sans-serif;
-  font-size:12.5px;
-  line-height:1.2;
+  font-size:12px;
+  line-height:1.15;
 }
 .cs-search-input::placeholder{color:#7f91bd}
 .cs-search-input::-webkit-search-cancel-button{display:none}
 .cs-search-clear{
-  width:27px;
-  height:27px;
-  flex:0 0 27px;
+  width:23px;
+  height:23px;
+  flex:0 0 23px;
   display:none;
   align-items:center;
   justify-content:center;
@@ -926,7 +927,8 @@
     padding-bottom:2px;
   }
   .cs-search-input-wrap{
-    min-height:40px;
+    height:34px;
+    min-height:34px;
     gap:5px;
     padding-right:6px;
   }
@@ -1324,7 +1326,7 @@
 </div>
 </div>
 <div class="subtab-content active" id="cs-pmp">
-<div id="cs-compact-nav" style="position:sticky;top:56px;z-index:60;background:var(--navy);padding:8px 14px 9px;margin:-22px -16px 14px;border-bottom:1px solid var(--line);box-shadow:0 8px 18px rgba(0,0,0,.15);">
+<div id="cs-compact-nav" style="position:sticky;top:56px;z-index:60;background:var(--navy);padding:8px 14px 9px;margin:0 -16px 14px;border-bottom:1px solid var(--line);box-shadow:0 8px 18px rgba(0,0,0,.15);">
 <div aria-label="Cheatsheet categories" class="cs-nav-primary" role="tablist">
 <button class="cs-group-btn active" data-cs-group="mindset" onclick="switchCSNavGroup('mindset',this)">🧠 Mindset</button>
 <button class="cs-group-btn" data-cs-group="tips" onclick="switchCSNavGroup('tips',this)">💡 Tips &amp; Tricks</button>
@@ -12469,19 +12471,6 @@ function refreshDashboard(){
       el('dash-wrong-hint').textContent='✓ tidak ada yang salah';
     }
   }
-  if(el('dash-wrong-card')){
-    const card=el('dash-wrong-card');
-    if(retryableWrong>0){
-      card.onclick=()=>startGlobalRetry();
-      card.title='Retry incorrect questions from supported practice sets';
-    }else if(simsWrong>0){
-      card.onclick=()=>switchTab('pmpsims');
-      card.title='Open PMP Sims to review incorrect answers';
-    }else{
-      card.onclick=null;
-      card.title='No incorrect questions';
-    }
-  }
 
   let passCount=0;
   stats.forEach((s,i)=>{
@@ -12593,11 +12582,7 @@ function refreshDashboard(){
       if(simsWrong>0)recos.push({icon:'🧪',text:'Ada <b>'+simsWrong+' jawaban salah di PMP Sims</b>. Tinjau melalui tab PMP Sims karena set simulasi memuat tipe soal khusus.'});
       const sorted=[...stats].filter(s=>s.answered>0).sort((a,b)=>(a.correct/a.answered)-(b.correct/b.answered));
       if(sorted.length>0){const w=sorted[0];const wA=Math.round(w.correct/w.answered*100);
-        if(wA<70){
-          const wCfg=PRACTICE_CONFIG_BY_ID[w.id];
-          const action=wCfg&&wCfg.disableRetry?'Review the explanations directly in that simulation tab.':'Use "Retry Incorrect" in that tab for targeted practice.';
-          recos.push({icon:'🎯',text:'Weakest set: <b>'+w.label+'</b> (accuracy '+wA+'%). '+action});
-        }}
+        if(wA<70)recos.push({icon:'🎯',text:'Weakest set: <b>'+w.label+'</b> (accuracy '+wA+'%). Use "Retry Incorrect" in that tab for targeted practice.'});}
       const unattempted=stats.filter(s=>s.answered===0);
       if(unattempted.length>0)recos.push({icon:'🆕',text:'Not started: <b>'+unattempted.map(s=>s.label).join(', ')+'</b>. Begin with the first question in those sets.'});
       if(avgAcc!==null&&avgAcc>=70&&passCount===PMP_OVERVIEW_IDS.length)recos.push({icon:'🏆',text:'Luar biasa! Seluruh practice set termasuk <b>PMP Sims</b> sudah lulus. Gunakan menu <b>Exam</b> untuk simulasi sesi ujian dengan set soal yang dihasilkan ulang.'});
@@ -12979,7 +12964,7 @@ function refreshReview(){
   </div>`;
 
   // ── Per-set collapsible panels (PMP cluster, then CAPM cluster) ─────────
-  html+='<div class="rv-cluster-title" style="font-family:Space Mono,monospace;font-size:12px;letter-spacing:.1em;color:var(--muted);margin:18px 0 8px;">📘 PMP PRACTICE SETS &amp; SIMULATION</div>';
+  html+='<div class="rv-cluster-title" style="font-family:Space Mono,monospace;font-size:12px;letter-spacing:.1em;color:var(--muted);margin:18px 0 8px;">📘 PMP PRACTICE SETS</div>';
   PMP_IDS.forEach((sid,setIdx)=>{
     const inst=quizInstances[sid]; if(!inst)return;
     const info=SET_INFO[sid];
@@ -15372,8 +15357,6 @@ function pgmRestoreCode(){
     // Refresh relevant UI
     if(result.tabId==='exam'){
       initExamTab();
-    } else if(result.tabId==='examcapm'){
-      initCapmExamTab();
     } else {
       // Force quiz instance to re-init from localStorage on next visit
       quizInstances[result.tabId]=null;
