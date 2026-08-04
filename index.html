@@ -965,6 +965,145 @@
   }
 }
 
+
+/* ===== Cheatsheet compact toolbar — no overlap ===== */
+#tab-cheatsheet .cs-top-toolbar{
+  align-items:center;
+  gap:10px;
+  margin-bottom:7px;
+}
+#tab-cheatsheet .cs-cheatsheet-switcher{
+  gap:7px;
+}
+#tab-cheatsheet .cs-cheatsheet-switcher .subtab-btn,
+#tab-cheatsheet .cs-search-input-wrap{
+  box-sizing:border-box;
+  height:34px;
+  min-height:34px;
+}
+#tab-cheatsheet .cs-cheatsheet-switcher .subtab-btn{
+  padding:0 13px;
+  border-radius:11px;
+  font-size:10.5px;
+  line-height:1;
+  white-space:nowrap;
+}
+#tab-cheatsheet .cs-search-shell{
+  flex:1 1 360px;
+  width:auto;
+  min-width:250px;
+  max-width:520px;
+}
+#tab-cheatsheet .cs-search-input-wrap{
+  gap:6px;
+  padding:0 7px 0 11px;
+  border-radius:11px;
+}
+#tab-cheatsheet .cs-search-icon{
+  font-size:12px;
+}
+#tab-cheatsheet .cs-search-input{
+  font-size:11.5px;
+}
+#tab-cheatsheet .cs-search-clear{
+  width:22px;
+  height:22px;
+  flex-basis:22px;
+  border-radius:6px;
+  font-size:16px;
+}
+#tab-cheatsheet .cs-search-count{
+  max-width:102px;
+  font-size:8.5px;
+}
+#tab-cheatsheet .cs-search-nav{
+  gap:3px;
+}
+#tab-cheatsheet .cs-search-nav button{
+  width:20px;
+  height:20px;
+  border-radius:5px;
+  font-size:9px;
+}
+
+/* The old inline margin:-22px caused the category row to collide with search. */
+#tab-cheatsheet #cs-compact-nav{
+  margin:0 -16px 11px !important;
+  padding:5px 10px 6px !important;
+  max-height:104px;
+  box-shadow:0 5px 12px rgba(0,0,0,.12) !important;
+}
+#tab-cheatsheet .cs-nav-primary,
+#tab-cheatsheet .cs-subnav{
+  gap:6px;
+}
+#tab-cheatsheet .cs-nav-primary{
+  padding-bottom:4px;
+}
+#tab-cheatsheet .cs-group-btn,
+#tab-cheatsheet .cs-mini-btn{
+  box-sizing:border-box;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  line-height:1;
+  border-radius:9px;
+  white-space:nowrap;
+}
+#tab-cheatsheet .cs-group-btn{
+  height:31px;
+  padding:0 10px;
+  font-size:9.8px;
+}
+#tab-cheatsheet .cs-mini-btn{
+  height:28px;
+  padding:0 9px;
+  font-size:9.2px;
+}
+#tab-cheatsheet .cs-group-btn:hover,
+#tab-cheatsheet .cs-mini-btn:hover{
+  transform:none;
+}
+
+@media(max-width:860px){
+  #tab-cheatsheet .cs-top-toolbar{
+    gap:7px;
+  }
+  #tab-cheatsheet .cs-search-shell{
+    flex-basis:100%;
+    max-width:none;
+  }
+}
+@media(max-width:560px){
+  #tab-cheatsheet .cs-top-toolbar{
+    margin-bottom:6px;
+  }
+  #tab-cheatsheet .cs-cheatsheet-switcher .subtab-btn,
+  #tab-cheatsheet .cs-search-input-wrap{
+    height:33px;
+    min-height:33px;
+  }
+  #tab-cheatsheet .cs-cheatsheet-switcher .subtab-btn{
+    padding:0 11px;
+    font-size:9.8px;
+  }
+  #tab-cheatsheet #cs-compact-nav{
+    margin:0 -16px 9px !important;
+    padding:4px 8px 5px !important;
+    max-height:98px;
+  }
+  #tab-cheatsheet .cs-group-btn{
+    height:29px;
+    padding:0 9px;
+    font-size:9.2px;
+  }
+  #tab-cheatsheet .cs-mini-btn{
+    height:27px;
+    padding:0 8px;
+    font-size:8.8px;
+  }
+}
+
 </style>
 <!-- Firebase (cloud progress sync) -->
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
