@@ -142,14 +142,6 @@
   @media(max-width:520px){.dash-grid{grid-template-columns:1fr;}}
   .set-card{background:var(--navy-2);border:1px solid var(--line);border-radius:var(--radius);padding:15px;cursor:pointer;transition:border-color .2s;}
   .set-card:hover{border-color:var(--amber);}
-  .set-card-wide{grid-column:1 / -1;padding:16px 18px;}
-  .set-card-wide .set-card-wide-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(210px,.65fr);gap:18px;align-items:center;}
-  .set-card-wide .set-card-top{margin-bottom:6px;}
-  .set-card-wide .prog-bar-wrap{margin-top:0;height:8px;}
-  .set-card-wide-note{font-size:11px;color:var(--muted);margin-top:5px;}
-  @media(max-width:620px){
-    .set-card-wide .set-card-wide-row{grid-template-columns:1fr;gap:10px;}
-  }
   .set-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;}
   .set-card-label{font-family:'Space Mono',monospace;font-size:11px;color:var(--amber);letter-spacing:.1em;text-transform:uppercase;}
   .set-badge{font-size:11px;padding:3px 8px;border-radius:999px;font-weight:600;}
@@ -375,8 +367,6 @@
 
 
   .rv-set-panel{margin-bottom:12px;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
-  .rv-set-panel[data-set-id="pmpsims"]{border-color:rgba(232,163,61,.45);}
-  .rv-set-panel[data-set-id="pmpsims"] .rv-set-header{background:linear-gradient(90deg,rgba(232,163,61,.11),var(--navy-2) 55%);}
   .rv-set-header{background:var(--navy-2);padding:12px 14px;cursor:pointer;
     display:flex;justify-content:space-between;align-items:center;gap:8px;
     transition:background .15s;user-select:none;flex-wrap:wrap;}
@@ -777,10 +767,10 @@
 /* ===== Cheatsheet Search ===== */
 .cs-top-toolbar{
   display:flex;
-  align-items:center;
+  align-items:flex-start;
   justify-content:space-between;
-  gap:12px;
-  margin-bottom:8px;
+  gap:14px;
+  margin-bottom:12px;
 }
 .cs-cheatsheet-switcher{
   display:flex;
@@ -794,14 +784,13 @@
   display:block;
 }
 .cs-search-input-wrap{
-  height:34px;
-  min-height:34px;
+  min-height:42px;
   display:flex;
   align-items:center;
-  gap:6px;
-  padding:0 7px 0 10px;
+  gap:7px;
+  padding:0 8px 0 11px;
   border:1px solid #385789;
-  border-radius:10px;
+  border-radius:12px;
   background:#111f3d;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
   transition:border-color .16s ease,box-shadow .16s ease,background .16s ease;
@@ -813,7 +802,7 @@
 }
 .cs-search-icon{
   flex:0 0 auto;
-  font-size:13px;
+  font-size:14px;
   filter:saturate(.9);
 }
 .cs-search-input{
@@ -824,15 +813,15 @@
   background:transparent;
   color:var(--paper);
   font-family:'Inter',sans-serif;
-  font-size:12px;
-  line-height:1.15;
+  font-size:12.5px;
+  line-height:1.2;
 }
 .cs-search-input::placeholder{color:#7f91bd}
 .cs-search-input::-webkit-search-cancel-button{display:none}
 .cs-search-clear{
-  width:23px;
-  height:23px;
-  flex:0 0 23px;
+  width:27px;
+  height:27px;
+  flex:0 0 27px;
   display:none;
   align-items:center;
   justify-content:center;
@@ -927,8 +916,7 @@
     padding-bottom:2px;
   }
   .cs-search-input-wrap{
-    height:34px;
-    min-height:34px;
+    min-height:40px;
     gap:5px;
     padding-right:6px;
   }
@@ -937,6 +925,104 @@
   .cs-search-nav button{width:22px;height:22px}
   .cs-search-clear{width:25px;height:25px;flex-basis:25px}
 }
+
+  /* PMP QUESTION SEARCH — COMPACT TRIGGER INSIDE PMP TAB */
+  .pmp-utility-strip{margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+  .pmp-search-trigger{
+    display:inline-flex;align-items:center;gap:6px;
+    background:rgba(232,163,61,.10);color:var(--amber);
+    border:1px solid rgba(232,163,61,.36);border-radius:999px;
+    padding:5px 11px;font-family:'Space Mono',monospace;font-size:11px;
+    letter-spacing:.02em;line-height:1.2;cursor:pointer;transition:all .18s;
+    white-space:nowrap;
+  }
+  .pmp-search-trigger:hover{background:rgba(232,163,61,.20);border-color:var(--amber);transform:translateY(-1px);}
+  .pmp-search-trigger:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+
+  body.pmp-search-open{overflow:hidden;}
+  .pmp-search-modal{
+    position:fixed;inset:0;z-index:500;background:rgba(5,10,26,.76);
+    backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;
+    padding:18px;
+  }
+  .pmp-search-modal.hidden{display:none;}
+  .pmp-search-dialog{
+    width:min(820px,100%);max-height:min(84vh,780px);display:flex;flex-direction:column;
+    background:#111B37;border:1px solid rgba(239,234,217,.22);border-radius:16px;
+    box-shadow:0 28px 80px rgba(0,0,0,.62);overflow:hidden;
+  }
+  .pmp-search-modal-head{
+    display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+    padding:15px 16px 12px;border-bottom:1px solid var(--line);
+  }
+  .pmp-search-modal-title{font-family:'Source Serif 4',serif;font-size:18px;font-weight:700;color:var(--paper);}
+  .pmp-search-modal-sub{margin-top:2px;color:var(--muted);font-size:11.5px;line-height:1.45;}
+  .pmp-search-modal-close{
+    flex:0 0 30px;width:30px;height:30px;border:1px solid var(--line);border-radius:9px;
+    background:rgba(255,255,255,.06);color:var(--muted);font-size:20px;line-height:1;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+  }
+  .pmp-search-modal-close:hover{background:rgba(226,96,79,.17);color:#ffb8ad;border-color:rgba(226,96,79,.45);}
+  .pmp-search-controls{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line);}
+  .pmp-search-input-wrap{
+    flex:1 1 420px;min-width:180px;display:flex;align-items:center;gap:7px;
+    min-height:39px;background:rgba(255,255,255,.06);border:1px solid var(--line);
+    border-radius:10px;padding:4px 5px 4px 11px;
+  }
+  .pmp-search-input-wrap:focus-within{border-color:rgba(232,163,61,.72);box-shadow:0 0 0 3px rgba(232,163,61,.11);}
+  .pmp-search-icon{flex:0 0 auto;color:var(--amber);font-size:13px;}
+  .pmp-search-input{
+    flex:1 1 auto;min-width:80px;border:none;outline:none;background:transparent;color:var(--ink);
+    font-family:'Inter',sans-serif;font-size:12.5px;padding:6px 1px;
+  }
+  .pmp-search-input::placeholder{color:var(--muted);}
+  .pmp-search-input::-webkit-search-cancel-button{-webkit-appearance:none;display:none;}
+  .pmp-search-deck{
+    flex:0 0 205px;max-width:205px;min-height:39px;border:1px solid var(--line);outline:none;
+    background:var(--navy-3);color:var(--ink);font-family:'Inter',sans-serif;font-size:11.5px;
+    border-radius:10px;padding:7px 28px 7px 10px;cursor:pointer;
+  }
+  .pmp-search-deck:focus{border-color:var(--amber);}
+  .pmp-search-clear{
+    display:none;flex:0 0 28px;width:28px;height:28px;border:none;border-radius:8px;
+    background:rgba(255,255,255,.08);color:var(--muted);font-size:18px;line-height:1;cursor:pointer;
+  }
+  .pmp-search-clear:hover{background:rgba(226,96,79,.18);color:#ffb8ad;}
+  .pmp-search-clear.show{display:inline-flex;align-items:center;justify-content:center;}
+  .pmp-search-panel{flex:1 1 auto;min-height:150px;overflow:auto;padding:10px 11px 12px;}
+  .pmp-search-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 7px 9px;color:var(--muted);font-family:'Space Mono',monospace;font-size:9.5px;border-bottom:1px solid var(--line);margin-bottom:8px;}
+  .pmp-search-summary b{color:var(--amber);}
+  .pmp-search-message{padding:34px 18px;text-align:center;color:var(--muted);font-size:12.5px;line-height:1.55;}
+  .pmp-search-message strong{display:block;color:var(--paper);font-family:'Source Serif 4',serif;font-size:16px;margin-bottom:5px;}
+  .pmp-search-result{background:var(--paper);color:#20243A;border:1px solid transparent;border-radius:11px;padding:13px 14px;margin-bottom:8px;box-shadow:0 5px 14px rgba(0,0,0,.14);}
+  .pmp-search-result:last-child{margin-bottom:0;}
+  .pmp-search-result:hover{border-color:var(--amber);}
+  .pmp-search-result-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:7px;}
+  .pmp-search-result-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-family:'Space Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:#75683F;}
+  .pmp-search-deck-badge{display:inline-flex;align-items:center;border-radius:999px;background:#E7D9AF;color:#6B5316;padding:3px 8px;font-weight:700;}
+  .pmp-search-type-badge{display:inline-flex;align-items:center;border-radius:999px;background:#E6E8EF;color:#525C78;padding:3px 8px;font-weight:700;}
+  .pmp-search-question{font-family:'Source Serif 4',serif;font-size:15px;line-height:1.48;color:#171B2E;white-space:pre-line;margin:4px 0 10px;}
+  .pmp-search-answer{background:#E9F8F1;border-left:4px solid var(--teal);border-radius:7px;padding:9px 10px;color:#245E48;font-size:12.5px;line-height:1.48;white-space:pre-line;}
+  .pmp-search-answer strong{color:#1E7A55;}
+  .pmp-search-explanation{margin-top:8px;border-top:1px dashed #D5CBAA;padding-top:7px;}
+  .pmp-search-explanation summary{cursor:pointer;font-family:'Inter',sans-serif;font-size:11.5px;font-weight:700;color:#71633B;user-select:none;}
+  .pmp-search-explanation div{font-size:12px;line-height:1.55;color:#4A4A3E;margin-top:7px;white-space:pre-line;}
+  .pmp-search-open{flex:0 0 auto;border:none;border-radius:999px;background:var(--navy);color:var(--paper);font-family:'Inter',sans-serif;font-size:10.5px;font-weight:700;padding:6px 10px;cursor:pointer;}
+  .pmp-search-open:hover{background:var(--navy-3);}
+  .pmp-search-result mark{background:#FFD880;color:#31230A;border-radius:3px;padding:0 1px;}
+  @media(max-width:620px){
+    .pmp-utility-strip{gap:6px;}
+    .pmp-search-trigger{font-size:10.5px;padding:5px 9px;}
+    .pmp-search-trigger .pmp-search-trigger-long{display:none;}
+    .pmp-search-trigger .pmp-search-trigger-short{display:inline!important;}
+    .pmp-search-modal{padding:8px;align-items:stretch;}
+    .pmp-search-dialog{width:100%;max-height:none;height:100%;border-radius:13px;}
+    .pmp-search-controls{flex-wrap:wrap;padding:10px;}
+    .pmp-search-input-wrap{flex:1 1 100%;}
+    .pmp-search-deck{flex:1 1 100%;max-width:none;width:100%;}
+    .pmp-search-panel{padding:8px;}
+    .pmp-search-summary{align-items:flex-start;flex-direction:column;gap:3px;}
+  }
 
 </style>
 <!-- Firebase (cloud progress sync) -->
@@ -966,6 +1052,7 @@
 </div>
 </div>
 </div>
+
 <nav class="tab-nav" style="margin-top:10px;">
 <button class="tab-btn active" onclick="switchTab('overview')">📊 Overview</button>
 <button class="tab-btn" onclick="switchTab('pmp')">📘 PMP</button>
@@ -976,6 +1063,31 @@
 <button class="tab-btn" onclick="switchTab('pmbok')">📚 PMBOK</button>
 </nav>
 </header>
+
+<div class="pmp-search-modal hidden" id="pmp-search-modal" role="dialog" aria-modal="true" aria-labelledby="pmp-search-modal-title" aria-hidden="true">
+  <div class="pmp-search-dialog" role="document">
+    <div class="pmp-search-modal-head">
+      <div>
+        <div class="pmp-search-modal-title" id="pmp-search-modal-title">🔎 Search Questions</div>
+        <div class="pmp-search-modal-sub">Cari keyword pada soal, opsi, jawaban benar, hint, atau penjelasan PMP. Shortcut: Ctrl/Cmd + K.</div>
+      </div>
+      <button class="pmp-search-modal-close" id="pmp-search-modal-close" type="button" aria-label="Tutup pencarian" title="Tutup">×</button>
+    </div>
+    <div class="pmp-search-controls">
+      <div class="pmp-search-input-wrap">
+        <span class="pmp-search-icon" aria-hidden="true">🔎</span>
+        <input class="pmp-search-input" id="pmp-search-input" type="search" autocomplete="off"
+               placeholder="Cari keyword, misalnya Pareto…" aria-label="Cari soal PMP" aria-controls="pmp-search-panel"/>
+        <button class="pmp-search-clear" id="pmp-search-clear" type="button" aria-label="Hapus pencarian" title="Hapus pencarian">×</button>
+      </div>
+      <select class="pmp-search-deck" id="pmp-search-deck" aria-label="Filter deck PMP">
+        <option value="__all__">Semua Deck PMP</option>
+        <option value="__current__">Deck PMP Aktif</option>
+      </select>
+    </div>
+    <div class="pmp-search-panel" id="pmp-search-panel" role="region" aria-live="polite"></div>
+  </div>
+</div>
 <main>
 <!-- OVERVIEW -->
 <section class="tab-content active" id="tab-overview">
@@ -1051,19 +1163,6 @@
 <div class="set-card-sub" id="dash-sub-pmp8">No questions answered yet</div>
 <div class="prog-bar-wrap"><div class="prog-bar" id="dash-bar-pmp8" style="width:0%;background:var(--coral);"></div></div>
 </div>
-<div class="set-card set-card-wide" onclick="switchTab('pmpsims')">
-<div class="set-card-wide-row">
-<div>
-<div class="set-card-top"><div class="set-card-label">PMP SIMS · FULL-LENGTH MOCK</div><span class="set-badge badge-none" id="dash-badge-pmpsims">⏳ Not Started</span></div>
-<div class="set-card-score" id="dash-score-pmpsims">0/180</div>
-<div class="set-card-sub" id="dash-sub-pmpsims">No questions answered yet</div>
-</div>
-<div>
-<div class="prog-bar-wrap"><div class="prog-bar" id="dash-bar-pmpsims" style="width:0%;background:var(--coral);"></div></div>
-<div class="set-card-wide-note">180 questions · full mock simulation · case study and special question types</div>
-</div>
-</div>
-</div>
 </div>
 </div>
 <!-- Key Metrics -->
@@ -1079,7 +1178,7 @@
 </div>
 <div class="dash-stat"><div class="dash-stat-num" id="dash-total-accuracy">—</div><div class="dash-stat-label">Avg. Accuracy</div></div>
 <div class="dash-stat"><div class="dash-stat-num" id="dash-total-coverage">0%</div><div class="dash-stat-label" id="dash-coverage-label">Coverage (all PMP sets)</div></div>
-<div class="dash-stat"><div class="dash-stat-num" id="dash-sets-pass">0/9</div><div class="dash-stat-label">Sets Passed (≥70%)</div></div>
+<div class="dash-stat"><div class="dash-stat-num" id="dash-sets-pass">0/8</div><div class="dash-stat-label">Sets Passed (≥70%)</div></div>
 </div>
 </div>
 <!-- Accuracy comparison -->
@@ -1094,7 +1193,6 @@
 <div class="acc-row"><div class="acc-label">PMP 6</div><div class="acc-bar-outer"><div class="acc-bar-inner" id="acc-bar-pmp6" style="width:0%;"></div></div><div class="acc-pct" id="acc-pct-pmp6">—</div></div>
 <div class="acc-row"><div class="acc-label">PMP 7</div><div class="acc-bar-outer"><div class="acc-bar-inner" id="acc-bar-pmp7" style="width:0%;"></div></div><div class="acc-pct" id="acc-pct-pmp7">—</div></div>
 <div class="acc-row"><div class="acc-label">PMP 8</div><div class="acc-bar-outer"><div class="acc-bar-inner" id="acc-bar-pmp8" style="width:0%;"></div></div><div class="acc-pct" id="acc-pct-pmp8">—</div></div>
-<div class="acc-row"><div class="acc-label">PMP Sims</div><div class="acc-bar-outer"><div class="acc-bar-inner" id="acc-bar-pmpsims" style="width:0%;"></div></div><div class="acc-pct" id="acc-pct-pmpsims">—</div></div>
 </div>
 </div>
 <!-- Recommendations -->
@@ -1120,7 +1218,7 @@
 <div class="milestone locked" id="ms-pass2">🥈 Pass 2 Sets</div>
 <div class="milestone locked" id="ms-pass4">🥇 Pass 4 Sets</div>
 <div class="milestone locked" id="ms-pass6">🏅 Pass 6 Sets</div>
-<div class="milestone locked" id="ms-passall">🏆 All 9 Sets Passed</div>
+<div class="milestone locked" id="ms-passall">🏆 All 8 Sets Passed</div>
 </div>
 </div>
 </div><!-- /ov-pmp -->
@@ -1326,7 +1424,7 @@
 </div>
 </div>
 <div class="subtab-content active" id="cs-pmp">
-<div id="cs-compact-nav" style="position:sticky;top:56px;z-index:60;background:var(--navy);padding:8px 14px 9px;margin:0 -16px 14px;border-bottom:1px solid var(--line);box-shadow:0 8px 18px rgba(0,0,0,.15);">
+<div id="cs-compact-nav" style="position:sticky;top:56px;z-index:60;background:var(--navy);padding:8px 14px 9px;margin:-22px -16px 14px;border-bottom:1px solid var(--line);box-shadow:0 8px 18px rgba(0,0,0,.15);">
 <div aria-label="Cheatsheet categories" class="cs-nav-primary" role="tablist">
 <button class="cs-group-btn active" data-cs-group="mindset" onclick="switchCSNavGroup('mindset',this)">🧠 Mindset</button>
 <button class="cs-group-btn" data-cs-group="tips" onclick="switchCSNavGroup('tips',this)">💡 Tips &amp; Tricks</button>
@@ -11192,12 +11290,238 @@ const SET_CONFIG=[
   {id:'pmp7',label:'PMP 7',title:'PMP Topic Questions 7',storageKey:'pmp_q1_125_7',range:' / 125',footnote:'Second and final batch (125 questions) rewritten from the same published exercise deck as PMP 6, completing that set. Includes a mix of situational judgment and EVM/formula-based questions, with extra emphasis on AI, sustainability, and value-delivery topics reflecting the 2026 PMP Exam Content Outline.'},
   {id:'pmp8',label:'PMP 8',title:'PMP Exam Preparation Exercises',storageKey:'pmp_q1_256_8',range:' / 256',footnote:'256 questions extracted from the uploaded PMP Exam Preparation Exercises PDF. Every question includes a Show Hint / Hide Hint toggle.'},
 ];
-const ALL_PRACTICE_CONFIG=[...SET_CONFIG,PMP_SIMS_CONFIG];
-const PRACTICE_CONFIG_BY_ID=Object.fromEntries(ALL_PRACTICE_CONFIG.map(c=>[c.id,c]));
-const PMP_OVERVIEW_IDS=['q1','q2','q3','q4','pmpmock16','pmp6','pmp7','pmp8','pmpsims'];
-const PMP_RETRY_IDS=PMP_OVERVIEW_IDS.filter(id=>!(PRACTICE_CONFIG_BY_ID[id]&&PRACTICE_CONFIG_BY_ID[id].disableRetry));
+const PMP_OVERVIEW_IDS=['q1','q2','q3','q4','pmpmock16','pmp6','pmp7','pmp8'];
 const CAPM_OVERVIEW_IDS=['capm1','capm2','capm3','capm4'];
 const quizInstances={};
+
+
+const PMP_SEARCH_DECK_IDS=['q1','q2','q3','q4','pmpmock16','pmp6','pmp7','pmp8','pmpsims'];
+
+const PMPQuestionSearch=(()=>{
+  const MAX_RENDERED_RESULTS=100;
+  let modal,dialog,input,deckSelect,panel,clearBtn,closeBtn,debounceTimer=null,lastQuery='';
+
+  function stripHTML(value){
+    const div=document.createElement('div');
+    div.innerHTML=String(value??'');
+    return (div.textContent||div.innerText||'').replace(/\u00a0/g,' ').trim();
+  }
+  function escapeHTML(value){
+    return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  }
+  function normalize(value){
+    return stripHTML(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
+  }
+  function deckMeta(id){
+    if(id==='pmpsims')return PMP_SIMS_CONFIG;
+    return SET_CONFIG.find(cfg=>cfg.id===id)||{id,label:id.toUpperCase(),title:id};
+  }
+  function questionType(q){
+    if(q.info)return'Info';
+    if(q.matching)return'Matching';
+    if(q.multi)return'Multiple Response';
+    if(q.caseText)return'Case Study';
+    return'Single Response';
+  }
+  function answerText(q){
+    if(q.info)return q.infoNote||'Tidak memiliki jawaban yang dinilai.';
+    if(q.matching&&q.ans&&typeof q.ans==='object'&&!Array.isArray(q.ans)){
+      return Object.entries(q.ans).map(([key,value])=>key+' → '+stripHTML(value)).join(' · ');
+    }
+    const answers=Array.isArray(q.ans)?q.ans:[q.ans];
+    return answers.filter(Boolean).map(letter=>{
+      const option=q.opts&&Object.prototype.hasOwnProperty.call(q.opts,letter)?stripHTML(q.opts[letter]):'';
+      return option?letter+'. '+option:String(letter);
+    }).join('\n');
+  }
+  function searchableText(q){
+    const values=[q.q,q.exp,q.hint,q.caseTitle,q.caseText,q.infoNote,q.domain,q.approach,q.source,q.chapter,answerText(q)];
+    if(q.opts)values.push(...Object.values(q.opts));
+    if(q.matching){
+      if(q.matching.scenarios)values.push(...Object.values(q.matching.scenarios));
+      if(q.matching.choices)values.push(...q.matching.choices);
+    }
+    if(Array.isArray(q.questions))q.questions.forEach(sub=>values.push(sub.q,sub.exp,sub.hint,sub.ans,...Object.values(sub.opts||{})));
+    return normalize(values.filter(v=>v!==undefined&&v!==null).join(' '));
+  }
+  function selectedDeckIds(){
+    const value=deckSelect?deckSelect.value:'__all__';
+    if(value==='__all__')return PMP_SEARCH_DECK_IDS.slice();
+    if(value==='__current__')return[(typeof activeSubTab!=='undefined'&&activeSubTab.pmp)||'q1'];
+    return[value];
+  }
+  function termsFromQuery(query){
+    return normalize(query).split(/\s+/).filter(Boolean);
+  }
+  function highlight(value,query,maxLength){
+    let clean=stripHTML(value);
+    if(maxLength&&clean.length>maxLength)clean=clean.slice(0,maxLength).trimEnd()+'…';
+    let safe=escapeHTML(clean);
+    const rawTerms=String(query||'').trim().split(/\s+/).filter(Boolean).sort((a,b)=>b.length-a.length);
+    rawTerms.forEach(term=>{
+      const escaped=term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+      if(!escaped)return;
+      safe=safe.replace(new RegExp('('+escaped+')','gi'),'<mark>$1</mark>');
+    });
+    return safe;
+  }
+  function isPMPActive(){
+    const el=document.getElementById('tab-pmp');
+    return !!(el&&el.classList.contains('active'));
+  }
+  function isOpen(){return !!(modal&&!modal.classList.contains('hidden'));}
+  function renderMessage(title,message){
+    if(!panel)return;
+    panel.innerHTML='<div class="pmp-search-message"><strong>'+escapeHTML(title)+'</strong>'+escapeHTML(message)+'</div>';
+  }
+  function openModal(){
+    if(!modal||!input)return;
+    if(!isPMPActive())return;
+    updateCurrentDeckLabel();
+    modal.classList.remove('hidden');
+    modal.setAttribute('aria-hidden','false');
+    document.body.classList.add('pmp-search-open');
+    if(input.value.trim().length>=2)renderResults(input.value);
+    else renderMessage('Cari seluruh bank soal PMP','Ketik minimal 2 karakter, lalu pilih Semua Deck PMP, Deck Aktif, atau deck tertentu.');
+    requestAnimationFrame(()=>{input.focus();input.select();});
+  }
+  function closeModal(){
+    if(!modal)return;
+    modal.classList.add('hidden');
+    modal.setAttribute('aria-hidden','true');
+    document.body.classList.remove('pmp-search-open');
+  }
+  function collect(query){
+    const terms=termsFromQuery(query);
+    const results=[];
+    selectedDeckIds().forEach(deckId=>{
+      const questions=Array.isArray(QDATA[deckId])?QDATA[deckId]:[];
+      const meta=deckMeta(deckId);
+      questions.forEach((q,index)=>{
+        if(!q)return;
+        const haystack=searchableText(q);
+        if(terms.every(term=>haystack.includes(term))){
+          results.push({deckId,deckLabel:meta.label||deckId,deckTitle:meta.title||'',index,q});
+        }
+      });
+    });
+    return results;
+  }
+  function renderResults(query){
+    if(!panel)return;
+    lastQuery=query;
+    const cleanQuery=String(query||'').trim();
+    clearBtn&&clearBtn.classList.toggle('show',!!cleanQuery);
+    if(cleanQuery.length<2){
+      renderMessage(cleanQuery?'Ketik minimal 2 karakter':'Cari seluruh bank soal PMP','Pencarian mencakup soal, opsi, jawaban benar, hint, dan penjelasan pada deck PMP.');
+      return;
+    }
+    const results=collect(cleanQuery);
+    const visible=results.slice(0,MAX_RENDERED_RESULTS);
+    const scopeLabel=deckSelect&&deckSelect.options[deckSelect.selectedIndex]?deckSelect.options[deckSelect.selectedIndex].text:'Semua Deck PMP';
+    let html='<div class="pmp-search-summary"><span><b>'+results.length+'</b> hasil untuk “'+escapeHTML(cleanQuery)+'”</span><span>'+escapeHTML(scopeLabel)+(results.length>MAX_RENDERED_RESULTS?' · menampilkan '+MAX_RENDERED_RESULTS:'')+'</span></div>';
+    if(!results.length){
+      html+='<div class="pmp-search-message"><strong>Tidak ada hasil</strong>Coba kata kunci lain atau ubah filter ke Semua Deck PMP.</div>';
+      panel.innerHTML=html;return;
+    }
+    visible.forEach(item=>{
+      const q=item.q;
+      const explanation=q.exp||q.hint||q.infoNote||'';
+      html+='<article class="pmp-search-result">'
+        +'<div class="pmp-search-result-top"><div class="pmp-search-result-meta">'
+        +'<span class="pmp-search-deck-badge">'+escapeHTML(item.deckLabel)+'</span>'
+        +'<span>Soal #'+escapeHTML(q.n??(item.index+1))+'</span>'
+        +'<span class="pmp-search-type-badge">'+escapeHTML(questionType(q))+'</span>'
+        +'</div><button class="pmp-search-open" type="button" data-search-open="1" data-deck="'+escapeHTML(item.deckId)+'" data-index="'+item.index+'">Buka Soal →</button></div>'
+        +(q.caseTitle||q.caseText?'<div style="font-size:10.5px;color:#71633B;margin-bottom:5px;"><b>'+highlight(q.caseTitle||'Case Study',cleanQuery,160)+'</b>'+(q.caseText?'<br>'+highlight(q.caseText,cleanQuery,420):'')+'</div>':'')
+        +'<div class="pmp-search-question">'+highlight(q.q||q.infoNote||'',cleanQuery,900)+'</div>'
+        +'<div class="pmp-search-answer"><strong>Jawaban benar:</strong><br>'+highlight(answerText(q),cleanQuery,900)+'</div>'
+        +(explanation?'<details class="pmp-search-explanation"><summary>Lihat penjelasan</summary><div>'+highlight(explanation,cleanQuery,1500)+'</div></details>':'')
+        +'</article>';
+    });
+    panel.innerHTML=html;
+  }
+  function runNow(){renderResults(input?input.value:'');}
+  function schedule(){clearTimeout(debounceTimer);debounceTimer=setTimeout(runNow,220);}
+  function clear(){
+    if(input)input.value='';
+    lastQuery='';
+    clearBtn&&clearBtn.classList.remove('show');
+    renderMessage('Cari seluruh bank soal PMP','Ketik minimal 2 karakter, lalu pilih Semua Deck PMP, Deck Aktif, atau deck tertentu.');
+    input&&input.focus();
+  }
+  function openQuestion(deckId,index){
+    closeModal();
+    switchTab('pmp');
+    switchSubTab('pmp',deckId);
+    requestAnimationFrame(()=>{
+      const instance=quizInstances[deckId];
+      if(instance&&typeof instance.goToQuestion==='function')instance.goToQuestion(Number(index));
+    });
+  }
+  function populateDecks(){
+    if(!deckSelect)return;
+    PMP_SEARCH_DECK_IDS.forEach(id=>{
+      const meta=deckMeta(id);
+      const option=document.createElement('option');
+      option.value=id;option.textContent=meta.label||id;
+      deckSelect.appendChild(option);
+    });
+    updateCurrentDeckLabel();
+  }
+  function updateCurrentDeckLabel(){
+    if(!deckSelect)return;
+    const option=deckSelect.querySelector('option[value="__current__"]');
+    const id=(typeof activeSubTab!=='undefined'&&activeSubTab.pmp)||'q1';
+    const meta=deckMeta(id);
+    if(option)option.textContent='Deck Aktif — '+(meta.label||id);
+  }
+  function onDeckChange(){
+    updateCurrentDeckLabel();
+    if(isOpen()&&input&&input.value.trim().length>=2)runNow();
+  }
+  function onTopTabChange(id){
+    if(id!=='pmp')closeModal();
+  }
+  function init(){
+    modal=document.getElementById('pmp-search-modal');
+    dialog=modal?modal.querySelector('.pmp-search-dialog'):null;
+    input=document.getElementById('pmp-search-input');
+    deckSelect=document.getElementById('pmp-search-deck');
+    panel=document.getElementById('pmp-search-panel');
+    clearBtn=document.getElementById('pmp-search-clear');
+    closeBtn=document.getElementById('pmp-search-modal-close');
+    if(!modal||!input||!deckSelect||!panel)return;
+    populateDecks();
+    renderMessage('Cari seluruh bank soal PMP','Ketik minimal 2 karakter, lalu pilih Semua Deck PMP, Deck Aktif, atau deck tertentu.');
+    input.addEventListener('input',schedule);
+    input.addEventListener('keydown',event=>{
+      if(event.key==='Escape'){event.preventDefault();closeModal();}
+      if(event.key==='Enter'){event.preventDefault();runNow();}
+    });
+    deckSelect.addEventListener('change',runNow);
+    clearBtn&&clearBtn.addEventListener('click',clear);
+    closeBtn&&closeBtn.addEventListener('click',closeModal);
+    panel.addEventListener('click',event=>{
+      const btn=event.target.closest('[data-search-open]');
+      if(btn)openQuestion(btn.dataset.deck,Number(btn.dataset.index));
+    });
+    modal.addEventListener('click',event=>{if(event.target===modal)closeModal();});
+    document.addEventListener('click',event=>{
+      const trigger=event.target.closest('[data-pmp-search-open-btn]');
+      if(trigger){event.preventDefault();openModal();}
+    });
+    document.addEventListener('keydown',event=>{
+      if(event.key==='Escape'&&isOpen()){event.preventDefault();closeModal();return;}
+      if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'&&isPMPActive()){
+        event.preventDefault();openModal();
+      }
+    });
+  }
+  return Object.freeze({init,open:openModal,run:runNow,clear,close:closeModal,openQuestion,onDeckChange,onTopTabChange});
+})();
+
+document.addEventListener('DOMContentLoaded',()=>PMPQuestionSearch.init());
 
 // ─── TAB ──────────────────────────────────────────────────────────────────
 
@@ -11623,6 +11947,7 @@ function switchTab(id){
     // Ensure the currently-selected sub-tab within this group is initialized & displayed
     switchSubTab(id,activeSubTab[id]);
   }
+  if(typeof PMPQuestionSearch!=='undefined')PMPQuestionSearch.onTopTabChange(id);
 }
 
 function switchSubTab(group,subId){
@@ -11639,16 +11964,18 @@ function switchSubTab(group,subId){
   activeSubTab[group]=subId;
   // Lazy-init quiz instance on first visit to this sub-tab
   if(!quizInstances[subId]){
-    const cfg=PRACTICE_CONFIG_BY_ID[subId];
+    const cfg=subId==='pmpsims'?PMP_SIMS_CONFIG:SET_CONFIG.find(c=>c.id===subId);
     if(cfg)quizInstances[subId]=createPMPQuiz(cfg);
   } else {
     quizInstances[subId].refreshDisplay();
   }
+  if(group==='pmp'&&typeof PMPQuestionSearch!=='undefined')PMPQuestionSearch.onDeckChange(subId);
 }
 
 // ─── QUIZ FACTORY ─────────────────────────────────────────────────────────
 function createPMPQuiz(cfg){
   const{id,label,title,storageKey,range,footnote,intro,disableRetry}=cfg;
+  const showPmpSearch=PMP_SEARCH_DECK_IDS.includes(id);
   const wrap=document.getElementById('tab-'+id);
   const questions=QDATA[id];
   const QUESTIONS_BANK=questions;
@@ -11674,7 +12001,8 @@ function createPMPQuiz(cfg){
     <span class="pill">🎯 Accuracy: <b data-r="pct-acc">—</b></span>
     <span class="pill">📈 Score: <b data-r="pct-prog">0%</b></span>
   </div>
-  <div class="score-strip" style="margin-bottom:4px;display:flex;align-items:center;gap:8px;"><span class="saved-pill" data-r="saved-banner">💾 No progress yet</span>
+  <div class="score-strip pmp-utility-strip"><span class="saved-pill" data-r="saved-banner">💾 No progress yet</span>
+    ${showPmpSearch?'<button class="pmp-search-trigger" type="button" data-pmp-search-open-btn="1" aria-haspopup="dialog" title="Search Questions (Ctrl/Cmd + K)">🔎 <span class="pmp-search-trigger-long">Search Questions</span><span class="pmp-search-trigger-short" style="display:none;">Search</span></button>':''}
     <button class="tab-reset-btn" data-r="tab-reset-btn">🔄 Reset Set</button></div>
   <div class="retry-mode-bar" data-r="retry-bar"></div>
   <div class="card" data-r="quiz-card">
@@ -12205,6 +12533,30 @@ function createPMPQuiz(cfg){
     refreshSavedBanner();
   }
 
+  // Opens an exact bank question from Global Question Search.
+  function goToQuestion(bankIndex){
+    const target=Math.max(0,Math.min(QUESTIONS_BANK.length-1,Number(bankIndex)||0));
+    if(isRetryMode){
+      if(savedMainState){
+        userAnswers=savedMainState.userAnswers;
+        userChecked=savedMainState.userChecked;
+        userToggles=savedMainState.userToggles;
+      }
+      QUESTIONS=QUESTIONS_BANK;
+      savedMainState=null;
+      isRetryMode=false;
+      hintShown=new Array(QUESTIONS.length).fill(false);
+      infoViewed=new Array(QUESTIONS.length).fill(false);
+      buildJumpGrid();
+      updateStats();
+      refreshSavedBanner();
+    }
+    current=target;
+    if(E.summary)E.summary.classList.remove('show');
+    if(E.card)E.card.style.display='block';
+    render();
+  }
+
   // Redirect per-set retry to Global Retry panel in Overview (same mechanism)
   window['__RETRY_'+id]=()=>{if(disableRetry)return;switchTab('overview');startGlobalRetry(id);};
   window['__BACK_'+id]=backToMainSummary;
@@ -12212,7 +12564,7 @@ function createPMPQuiz(cfg){
   window['__RESET_'+id]=confirmReset;
 
   buildJumpGrid();loadProgress();updateStats();render();refreshSavedBanner();
-  return{getStats,getWrongQuestions,updateAnswer,refreshDisplay,getFullAnalysis,label,id};
+  return{getStats,getWrongQuestions,updateAnswer,refreshDisplay,getFullAnalysis,goToQuestion,label,id};
 }
 
 // ─── GLOBAL RETRY ENGINE ──────────────────────────────────────────────────
@@ -12220,15 +12572,10 @@ let gRetry=null;
 
 function startGlobalRetry(filterSetId){
   // Ensure all quiz instances are initialized before accessing stats
-  ALL_PRACTICE_CONFIG.forEach(cfg=>{if(!quizInstances[cfg.id])quizInstances[cfg.id]=createPMPQuiz(cfg);});
+  SET_CONFIG.forEach(cfg=>{if(!quizInstances[cfg.id])quizInstances[cfg.id]=createPMPQuiz(cfg);});
   // filterSetId: optional — a single set id, an array of set ids, or omitted (defaults to all PMP sets)
   const allWrong=[];
-  const requested=Array.isArray(filterSetId)?filterSetId:(filterSetId?[filterSetId]:PMP_RETRY_IDS);
-  const sids=requested.filter(sid=>PRACTICE_CONFIG_BY_ID[sid]&&!PRACTICE_CONFIG_BY_ID[sid].disableRetry);
-  if(requested.length>0&&sids.length===0){
-    alert('Retry otomatis tidak tersedia untuk PMP Sims karena set ini memuat case study, matching, dan tipe soal khusus. Buka tab PMP Sims untuk meninjau jawaban langsung.');
-    return;
-  }
+  const sids=Array.isArray(filterSetId)?filterSetId:(filterSetId?[filterSetId]:PMP_OVERVIEW_IDS);
   sids.forEach(sid=>{
     const inst=quizInstances[sid];
     if(!inst)return;
@@ -12245,11 +12592,10 @@ function startGlobalRetry(filterSetId){
     hint:new Array(allWrong.length).fill(false),
   };
   const cnt=allWrong.length;
-  const labelForSet=sid=>(PRACTICE_CONFIG_BY_ID[sid]&&PRACTICE_CONFIG_BY_ID[sid].label)||sid.toUpperCase();
-  const sets=[...new Set(allWrong.map(x=>x.setId))].map(labelForSet).join(', ');
+  const sets=[...new Set(allWrong.map(x=>x.setId))].map(s=>s.replace('q','Q').replace('capm','CAPM ')).join(', ');
   const isSingle=typeof filterSetId==='string';
   const headerLabel=isSingle
-    ?'🔁 Retry '+labelForSet(filterSetId)+' — '+cnt+' Incorrect'
+    ?'🔁 Retry '+filterSetId.replace('q','Q')+' — '+cnt+' Incorrect'
     :'🔁 Cross-Set Retry — '+cnt+' Incorrect (from: '+sets+')';
   document.getElementById('gr-header').textContent=headerLabel;
   document.getElementById('gr-stat-total').textContent=cnt;
@@ -12265,7 +12611,7 @@ function buildGRJumpGrid(){
   gRetry.items.forEach((item,i)=>{
     const d=document.createElement('div');d.className='gr-jump-dot';
     d.title='Q'+item.question.n+' ('+item.setId.toUpperCase()+')';
-    d.innerHTML='<span>'+item.question.n+'</span><span class="gr-jump-set">'+((PRACTICE_CONFIG_BY_ID[item.setId]&&PRACTICE_CONFIG_BY_ID[item.setId].label)||item.setId.toUpperCase())+'</span>';
+    d.innerHTML='<span>'+item.question.n+'</span><span class="gr-jump-set">'+item.setId.replace('q','Q')+'</span>';
     d.id='gr-dot-'+i;d.onclick=()=>{gRetry.cur=i;renderGR();};
     grid.appendChild(d);
   });updateGRJumpGrid();
@@ -12302,7 +12648,7 @@ function renderGR(){
   const i=gRetry.cur,item=gRetry.items[i],q=item.question;
   document.getElementById('gr-pos').textContent=(i+1)+'/'+gRetry.items.length;
   document.getElementById('gr-q-meta').textContent='Question #'+q.n;
-  document.getElementById('gr-set-badge').textContent=((PRACTICE_CONFIG_BY_ID[item.setId]&&PRACTICE_CONFIG_BY_ID[item.setId].label)||item.setId.toUpperCase())+' · #'+q.n;
+  document.getElementById('gr-set-badge').textContent=item.setId.replace('q','Q')+' · #'+q.n;
   const mt=document.getElementById('gr-multi-tag');
   if(q.multi){mt.style.display='inline-block';mt.textContent='SELECT '+(q.pick===2?'TWO':'THREE')+' ANSWERS';}
   else mt.style.display='none';
@@ -12433,8 +12779,8 @@ function closeGRSession(){
   document.getElementById('gr-card').style.display='block';
   document.getElementById('gr-summary').classList.remove('show');
   // Refresh all quiz tabs (PMP & CAPM) so their summaries/scores are up to date
-  ALL_PRACTICE_CONFIG.forEach(cfg=>{
-    if(quizInstances[cfg.id]) quizInstances[cfg.id].refreshDisplay();
+  ['q1','q2','q3','q4','capm1','capm2','capm3','capm4'].forEach(sid=>{
+    if(quizInstances[sid]) quizInstances[sid].refreshDisplay();
   });
   gRetry=null;refreshDashboard();
 }
@@ -12442,7 +12788,7 @@ function closeGRSession(){
 // ─── DASHBOARD ─────────────────────────────────────────────────────────────
 function refreshDashboard(){
   // Init any missing quiz instances needed for dashboard stats
-  ALL_PRACTICE_CONFIG.forEach(cfg=>{
+  SET_CONFIG.forEach(cfg=>{
     if(!quizInstances[cfg.id])quizInstances[cfg.id]=createPMPQuiz(cfg);
   });
   const stats=PMP_OVERVIEW_IDS.map(k=>quizInstances[k].getStats());
@@ -12450,11 +12796,6 @@ function refreshDashboard(){
   const totAnswered=stats.reduce((s,x)=>s+x.answered,0);
   const totCorrect=stats.reduce((s,x)=>s+x.correct,0);
   const totWrong=totAnswered-totCorrect;
-  const retryableWrong=PMP_RETRY_IDS.reduce((sum,sid)=>{
-    const inst=quizInstances[sid];
-    return sum+(inst?inst.getWrongQuestions().length:0);
-  },0);
-  const simsWrong=totWrong-retryableWrong;
   const el=id=>document.getElementById(id);
 
   // Update "Total Salah" card
@@ -12463,13 +12804,7 @@ function refreshDashboard(){
     el('dash-total-wrong').style.color=totWrong>0?'var(--coral)':'var(--teal)';
   }
   if(el('dash-wrong-hint')){
-    if(retryableWrong>0){
-      el('dash-wrong-hint').textContent='↑ ulangi '+retryableWrong+' soal'+(simsWrong>0?' · '+simsWrong+' PMP Sims ditinjau di tab':'');
-    }else if(simsWrong>0){
-      el('dash-wrong-hint').textContent=simsWrong+' salah di PMP Sims · tinjau langsung di tab';
-    }else{
-      el('dash-wrong-hint').textContent='✓ tidak ada yang salah';
-    }
+    el('dash-wrong-hint').textContent=totWrong>0?'↑ klik untuk ulangi '+totWrong+' soal':'✓ tidak ada yang salah';
   }
 
   let passCount=0;
@@ -12578,14 +12913,13 @@ function refreshDashboard(){
     const recos=[];
     if(totAnswered===0){recos.push({icon:'📝',text:'Start with <b>PMP 1</b> to build your PMP concept foundation.'});}
     else{
-      if(retryableWrong>0)recos.push({icon:'🔁',text:'Ada <b>'+retryableWrong+' soal yang masih salah</b> pada set yang mendukung retry lintas-set. Klik kartu "<b>Incorrect</b>" untuk mengerjakannya ulang.'});
-      if(simsWrong>0)recos.push({icon:'🧪',text:'Ada <b>'+simsWrong+' jawaban salah di PMP Sims</b>. Tinjau melalui tab PMP Sims karena set simulasi memuat tipe soal khusus.'});
+      if(totWrong>0)recos.push({icon:'🔁',text:'Ada <b>'+totWrong+' soal yang masih salah</b> dari semua set. Klik kartu "<b>Incorrect</b>" di atas untuk mengerjakan ulang semuanya sekarang.'});
       const sorted=[...stats].filter(s=>s.answered>0).sort((a,b)=>(a.correct/a.answered)-(b.correct/b.answered));
       if(sorted.length>0){const w=sorted[0];const wA=Math.round(w.correct/w.answered*100);
         if(wA<70)recos.push({icon:'🎯',text:'Weakest set: <b>'+w.label+'</b> (accuracy '+wA+'%). Use "Retry Incorrect" in that tab for targeted practice.'});}
       const unattempted=stats.filter(s=>s.answered===0);
       if(unattempted.length>0)recos.push({icon:'🆕',text:'Not started: <b>'+unattempted.map(s=>s.label).join(', ')+'</b>. Begin with the first question in those sets.'});
-      if(avgAcc!==null&&avgAcc>=70&&passCount===PMP_OVERVIEW_IDS.length)recos.push({icon:'🏆',text:'Luar biasa! Seluruh practice set termasuk <b>PMP Sims</b> sudah lulus. Gunakan menu <b>Exam</b> untuk simulasi sesi ujian dengan set soal yang dihasilkan ulang.'});
+      if(avgAcc!==null&&avgAcc>=70&&passCount===PMP_OVERVIEW_IDS.length)recos.push({icon:'🏆',text:'Luar biasa! Semua set sudah lulus. Pertimbangkan <b>mock exam</b> full 180 soal dalam kondisi ujian sesungguhnya sebagai persiapan terakhir.'});
       else if(totAnswered>=200&&avgAcc>=60)recos.push({icon:'⏱️',text:'Latih <b>time management</b> — ujian PMP memberikan sekitar 1.5 menit per soal. Kerjakan soal dengan timer.'});
       if(recos.length===0)recos.push({icon:'✅',text:'Semua area terlihat baik. Tetap pertahankan latihan rutin!'});
     }
@@ -12922,7 +13256,7 @@ function refreshReview(){
   const BADGE=p=>p>=80?'<span class="rv-ka-badge badge-strong">Kuat</span>':p>=60?'<span class="rv-ka-badge badge-avg">Rata-rata</span>':p>0?'<span class="rv-ka-badge badge-weak">Lemah</span>':'<span class="rv-ka-badge badge-na">—</span>';
   const KA_ORDER=['Integration','Scope','Schedule','Cost','Quality','HR','Communications','Risk','Procurement','Stakeholder'];
   const KA_EMOJI={Integration:'🔗',Scope:'📋',Schedule:'📅',Cost:'💰',Quality:'✅',HR:'👥',Communications:'📢',Risk:'⚠️',Procurement:'📝',Stakeholder:'🤝'};
-  const SET_INFO=Object.fromEntries(ALL_PRACTICE_CONFIG.map(c=>[c.id,{label:c.label,title:c.title}]));
+  const SET_INFO=Object.fromEntries(SET_CONFIG.map(c=>[c.id,{label:c.label,title:c.title}]));
   const PMP_IDS=PMP_OVERVIEW_IDS;
   const CAPM_IDS=CAPM_OVERVIEW_IDS;
 
@@ -13078,7 +13412,7 @@ function refreshReview(){
     }
 
     html+=`
-    <div class="rv-set-panel" data-set-id="${sid}">
+    <div class="rv-set-panel">
       <div class="rv-set-header" onclick="toggleSetPanel('${sid}')">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <span class="rv-set-label">${info.label}</span>
@@ -13197,7 +13531,7 @@ function refreshReview(){
     }
 
     html+=`
-    <div class="rv-set-panel" data-set-id="${sid}">
+    <div class="rv-set-panel">
       <div class="rv-set-header" onclick="toggleSetPanel('${sid}')">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <span class="rv-set-label">${info.label}</span>
@@ -15361,7 +15695,7 @@ function pgmRestoreCode(){
       // Force quiz instance to re-init from localStorage on next visit
       quizInstances[result.tabId]=null;
       // Re-init immediately and switch to the tab
-      const cfg=PRACTICE_CONFIG_BY_ID[result.tabId];
+      const cfg=SET_CONFIG.find(s=>s.id===result.tabId);
       if(cfg){
         quizInstances[result.tabId]=createPMPQuiz(cfg);
         switchTab(result.tabId);
@@ -15377,12 +15711,15 @@ function saveProgressBackup(){
 }
 
 function gatherAllProgress(){
-  const data={version:2,ts:new Date().toISOString(),sets:{},exam:null,capmExam:null};
-  ALL_PRACTICE_CONFIG.forEach(cfg=>{
-    try{data.sets[cfg.storageKey]=JSON.parse(localStorage.getItem(cfg.storageKey)||'null');}catch(e){}
+  const data={version:1,ts:new Date().toISOString(),sets:{},exam:null};
+  const SET_KEYS_MAP=[
+    {id:'q1',key:'pmp_q1_100'},{id:'q2',key:'pmp_q101_200'},
+    {id:'q3',key:'pmp_q201_300'},{id:'q4',key:'pmp_q301_400'},
+  ];
+  SET_KEYS_MAP.forEach(({id,key})=>{
+    try{data.sets[key]=JSON.parse(localStorage.getItem(key)||'null');}catch(e){}
   });
   try{data.exam=JSON.parse(localStorage.getItem('pmp_exam_session')||'null');}catch(e){}
-  try{data.capmExam=JSON.parse(localStorage.getItem('capm_exam_session')||'null');}catch(e){}
   return data;
 }
 
@@ -15392,18 +15729,17 @@ function restoreProgressBackup(event){
   reader.onload=function(e){
     try{
       const data=JSON.parse(e.target.result);
-      if(!data||![1,2].includes(data.version)||!data.ts){showToast('❌ File tidak valid.',true);return;}
+      if(!data||data.version!==1||!data.ts){showToast('❌ File tidak valid.',true);return;}
       const d=new Date(data.ts);
       const dateStr=d.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})
                    +' pukul '+d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
       if(!confirm('Pulihkan cadangan dari '+dateStr+'? Progres saat ini akan diganti.'))return;
-      const SKEYS=ALL_PRACTICE_CONFIG.map(c=>c.storageKey);
+      const SKEYS=SET_CONFIG.map(c=>c.storageKey);
       SKEYS.forEach(key=>{
         if(data.sets[key]!==undefined&&data.sets[key]!==null)
           localStorage.setItem(key,JSON.stringify(data.sets[key]));
       });
       if(data.exam)localStorage.setItem('pmp_exam_session',JSON.stringify(data.exam));
-      if(data.capmExam)localStorage.setItem('capm_exam_session',JSON.stringify(data.capmExam));
       localStorage.setItem(BACKUP_META_KEY,JSON.stringify({ts:data.ts}));
       updateBackupLabel();
       showToast('✅ Progres dipulihkan! Memuat ulang...',false);
@@ -15434,11 +15770,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 <div class="pgm-tab" onclick="pgmSelectTab('q2')">PMP 2</div>
 <div class="pgm-tab" onclick="pgmSelectTab('q3')">PMP 3</div>
 <div class="pgm-tab" onclick="pgmSelectTab('q4')">PMP 4</div>
-<div class="pgm-tab" onclick="pgmSelectTab('pmpmock16')">PMP 5</div>
-<div class="pgm-tab" onclick="pgmSelectTab('pmp6')">PMP 6</div>
-<div class="pgm-tab" onclick="pgmSelectTab('pmp7')">PMP 7</div>
 <div class="pgm-tab" onclick="pgmSelectTab('pmp8')">PMP 8</div>
-<div class="pgm-tab" onclick="pgmSelectTab('pmpsims')">PMP Sims</div>
 <div class="pgm-tab" onclick="pgmSelectTab('capm1')">CAPM 1</div>
 <div class="pgm-tab" onclick="pgmSelectTab('capm2')">CAPM 2</div>
 <div class="pgm-tab" onclick="pgmSelectTab('capm3')">CAPM 3</div>
