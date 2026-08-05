@@ -152,6 +152,54 @@
   .set-card-sub{font-size:12px;color:var(--muted);}
   .prog-bar-wrap{height:6px;background:rgba(255,255,255,.08);border-radius:3px;margin-top:9px;overflow:hidden;}
   .prog-bar{height:100%;border-radius:3px;transition:width .5s ease;}
+  /* PMP Sims — first full-width card on Overview */
+  .set-card-wide{
+    grid-column:1/-1;
+    display:grid;
+    grid-template-columns:minmax(320px,1.45fr) minmax(145px,.55fr) minmax(220px,.8fr) 28px;
+    grid-template-rows:auto auto;
+    align-items:center;
+    column-gap:22px;
+    row-gap:12px;
+    padding:17px 19px 15px;
+    background:linear-gradient(110deg,rgba(139,92,246,.18),rgba(24,39,72,.96) 42%,rgba(18,32,62,.98));
+    border-color:rgba(167,139,250,.46);
+    box-shadow:inset 3px 0 0 rgba(167,139,250,.68);
+  }
+  .set-card-wide:hover{border-color:#A78BFA;background:linear-gradient(110deg,rgba(139,92,246,.23),rgba(24,39,72,.98) 42%,rgba(18,32,62,1));}
+  .sims-card-intro{display:flex;align-items:center;gap:13px;min-width:0;}
+  .sims-card-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;background:rgba(139,92,246,.2);border:1px solid rgba(167,139,250,.44);font-size:19px;}
+  .set-card-wide-identity{min-width:0;}
+  .set-card-wide-title{font-size:14px;font-weight:700;color:var(--paper);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .set-card-wide-meta{font-size:10.5px;color:var(--muted);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .sims-card-status{display:flex;justify-content:center;align-items:center;}
+  .sims-card-status .set-badge{padding:5px 10px;white-space:nowrap;}
+  .sims-card-result{min-width:0;padding-left:20px;border-left:1px solid rgba(148,160,194,.18);}
+  .sims-card-result-label{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.09em;color:var(--muted);text-transform:uppercase;margin-bottom:3px;}
+  .set-card-wide .set-card-score{margin:0;font-size:23px;line-height:1.05;}
+  .set-card-wide .set-card-sub{margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .set-card-wide-progress{grid-column:1/4;min-width:0;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:11px;}
+  .set-card-wide-progress-label{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.07em;color:var(--muted);text-transform:uppercase;white-space:nowrap;}
+  .set-card-wide-progress .prog-bar-wrap{margin:0;height:7px;}
+  .set-card-wide-progress-value{font-family:'Space Mono',monospace;font-size:10px;color:#A78BFA;min-width:34px;text-align:right;padding-right:10px;}
+  .set-card-wide-arrow{grid-column:4;grid-row:1/3;align-self:stretch;display:flex;align-items:center;justify-content:flex-end;font-size:27px;color:#A78BFA;}
+  @media(max-width:900px){
+    .set-card-wide{grid-template-columns:minmax(260px,1.2fr) auto minmax(190px,.8fr) 24px;column-gap:14px;}
+    .sims-card-result{padding-left:14px;}
+  }
+  @media(max-width:700px){
+    .set-card-wide{grid-template-columns:minmax(230px,1fr) auto 22px;}
+    .sims-card-result{grid-column:1/3;grid-row:2;padding:10px 0 0;border-left:0;border-top:1px solid rgba(148,160,194,.18);}
+    .set-card-wide-progress{grid-column:1/3;grid-row:3;}
+    .set-card-wide-arrow{grid-column:3;grid-row:1/4;}
+  }
+  @media(max-width:520px){
+    .set-card-wide{display:flex;flex-direction:column;align-items:stretch;gap:11px;padding:15px;}
+    .sims-card-status{justify-content:flex-start;}
+    .sims-card-result{padding-top:10px;}
+    .set-card-wide-progress{display:grid;grid-template-columns:auto 1fr auto;width:100%;}
+    .set-card-wide-arrow{display:none;}
+  }
   .dash-section{margin-bottom:16px;}
   .dash-section-title{font-family:'Space Mono',monospace;font-size:10.5px;color:var(--amber);letter-spacing:.12em;text-transform:uppercase;margin-bottom:11px;padding-bottom:7px;border-bottom:1px solid var(--line);}
   .dash-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
@@ -375,6 +423,32 @@
     color:var(--amber);letter-spacing:.1em;}
   .rv-set-title{font-size:12px;color:var(--muted);white-space:nowrap;}
   .rv-set-badge{font-size:11px;padding:3px 8px;border-radius:999px;font-weight:600;}
+  /* PMP Sims — first, full-width horizontal panel on Review */
+  .rv-set-panel-wide{border-color:rgba(167,139,250,.46);background:rgba(139,92,246,.035);box-shadow:inset 3px 0 0 rgba(167,139,250,.68);}
+  .rv-set-header-wide{
+    display:grid;grid-template-columns:minmax(320px,1.35fr) minmax(145px,.5fr) minmax(220px,.72fr) 24px;
+    align-items:center;gap:20px;padding:15px 17px;
+    background:linear-gradient(110deg,rgba(139,92,246,.18),var(--navy-2) 46%,rgba(91,101,132,.08));
+  }
+  .rv-set-header-wide:hover{background:linear-gradient(110deg,rgba(139,92,246,.24),var(--navy-3) 46%,rgba(91,101,132,.12));}
+  .rv-set-wide-intro{display:flex;align-items:center;gap:12px;min-width:0;}
+  .rv-set-wide-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;background:rgba(139,92,246,.2);border:1px solid rgba(167,139,250,.42);font-size:17px;}
+  .rv-set-wide-identity{min-width:0;}
+  .rv-set-wide-title{font-size:13px;font-weight:700;color:var(--paper);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rv-set-wide-meta{font-size:10.5px;color:var(--muted);margin-top:4px;}
+  .rv-set-wide-status{display:flex;justify-content:center;}
+  .rv-set-wide-result{text-align:left;font-family:'Space Mono',monospace;font-size:10.5px;color:var(--muted);white-space:nowrap;padding-left:19px;border-left:1px solid rgba(148,160,194,.18);}
+  .rv-set-wide-result strong{display:block;font-size:18px;color:var(--paper);margin-bottom:3px;}
+  @media(max-width:780px){
+    .rv-set-header-wide{grid-template-columns:minmax(240px,1fr) auto 22px;gap:13px;}
+    .rv-set-wide-result{grid-column:1/3;padding:9px 0 0;border-left:0;border-top:1px solid rgba(148,160,194,.18);}
+  }
+  @media(max-width:520px){
+    .rv-set-header-wide{display:flex;align-items:flex-start;flex-wrap:wrap;gap:10px;padding:14px;}
+    .rv-set-wide-intro{flex:1 1 100%;}
+    .rv-set-wide-status{justify-content:flex-start;}
+    .rv-set-wide-result{flex:1 1 100%;}
+  }
 
 
   @media(max-width:420px){
@@ -1115,6 +1189,30 @@
 <div class="dash-section">
 <div class="dash-section-title">📋 Performance by Set</div>
 <div class="dash-grid">
+<div class="set-card set-card-wide" onclick="switchTab('pmpsims')" aria-label="Open PMP Sims full length mock exam">
+  <div class="sims-card-intro">
+    <div class="sims-card-icon" aria-hidden="true">⏱️</div>
+    <div class="set-card-wide-identity">
+      <div class="set-card-label" style="color:#A78BFA;">PMP Sims</div>
+      <div class="set-card-wide-title">Full Length Mock Exam</div>
+      <div class="set-card-wide-meta">180 questions · 240 minutes · exam simulation</div>
+    </div>
+  </div>
+  <div class="sims-card-status">
+    <span class="set-badge badge-none" id="dash-badge-pmpsims">⏳ Not Started</span>
+  </div>
+  <div class="sims-card-result">
+    <div class="sims-card-result-label">Score</div>
+    <div class="set-card-score" id="dash-score-pmpsims">0/180</div>
+    <div class="set-card-sub" id="dash-sub-pmpsims">No questions answered yet</div>
+  </div>
+  <div class="set-card-wide-progress">
+    <span class="set-card-wide-progress-label">Score progress</span>
+    <div class="prog-bar-wrap"><div class="prog-bar" id="dash-bar-pmpsims" style="width:0%;background:var(--muted);"></div></div>
+    <span class="set-card-wide-progress-value" id="dash-progress-pmpsims">0%</span>
+  </div>
+  <div class="set-card-wide-arrow" aria-hidden="true">›</div>
+</div>
 <div class="set-card" onclick="switchTab('q1')">
 <div class="set-card-top"><div class="set-card-label">PMP 1</div><span class="set-badge badge-none" id="dash-badge-q1">⏳ Not Started</span></div>
 <div class="set-card-score" id="dash-score-q1">0/100</div>
@@ -1178,13 +1276,14 @@
 </div>
 <div class="dash-stat"><div class="dash-stat-num" id="dash-total-accuracy">—</div><div class="dash-stat-label">Avg. Accuracy</div></div>
 <div class="dash-stat"><div class="dash-stat-num" id="dash-total-coverage">0%</div><div class="dash-stat-label" id="dash-coverage-label">Coverage (all PMP sets)</div></div>
-<div class="dash-stat"><div class="dash-stat-num" id="dash-sets-pass">0/8</div><div class="dash-stat-label">Sets Passed (≥70%)</div></div>
+<div class="dash-stat"><div class="dash-stat-num" id="dash-sets-pass">0/9</div><div class="dash-stat-label">Sets Passed (≥70%)</div></div>
 </div>
 </div>
 <!-- Accuracy comparison -->
 <div class="dash-section">
 <div class="dash-section-title">🎯 Accuracy by Set</div>
 <div class="accuracy-bars">
+<div class="acc-row"><div class="acc-label" style="color:#A78BFA;">PMP Sims</div><div class="acc-bar-outer"><div class="acc-bar-inner" id="acc-bar-pmpsims" style="width:0%;background:#A78BFA;"></div></div><div class="acc-pct" id="acc-pct-pmpsims">—</div></div>
 <div class="acc-row"><div class="acc-label">PMP 1</div><div class="acc-bar-outer"><div class="acc-bar-inner" id="acc-bar-q1" style="width:0%;"></div></div><div class="acc-pct" id="acc-pct-q1">—</div></div>
 <div class="acc-row"><div class="acc-label">PMP 2</div><div class="acc-bar-outer"><div class="acc-bar-inner" id="acc-bar-q2" style="width:0%;"></div></div><div class="acc-pct" id="acc-pct-q2">—</div></div>
 <div class="acc-row"><div class="acc-label">PMP 3</div><div class="acc-bar-outer"><div class="acc-bar-inner" id="acc-bar-q3" style="width:0%;"></div></div><div class="acc-pct" id="acc-pct-q3">—</div></div>
@@ -11290,7 +11389,7 @@ const SET_CONFIG=[
   {id:'pmp7',label:'PMP 7',title:'PMP Topic Questions 7',storageKey:'pmp_q1_125_7',range:' / 125',footnote:'Second and final batch (125 questions) rewritten from the same published exercise deck as PMP 6, completing that set. Includes a mix of situational judgment and EVM/formula-based questions, with extra emphasis on AI, sustainability, and value-delivery topics reflecting the 2026 PMP Exam Content Outline.'},
   {id:'pmp8',label:'PMP 8',title:'PMP Exam Preparation Exercises',storageKey:'pmp_q1_256_8',range:' / 256',footnote:'256 questions extracted from the uploaded PMP Exam Preparation Exercises PDF. Every question includes a Show Hint / Hide Hint toggle.'},
 ];
-const PMP_OVERVIEW_IDS=['q1','q2','q3','q4','pmpmock16','pmp6','pmp7','pmp8'];
+const PMP_OVERVIEW_IDS=['pmpsims','q1','q2','q3','q4','pmpmock16','pmp6','pmp7','pmp8'];
 const CAPM_OVERVIEW_IDS=['capm1','capm2','capm3','capm4'];
 const quizInstances={};
 
@@ -12575,7 +12674,7 @@ function startGlobalRetry(filterSetId){
   SET_CONFIG.forEach(cfg=>{if(!quizInstances[cfg.id])quizInstances[cfg.id]=createPMPQuiz(cfg);});
   // filterSetId: optional — a single set id, an array of set ids, or omitted (defaults to all PMP sets)
   const allWrong=[];
-  const sids=Array.isArray(filterSetId)?filterSetId:(filterSetId?[filterSetId]:PMP_OVERVIEW_IDS);
+  const sids=Array.isArray(filterSetId)?filterSetId:(filterSetId?[filterSetId]:PMP_OVERVIEW_IDS.filter(sid=>sid!=='pmpsims'));
   sids.forEach(sid=>{
     const inst=quizInstances[sid];
     if(!inst)return;
@@ -12778,10 +12877,11 @@ function closeGRSession(){
   document.getElementById('gr-container').style.display='none';
   document.getElementById('gr-card').style.display='block';
   document.getElementById('gr-summary').classList.remove('show');
-  // Refresh all quiz tabs (PMP & CAPM) so their summaries/scores are up to date
-  ['q1','q2','q3','q4','capm1','capm2','capm3','capm4'].forEach(sid=>{
-    if(quizInstances[sid]) quizInstances[sid].refreshDisplay();
+  // Refresh every practice tab so summaries/scores stay consistent after retry
+  SET_CONFIG.forEach(cfg=>{
+    if(quizInstances[cfg.id])quizInstances[cfg.id].refreshDisplay();
   });
+  if(quizInstances.pmpsims)quizInstances.pmpsims.refreshDisplay();
   gRetry=null;refreshDashboard();
 }
 
@@ -12791,6 +12891,7 @@ function refreshDashboard(){
   SET_CONFIG.forEach(cfg=>{
     if(!quizInstances[cfg.id])quizInstances[cfg.id]=createPMPQuiz(cfg);
   });
+  if(!quizInstances.pmpsims)quizInstances.pmpsims=createPMPQuiz(PMP_SIMS_CONFIG);
   const stats=PMP_OVERVIEW_IDS.map(k=>quizInstances[k].getStats());
   const totGradable=stats.reduce((s,x)=>s+x.total,0);
   const totAnswered=stats.reduce((s,x)=>s+x.answered,0);
@@ -12827,6 +12928,7 @@ function refreshDashboard(){
       const col=passen?'var(--teal)':s.answered===0?'var(--muted)':'var(--coral)';
       el('dash-bar-'+sid).style.width=score_pct+'%';el('dash-bar-'+sid).style.background=col;
     }
+    if(sid==='pmpsims'&&el('dash-progress-pmpsims'))el('dash-progress-pmpsims').textContent=score_pct+'%';
     const accBar=el('acc-bar-'+sid),accPct=el('acc-pct-'+sid);
     if(accBar){
       const col=acc===null?'rgba(148,160,194,.4)':acc>=70?'var(--teal)':acc>=50?'var(--warn)':'var(--coral)';
@@ -13256,7 +13358,7 @@ function refreshReview(){
   const BADGE=p=>p>=80?'<span class="rv-ka-badge badge-strong">Kuat</span>':p>=60?'<span class="rv-ka-badge badge-avg">Rata-rata</span>':p>0?'<span class="rv-ka-badge badge-weak">Lemah</span>':'<span class="rv-ka-badge badge-na">—</span>';
   const KA_ORDER=['Integration','Scope','Schedule','Cost','Quality','HR','Communications','Risk','Procurement','Stakeholder'];
   const KA_EMOJI={Integration:'🔗',Scope:'📋',Schedule:'📅',Cost:'💰',Quality:'✅',HR:'👥',Communications:'📢',Risk:'⚠️',Procurement:'📝',Stakeholder:'🤝'};
-  const SET_INFO=Object.fromEntries(SET_CONFIG.map(c=>[c.id,{label:c.label,title:c.title}]));
+  const SET_INFO=Object.fromEntries([PMP_SIMS_CONFIG,...SET_CONFIG].map(c=>[c.id,{label:c.label,title:c.title}]));
   const PMP_IDS=PMP_OVERVIEW_IDS;
   const CAPM_IDS=CAPM_OVERVIEW_IDS;
 
@@ -13303,6 +13405,7 @@ function refreshReview(){
     const inst=quizInstances[sid]; if(!inst)return;
     const info=SET_INFO[sid];
     const analysis=inst.getFullAnalysis();
+    const setTotal=analysis.filter(x=>!x.question.info).length;
     const items=analysis.filter(x=>x.isAnswered&&!x.question.info);
     const setAns=items.length;
     const setCorr=items.filter(x=>x.isEffectiveCorrect).length;
@@ -13411,21 +13514,46 @@ function refreshReview(){
       }
     }
 
-    html+=`
-    <div class="rv-set-panel">
-      <div class="rv-set-header" onclick="toggleSetPanel('${sid}')">
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <span class="rv-set-label">${info.label}</span>
-          <span class="rv-set-title">${info.title}</span>
-          ${setStatus}
-          ${setAns>0?`<span style="font-family:Space Mono,monospace;font-size:11px;color:${COL(setPct)};">${setCorr}/${setAns} correct (${setPct}%)</span>`:''}
+    if(sid==='pmpsims'){
+      html+=`
+      <div class="rv-set-panel rv-set-panel-wide">
+        <div class="rv-set-header rv-set-header-wide" onclick="toggleSetPanel('${sid}')">
+          <div class="rv-set-wide-intro">
+            <div class="rv-set-wide-icon" aria-hidden="true">⏱️</div>
+            <div class="rv-set-wide-identity">
+              <div class="rv-set-label" style="color:#A78BFA;">${info.label}</div>
+              <div class="rv-set-wide-title">Full Length Mock Exam</div>
+              <div class="rv-set-wide-meta">${setTotal} questions · 240 minutes</div>
+            </div>
+          </div>
+          <div class="rv-set-wide-status">${setStatus}</div>
+          <div class="rv-set-wide-result">
+            <strong style="color:${setAns>0?COL(setPct):'var(--paper)'};">${setAns>0?setPct+'%':'—'}</strong>
+            ${setAns}/${setTotal} answered${setAns>0?' · '+setCorr+' correct':''}
+          </div>
+          <span id="rv-icon-${sid}" style="color:#A78BFA;font-size:18px;flex:0 0 auto;">${isFirst?'▲':'▼'}</span>
         </div>
-        <span id="rv-icon-${sid}" style="color:var(--amber);font-size:16px;flex:0 0 auto;">${isFirst?'▲':'▼'}</span>
-      </div>
-      <div id="rv-body-${sid}" style="display:${isFirst?'block':'none'};padding:14px 14px 6px;">
-        ${body}
-      </div>
-    </div>`;
+        <div id="rv-body-${sid}" style="display:${isFirst?'block':'none'};padding:14px 14px 6px;">
+          ${body}
+        </div>
+      </div>`;
+    }else{
+      html+=`
+      <div class="rv-set-panel">
+        <div class="rv-set-header" onclick="toggleSetPanel('${sid}')">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <span class="rv-set-label">${info.label}</span>
+            <span class="rv-set-title">${info.title}</span>
+            ${setStatus}
+            ${setAns>0?`<span style="font-family:Space Mono,monospace;font-size:11px;color:${COL(setPct)};">${setCorr}/${setAns} correct (${setPct}%)</span>`:''}
+          </div>
+          <span id="rv-icon-${sid}" style="color:var(--amber);font-size:16px;flex:0 0 auto;">${isFirst?'▲':'▼'}</span>
+        </div>
+        <div id="rv-body-${sid}" style="display:${isFirst?'block':'none'};padding:14px 14px 6px;">
+          ${body}
+        </div>
+      </div>`;
+    }
   });
 
   html+='<div class="rv-cluster-title" style="font-family:Space Mono,monospace;font-size:12px;letter-spacing:.1em;color:var(--muted);margin:22px 0 8px;">📗 CAPM PRACTICE SETS</div>';
@@ -15514,7 +15642,27 @@ const TAB_KEYS = {
 const TAB_LABELS = {
   q1:'PMP 1', q2:'PMP 2', q3:'PMP 3', q4:'PMP 4', pmpmock16:'PMP 5', pmp6:'PMP 6', pmp7:'PMP 7', pmp8:'PMP 8', pmpsims:'PMP Sims', capm1:'CAPM 1', capm2:'CAPM 2', capm3:'CAPM 3', capm4:'CAPM 4', exam:'PMP Exam', examcapm:'CAPM Exam'
 };
+const PGM_TAB_ORDER = ['pmpsims','q1','q2','q3','q4','pmpmock16','pmp6','pmp7','pmp8','capm1','capm2','capm3','capm4','exam','examcapm'];
 let pgmActiveTab = 'q1';
+
+function renderPGMTabs(){
+  const row=document.getElementById('pgm-tab-row');
+  if(!row)return;
+  row.innerHTML=PGM_TAB_ORDER.map(tabId=>
+    '<div class="pgm-tab" data-tab-id="'+tabId+'" onclick="pgmSelectTab(\''+tabId+'\')">'+TAB_LABELS[tabId]+'</div>'
+  ).join('');
+}
+
+function getPGMPreferredTab(){
+  const activeMain=document.querySelector('.tab-content.active');
+  if(activeMain&&activeMain.id==='tab-pmp'&&TAB_KEYS[activeSubTab.pmp])return activeSubTab.pmp;
+  if(activeMain&&activeMain.id==='tab-capm'&&TAB_KEYS[activeSubTab.capm])return activeSubTab.capm;
+  if(activeMain&&activeMain.id==='tab-exam'){
+    const capmExam=document.getElementById('ex-capm');
+    return capmExam&&capmExam.classList.contains('active')?'examcapm':'exam';
+  }
+  return pgmActiveTab&&TAB_KEYS[pgmActiveTab]?pgmActiveTab:'q1';
+}
 
 function showToast(msg, isError){
   const t=document.getElementById('prog-toast');if(!t)return;
@@ -15579,6 +15727,7 @@ function pgmDecode(code){
     const parts=code.split(':');
     if(parts.length<3)return null;
     const tabId=parts[1];
+    if(!Object.prototype.hasOwnProperty.call(TAB_KEYS,tabId))return null;
     const encoded=parts.slice(2).join(':');
     // decodeURIComponent reverses the encoding before JSON.parse
     const json=decodeURIComponent(atob(encoded));
@@ -15601,8 +15750,9 @@ function pgmDecode(code){
 
 // ── Modal open / close ───────────────────────────────────────────────────────
 function openPGM(){
+  renderPGMTabs();
   const el=document.getElementById('pgm-overlay');if(el)el.style.display='flex';
-  pgmSelectTab('q1');
+  pgmSelectTab(getPGMPreferredTab());
 }
 function closePGM(){
   const el=document.getElementById('pgm-overlay');if(el)el.style.display='none';
@@ -15610,9 +15760,10 @@ function closePGM(){
 }
 
 function pgmSelectTab(tabId){
+  if(!Object.prototype.hasOwnProperty.call(TAB_KEYS,tabId))tabId='q1';
   pgmActiveTab=tabId;
   document.querySelectorAll('.pgm-tab').forEach(t=>{
-    t.classList.toggle('active',t.textContent.trim()===TAB_LABELS[tabId]);
+    t.classList.toggle('active',t.dataset.tabId===tabId);
   });
   const lbl=document.getElementById('pgm-code-label');
   if(lbl)lbl.textContent='Kode Progres — '+TAB_LABELS[tabId];
@@ -15680,7 +15831,11 @@ function pgmRestoreCode(){
   const result=pgmDecode(pa.value);
   if(!result){showToast('❌ Kode tidak valid. Pastikan kode disalin lengkap.',true);return;}
   const label=TAB_LABELS[result.tabId]||result.tabId;
-  if(!confirm('Pulihkan progres '+label+'? Progres tab ini akan ditimpa.'))return;
+  if(result.tabId!==pgmActiveTab){
+    const selectedLabel=TAB_LABELS[pgmActiveTab]||pgmActiveTab;
+    if(!confirm('Kode ini berisi progres '+label+', bukan '+selectedLabel+'. Tetap pulihkan '+label+'?'))return;
+    pgmSelectTab(result.tabId);
+  } else if(!confirm('Pulihkan progres '+label+'? Progres tab ini akan ditimpa.'))return;
   try{
     localStorage.setItem(TAB_KEYS[result.tabId],result.json);
     localStorage.setItem(BACKUP_META_KEY,JSON.stringify({ts:new Date().toISOString()}));
@@ -15691,11 +15846,13 @@ function pgmRestoreCode(){
     // Refresh relevant UI
     if(result.tabId==='exam'){
       initExamTab();
+    } else if(result.tabId==='examcapm'){
+      initCapmExamTab();
     } else {
       // Force quiz instance to re-init from localStorage on next visit
       quizInstances[result.tabId]=null;
-      // Re-init immediately and switch to the tab
-      const cfg=SET_CONFIG.find(s=>s.id===result.tabId);
+      // Re-init immediately and switch to the restored practice set
+      const cfg=result.tabId==='pmpsims'?PMP_SIMS_CONFIG:SET_CONFIG.find(s=>s.id===result.tabId);
       if(cfg){
         quizInstances[result.tabId]=createPMPQuiz(cfg);
         switchTab(result.tabId);
@@ -15711,15 +15868,15 @@ function saveProgressBackup(){
 }
 
 function gatherAllProgress(){
-  const data={version:1,ts:new Date().toISOString(),sets:{},exam:null};
-  const SET_KEYS_MAP=[
-    {id:'q1',key:'pmp_q1_100'},{id:'q2',key:'pmp_q101_200'},
-    {id:'q3',key:'pmp_q201_300'},{id:'q4',key:'pmp_q301_400'},
-  ];
-  SET_KEYS_MAP.forEach(({id,key})=>{
-    try{data.sets[key]=JSON.parse(localStorage.getItem(key)||'null');}catch(e){}
+  const data={version:1,ts:new Date().toISOString(),sets:{},exam:null,examcapm:null};
+  Object.entries(TAB_KEYS).forEach(([tabId,key])=>{
+    try{
+      const value=JSON.parse(localStorage.getItem(key)||'null');
+      if(tabId==='exam')data.exam=value;
+      else if(tabId==='examcapm')data.examcapm=value;
+      else data.sets[key]=value;
+    }catch(e){}
   });
-  try{data.exam=JSON.parse(localStorage.getItem('pmp_exam_session')||'null');}catch(e){}
   return data;
 }
 
@@ -15734,12 +15891,13 @@ function restoreProgressBackup(event){
       const dateStr=d.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})
                    +' pukul '+d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
       if(!confirm('Pulihkan cadangan dari '+dateStr+'? Progres saat ini akan diganti.'))return;
-      const SKEYS=SET_CONFIG.map(c=>c.storageKey);
-      SKEYS.forEach(key=>{
-        if(data.sets[key]!==undefined&&data.sets[key]!==null)
-          localStorage.setItem(key,JSON.stringify(data.sets[key]));
+      Object.entries(TAB_KEYS).forEach(([tabId,key])=>{
+        let value=null;
+        if(tabId==='exam')value=data.exam;
+        else if(tabId==='examcapm')value=data.examcapm;
+        else value=data.sets?data.sets[key]:null;
+        if(value!==undefined&&value!==null)localStorage.setItem(key,JSON.stringify(value));
       });
-      if(data.exam)localStorage.setItem('pmp_exam_session',JSON.stringify(data.exam));
       localStorage.setItem(BACKUP_META_KEY,JSON.stringify({ts:data.ts}));
       updateBackupLabel();
       showToast('✅ Progres dipulihkan! Memuat ulang...',false);
@@ -15756,6 +15914,7 @@ function closeShareGuide(){closePGM();}
 // ─── INIT ──────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
   // Lazy init: quiz instances created on first tab click, not at page load
+  renderPGMTabs();
   refreshDashboard();
   updateBackupLabel();
 });
@@ -15765,26 +15924,14 @@ document.addEventListener('DOMContentLoaded',()=>{
 <div class="pgm-modal">
 <div class="pgm-title">🔄 Kelola Progres</div>
 <div class="pgm-sub">Salin kode progres per tab, kirim ke diri sendiri via WhatsApp. Di perangkat lain, tempel kode untuk memulihkan.</div>
-<div class="pgm-tab-row">
-<div class="pgm-tab active" onclick="pgmSelectTab('q1')">PMP 1</div>
-<div class="pgm-tab" onclick="pgmSelectTab('q2')">PMP 2</div>
-<div class="pgm-tab" onclick="pgmSelectTab('q3')">PMP 3</div>
-<div class="pgm-tab" onclick="pgmSelectTab('q4')">PMP 4</div>
-<div class="pgm-tab" onclick="pgmSelectTab('pmp8')">PMP 8</div>
-<div class="pgm-tab" onclick="pgmSelectTab('capm1')">CAPM 1</div>
-<div class="pgm-tab" onclick="pgmSelectTab('capm2')">CAPM 2</div>
-<div class="pgm-tab" onclick="pgmSelectTab('capm3')">CAPM 3</div>
-<div class="pgm-tab" onclick="pgmSelectTab('capm4')">CAPM 4</div>
-<div class="pgm-tab" onclick="pgmSelectTab('exam')">PMP Exam</div>
-<div class="pgm-tab" onclick="pgmSelectTab('examcapm')">CAPM Exam</div>
-</div>
+<div class="pgm-tab-row" id="pgm-tab-row"></div>
 <div class="pgm-label" id="pgm-code-label">Kode Progres — PMP 1</div>
 <textarea class="pgm-code" id="pgm-code-display" readonly="" rows="4">Memuat...</textarea>
 <button class="pgm-copy-btn" id="pgm-copy-btn" onclick="pgmCopyCode()">📋 Salin Kode</button>
 <button class="pgm-copy-btn" id="pgm-share-btn" onclick="pgmShare()" style="display:none;background:rgba(37,211,102,.15);border:1px solid rgba(37,211,102,.4);color:#25D366;margin-top:6px;">📤 Kirim via WhatsApp / Share</button>
 <hr class="pgm-divider"/>
 <div class="pgm-label">Tempel Kode dari Perangkat Lain</div>
-<div class="pgm-restore-label">Paste kode di bawah ini, lalu tap Pulihkan. Hanya tab yang aktif di atas yang akan ditimpa.</div>
+<div class="pgm-restore-label">Paste kode di bawah ini, lalu tap Pulihkan. Kode menentukan tab yang dipulihkan; progres tab lain tidak berubah.</div>
 <textarea class="pgm-paste-area" id="pgm-paste-area" placeholder="Paste kode di sini..."></textarea>
 <button class="pgm-restore-btn" onclick="pgmRestoreCode()">📥 Pulihkan Tab Ini</button>
 <button class="pgm-close" onclick="closePGM()">Tutup</button>
