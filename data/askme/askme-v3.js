@@ -7,6 +7,14 @@
   const MODE_KEY = 'pmp_askme_mode_v3';
   const SESSION_KEY = 'pmp_askme_session_key_v3';
   const AAD = new TextEncoder().encode('askme-v3');
+  const WEBLLM_URLS = [
+    'https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.84/+esm',
+    'https://esm.run/@mlc-ai/web-llm@0.2.84'
+  ];
+  const LOCAL_AI_MODEL = 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC';
+  const LOCAL_AI_LABEL = 'Qwen2.5 0.5B';
+  const AI_MAX_RETRIES = 3;
+  const AI_MIN_FREE_BYTES = 850 * 1024 * 1024;
   const STOP = new Set(('yang dan atau dengan dari untuk pada di ke dalam adalah itu ini apa apakah bagaimana mengapa kenapa siapa kapan dimana mana berapa sebuah suatu antara hasil keluaran output masukan input the a an and or of to in on for is are was were be been being what which how why when where does do did project proyek management manajemen tentang jelaskan tolong materi').split(/\s+/));
   const ACRONYM = {
     wpd:'work performance data',wpi:'work performance information',wpr:'work performance report',
@@ -55,7 +63,7 @@
   const state = {
     manifest:null,key:null,docs:[],docByPage:new Map(),inverted:new Map(),avgLen:1,ready:false,
     mode:localStorage.getItem(MODE_KEY)==='ai'?'ai':'smart',lastUserQuery:'',plainHistory:[],
-    imageCache:new Map(),aiEngine:null,aiLoading:null,visionWorker:null,visionReady:false,visionLoading:false,
+    imageCache:new Map(),aiEngine:null,aiLoading:null,webllm:null,visionWorker:null,visionReady:false,visionLoading:false,
     els:{},authUnsub:null
   };
 
@@ -91,9 +99,13 @@
   function bucketFor(page){const s=Math.floor((page-1)/100)*100+1;const e=Math.min(s+99,state.manifest?.pages||1086);return String(s).padStart(4,'0')+'-'+String(e).padStart(4,'0');}
   function imagePath(page){return `pages/${bucketFor(page)}/page-${String(page).padStart(4,'0')}.webp.bin`;}
 
-  function setStatus(text,type='ok'){
+  function setStatus(text,type='ok',detail=''){
     const box=state.els.status,txt=state.els.statusText;if(txt)txt.textContent=text;
-    if(box){box.classList.remove('loading','error');if(type==='loading')box.classList.add('loading');if(type==='error')box.classList.add('error');}
+    if(box){
+      box.classList.remove('loading','error');
+      if(type==='loading')box.classList.add('loading');if(type==='error')box.classList.add('error');
+      box.title=detail||String(text||'');
+    }
   }
   function setProgress(pct){
     if(!state.els.progress)return;const n=Math.max(0,Math.min(100,Number(pct)||0));
@@ -204,7 +216,7 @@
   function addMessage(role,content,save=true){
     if(!state.els.chat)return null;const wrap=document.createElement('div');wrap.className='askme-message '+role;const av=document.createElement('div');av.className='askme-avatar';av.textContent=role==='user'?'👤':'💡';const bubble=document.createElement('div');bubble.className='askme-bubble';bubble.innerHTML=content;wrap.append(av,bubble);state.els.chat.appendChild(wrap);state.els.chat.scrollTop=state.els.chat.scrollHeight;if(save)saveHistory();return wrap;
   }
-  function addGreeting(){addMessage('bot','<div class="askme-answer-title">Halo, saya AskME</div><div class="askme-answer-main"><p>Saya mencari jawaban dari materi ANT PMP 2026 dan dapat menampilkan <b>gambar halaman sumber</b>.</p><p>Mode <b>Smart</b> ringan dan langsung siap. Mode <b>AI Lokal</b> memberi jawaban lebih natural, tetapi perlu mengunduh model ke browser satu kali.</p></div><div class="askme-answer-note">Contoh: “Apa itu assumption dan bagaimana mengelolanya?”</div>',false);}
+  function addGreeting(){addMessage('bot','<div class="askme-answer-title">Halo, saya AskME</div><div class="askme-answer-main"><p>Saya mencari jawaban dari materi ANT PMP 2026 dan dapat menampilkan <b>gambar halaman sumber</b>.</p><p>Mode <b>Smart</b> ringan dan langsung siap. Mode <b>AI Lokal</b> memakai model multilingual yang disimpan di IndexedDB, dengan percobaan ulang otomatis bila koneksi terputus.</p></div><div class="askme-answer-note">Contoh: “Apa itu assumption dan bagaimana mengelolanya?”</div>',false);}
   function saveHistory(){try{const items=[...state.els.chat.querySelectorAll('.askme-message')].slice(-24).map(m=>({role:m.classList.contains('user')?'user':'bot',html:m.querySelector('.askme-bubble').innerHTML}));localStorage.setItem(HISTORY_KEY,JSON.stringify(items));}catch(_){}}
   function loadHistory(){try{const arr=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');if(Array.isArray(arr)&&arr.length){arr.forEach(x=>addMessage(x.role==='user'?'user':'bot',x.html,false));return;}}catch(_){}addGreeting();}
   function clear(){state.els.chat.innerHTML='';state.plainHistory=[];state.lastUserQuery='';try{localStorage.removeItem(HISTORY_KEY);}catch(_){}addGreeting();}
@@ -229,25 +241,80 @@
   }
   function closePage(){state.els.pageModal.classList.remove('show');}
 
+  function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
+  function formatBytes(bytes){
+    const n=Number(bytes)||0;if(n>=1024**3)return(n/1024**3).toFixed(1)+' GB';if(n>=1024**2)return Math.round(n/1024**2)+' MB';return Math.round(n/1024)+' KB';
+  }
+  function progressSummary(report,attempt){
+    const full=String(report?.text||'').trim();const pct=Math.max(0,Math.min(100,Math.round((Number(report?.progress)||0)*100)));
+    const fetched=full.match(/([0-9.]+\s*(?:KB|MB|GB))\s+fetched/i)?.[1];
+    const part=full.match(/cache\s*\[(\d+\/\d+)\]/i)?.[1];
+    return {pct,full,short:`AI Lokal ${pct}%${fetched?' · '+fetched:''}${part?' · '+part:''}${attempt>1?' · coba '+attempt+'/'+AI_MAX_RETRIES:''}`};
+  }
+  function isRetryableAIError(err){
+    const m=String(err?.message||err||'').toLowerCase();
+    return /network|fetch|cache\.add|failed to execute 'add'|load failed|connection|timeout|temporar|abort|http|body stream/.test(m);
+  }
+  async function prepareAIStorage(){
+    try{if(navigator.storage?.persist)await navigator.storage.persist();}catch(_){}
+    try{
+      if(navigator.storage?.estimate){
+        const e=await navigator.storage.estimate();const free=Math.max(0,(e.quota||0)-(e.usage||0));
+        if(e.quota&&free<AI_MIN_FREE_BYTES)throw new Error(`Ruang penyimpanan browser tersisa sekitar ${formatBytes(free)}. Sediakan minimal sekitar 850 MB untuk AI Lokal.`);
+      }
+    }catch(err){if(/Sediakan minimal/.test(String(err?.message||err)))throw err;}
+  }
+  async function loadWebLLM(){
+    if(state.webllm)return state.webllm;let lastErr;
+    for(const url of WEBLLM_URLS){
+      try{state.webllm=await import(url);return state.webllm;}catch(err){lastErr=err;}
+    }
+    throw new Error('Library AI lokal gagal dimuat dari CDN. '+String(lastErr?.message||lastErr||''));
+  }
+  async function createAIEngine(webllm,attempt){
+    const appConfig={...webllm.prebuiltAppConfig,cacheBackend:'indexeddb'};
+    return webllm.CreateMLCEngine(LOCAL_AI_MODEL,{
+      appConfig,
+      initProgressCallback:(p)=>{
+        const info=progressSummary(p,attempt);setProgress(info.pct);setStatus(info.short,'loading',info.full||info.short);
+      }
+    });
+  }
   async function ensureAI(){
     if(state.aiEngine)return state.aiEngine;if(state.aiLoading)return state.aiLoading;if(!navigator.gpu)throw new Error('WebGPU tidak tersedia pada browser/perangkat ini.');
     state.aiLoading=(async()=>{
-      setStatus('Mengunduh model AI lokal…','loading');setProgress(2);
-      const webllm=await import('https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.84/+esm');
-      const model='Llama-3.2-1B-Instruct-q4f16_1-MLC';
-      state.aiEngine=await webllm.CreateMLCEngine(model,{initProgressCallback:(p)=>{const v=Math.round((p.progress||0)*100);setProgress(v);setStatus(p.text||`Menyiapkan AI lokal ${v}%`,'loading');}});
-      setProgress(100);setStatus('AI lokal siap');return state.aiEngine;
-    })().catch(err=>{state.aiLoading=null;state.aiEngine=null;setStatus('AI lokal gagal','error');throw err;});
+      await prepareAIStorage();setStatus('Menyiapkan AI Lokal…','loading');setProgress(1);
+      const webllm=await loadWebLLM();let lastErr;
+      for(let attempt=1;attempt<=AI_MAX_RETRIES;attempt++){
+        try{
+          if(attempt>1){setStatus(`Koneksi terputus · melanjutkan coba ${attempt}/${AI_MAX_RETRIES}`,'loading');await sleep(1200*attempt);}
+          state.aiEngine=await createAIEngine(webllm,attempt);setProgress(100);setStatus(`AI Lokal siap · ${LOCAL_AI_LABEL}`);return state.aiEngine;
+        }catch(err){
+          lastErr=err;state.aiEngine=null;
+          if(attempt>=AI_MAX_RETRIES||!isRetryableAIError(err))throw err;
+        }
+      }
+      throw lastErr||new Error('AI Lokal gagal dimuat.');
+    })().catch(err=>{
+      state.aiLoading=null;state.aiEngine=null;setProgress(0);setStatus('AI Lokal gagal · Smart tetap siap','error',String(err?.message||err));
+      if(isRetryableAIError(err))throw new Error('Unduhan model terputus setelah 3 percobaan. Klik AI Lokal lagi saat koneksi lebih stabil; bagian yang telah tersimpan di IndexedDB biasanya tidak perlu diunduh ulang.');
+      throw err;
+    });
     return state.aiLoading;
   }
   async function setMode(mode){
     if(mode==='ai'){
       if(!navigator.gpu){alert('AI Lokal memerlukan browser dengan WebGPU. Mode Smart tetap dapat digunakan.');return;}
-      if(!state.aiEngine){const ok=confirm('AI Lokal akan mengunduh model berukuran ratusan MB satu kali dan menyimpannya di cache browser. Semua proses berjalan di perangkat. Lanjutkan?');if(!ok)return;try{await ensureAI();}catch(err){alert('Gagal memuat AI lokal: '+String(err?.message||err));return;}}
+      if(!state.aiEngine){
+        const ok=confirm(`AI Lokal (${LOCAL_AI_LABEL}) akan mengunduh model ke IndexedDB browser. Unduhan dapat dilanjutkan otomatis hingga ${AI_MAX_RETRIES} kali jika koneksi terputus. Semua proses berjalan di perangkat. Lanjutkan?`);
+        if(!ok)return;
+        state.els.modeAI.disabled=true;state.els.modeAI.textContent='⏳ Menyiapkan…';
+        try{await ensureAI();}catch(err){alert('Gagal memuat AI lokal: '+String(err?.message||err));return;}finally{state.els.modeAI.disabled=false;state.els.modeAI.textContent='🧠 AI Lokal';}
+      }
     }
     state.mode=mode;localStorage.setItem(MODE_KEY,mode);updateModeUI();
   }
-  function updateModeUI(){state.els.modeSmart?.classList.toggle('active',state.mode==='smart');state.els.modeAI?.classList.toggle('active',state.mode==='ai');if(state.els.modeInfo)state.els.modeInfo.textContent=state.mode==='ai'?'AI lokal menyusun jawaban dari halaman yang ditemukan.':'Pencarian pintar ringan tanpa unduhan model.';}
+  function updateModeUI(){state.els.modeSmart?.classList.toggle('active',state.mode==='smart');state.els.modeAI?.classList.toggle('active',state.mode==='ai');if(state.els.modeInfo)state.els.modeInfo.textContent=state.mode==='ai'?`AI lokal ${LOCAL_AI_LABEL} menyusun jawaban dari halaman yang ditemukan.`:'Pencarian pintar ringan tanpa unduhan model.';}
   function buildContext(results){return results.slice(0,5).map(r=>`[HALAMAN ${r.p} — ${r.t}]\n${String(r.full||'').slice(0,2600)}`).join('\n\n').slice(0,10500);}
   async function aiAnswer(question,results){
     const engine=await ensureAI();const context=buildContext(results);const prior=state.plainHistory.slice(-4).map(x=>({role:x.role,content:x.content}));
@@ -317,6 +384,9 @@
   }
   function init(){if(!bindUI())return;showLock('Menyiapkan AskME','Memeriksa login dan kunci materi…');startAuth();}
 
-  window.AskME={init,search,askText,clear,openPage,unlock:unlockWithKey,setMode};
+  async function resetLocalAI(){
+    state.aiEngine=null;state.aiLoading=null;state.webllm=null;localStorage.setItem(MODE_KEY,'smart');state.mode='smart';updateModeUI();setProgress(0);setStatus(state.ready?`${state.docs.length} halaman siap`:'Materi siap');
+  }
+  window.AskME={init,search,askText,clear,openPage,unlock:unlockWithKey,setMode,resetLocalAI};
   document.addEventListener('DOMContentLoaded',init);
 })();

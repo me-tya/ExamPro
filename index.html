@@ -1140,11 +1140,12 @@
   #tab-askme{max-width:940px;}
   .askme-shell{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:rgba(16,26,51,.78);box-shadow:0 24px 60px rgba(0,0,0,.28);}
   .askme-head{padding:18px 20px;background:linear-gradient(120deg,rgba(63,182,138,.17),rgba(107,138,235,.13),rgba(23,35,70,.96));border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
-  .askme-brand{display:flex;gap:12px;align-items:flex-start;min-width:0;}
+  .askme-brand{display:flex;gap:12px;align-items:flex-start;min-width:0;flex:1 1 auto;}
   .askme-logo{width:43px;height:43px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:rgba(63,182,138,.16);border:1px solid rgba(63,182,138,.38);font-size:21px;flex:0 0 auto;}
   .askme-title{font-family:'Source Serif 4',serif;font-size:21px;color:var(--paper);font-weight:600;line-height:1.1;}
   .askme-subtitle{font-size:12px;color:var(--muted);line-height:1.5;margin-top:5px;max-width:620px;}
-  .askme-status{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(63,182,138,.32);background:rgba(63,182,138,.10);color:var(--teal);border-radius:999px;padding:6px 10px;font-family:'Space Mono',monospace;font-size:9.5px;white-space:nowrap;}
+  .askme-status{flex:0 1 auto;max-width:min(48vw,430px);min-width:0;display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(63,182,138,.32);background:rgba(63,182,138,.10);color:var(--teal);border-radius:999px;padding:6px 10px;font-family:'Space Mono',monospace;font-size:9.5px;white-space:nowrap;overflow:hidden;}
+  #askme-status-text{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .askme-status-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 3px rgba(63,182,138,.12);}
   .askme-tools{padding:12px 16px 5px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
   .askme-chip-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin;flex:1 1 620px;}
@@ -1188,7 +1189,7 @@
   @media(max-width:620px){
     #tab-askme{padding:12px 8px 24px;}
     .askme-head{padding:14px;display:block;}
-    .askme-status{margin-top:10px;}
+    .askme-status{margin-top:10px;max-width:100%;}
     .askme-chat{height:calc(100dvh - 470px);min-height:220px;max-height:420px;padding:12px 10px 16px;}
     .askme-message{max-width:96%;}
     .askme-tools{padding:9px 10px 3px;}
@@ -1197,7 +1198,7 @@
   }
 
 </style>
-<link rel="stylesheet" href="data/askme/askme-v3.css">
+<link rel="stylesheet" href="data/askme/askme-v3.css?v=3.1.0">
 <!-- Firebase (cloud progress sync) -->
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
@@ -1610,7 +1611,7 @@
       <button class="askme-mode-btn" id="askme-mode-ai" type="button">🧠 AI Lokal</button>
       <span class="askme-mode-info" id="askme-mode-info">Pencarian pintar ringan tanpa unduhan model.</span>
     </div>
-    <div class="askme-ai-notice"><strong>Smart</strong> langsung siap. <strong>AI Lokal</strong> bersifat opsional, gratis, dan mengunduh model ke perangkat pada pemakaian pertama. Analisis gambar lokal memerlukan browser yang mendukung WebGPU.</div>
+    <div class="askme-ai-notice"><strong>Smart</strong> langsung siap. <strong>AI Lokal</strong> memakai model Qwen2.5 0.5B, disimpan di IndexedDB, dan mencoba ulang otomatis jika unduhan terputus. Analisis gambar lokal memerlukan browser yang mendukung WebGPU.</div>
 
     <div class="askme-tools" id="askme-tools">
       <div class="askme-chip-row" aria-label="Contoh pertanyaan AskME">
@@ -18772,7 +18773,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 </script>
 
-<script src="data/askme/askme-v3.js"></script>
+<script src="data/askme/askme-v3.js?v=3.1.0"></script>
 
 <footer style="text-align:center;padding:18px 12px 24px;font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);">
   © 2026 Atitya Pritasari. All rights reserved.
