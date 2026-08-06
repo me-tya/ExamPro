@@ -1,4 +1,4 @@
-/* AskME v3.2 - resilient local AI, encrypted document search, and visual page analysis */
+/* AskME v3.5 Audited Stable - Smart Plus encrypted search with reliable page viewer and local page analysis */
 (() => {
   'use strict';
 
@@ -6,17 +6,8 @@
   const HISTORY_KEY = 'pmp_askme_history_v3';
   const MODE_KEY = 'pmp_askme_mode_v3';
   const SESSION_KEY = 'pmp_askme_session_key_v3';
+  const STABLE_MIGRATION_KEY = 'pmp_askme_stable_v35';
   const AAD = new TextEncoder().encode('askme-v3');
-  const WEBLLM_URLS = [
-    'https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.84/+esm',
-    'https://esm.run/@mlc-ai/web-llm@0.2.84'
-  ];
-  const LOCAL_AI_MODEL = 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC';
-  const LOCAL_AI_LABEL = 'Qwen2.5 0.5B';
-  const AI_MAX_RETRIES = 3;
-  const AI_MIN_FREE_BYTES = 850 * 1024 * 1024;
-  const AI_CONTEXT_WINDOW = 2048;
-  const AI_MAX_OUTPUT_TOKENS = 280;
   const STOP = new Set(('yang dan atau dengan dari untuk pada di ke dalam adalah itu ini apa apakah bagaimana mengapa kenapa siapa kapan dimana mana berapa sebuah suatu antara hasil keluaran output masukan input the a an and or of to in on for is are was were be been being what which how why when where does do did project proyek management manajemen tentang jelaskan tolong materi').split(/\s+/));
   const ACRONYM = {
     wpd:'work performance data',wpi:'work performance information',wpr:'work performance report',
@@ -45,9 +36,11 @@
     'validasi ruang lingkup':'validate scope','pengendalian kualitas':'control quality',
     'kontrol perubahan terintegrasi':'integrated change control','definisi selesai':'definition of done',
     'asumsi':'assumption assumptions assumption log basis of estimates constraint constraints',
-    'anggapan':'assumption assumptions assumption log','batasan':'constraint constraints assumption log'
+    'anggapan':'assumption assumptions assumption log','batasan':'constraint constraints assumption log',
+    'matriks seimbang':'balanced matrix organization','organisasi matriks seimbang':'balanced matrix organization'
   };
   const TERM_ID = {
+    'work performance reports':'laporan kinerja pekerjaan','project documents':'dokumen proyek','project plan':'rencana proyek',
     'work performance data':'data kinerja pekerjaan','work performance information':'informasi kinerja pekerjaan',
     'work performance report':'laporan kinerja pekerjaan','project management plan':'rencana manajemen proyek',
     'project manager':'manajer proyek','project team':'tim proyek','stakeholders':'pemangku kepentingan',
@@ -64,8 +57,8 @@
 
   const state = {
     manifest:null,key:null,docs:[],docByPage:new Map(),inverted:new Map(),avgLen:1,ready:false,
-    mode:localStorage.getItem(MODE_KEY)==='ai'?'ai':'smart',lastUserQuery:'',plainHistory:[],
-    imageCache:new Map(),aiEngine:null,aiLoading:null,webllm:null,visionWorker:null,visionReady:false,visionLoading:false,
+    mode:'smart',lastUserQuery:'',plainHistory:[],
+    imageCache:new Map(),
     els:{},authUnsub:null
   };
 
@@ -82,8 +75,16 @@
   function tokens(q){return [...new Set(expandQuery(q).split(' ').filter(t=>t.length>1&&!STOP.has(t)))];}
   function has(n,...terms){return terms.some(t=>n.includes(norm(t)));}
   function effectiveQuery(q){
-    const n=norm(q);const follow=n.length<38||/\b(itu|tersebut|bedanya|kalau begitu|terus|lalu|yang tadi|kenapa begitu)\b/.test(n);
-    return follow&&state.lastUserQuery?state.lastUserQuery+' '+q:q;
+    if(!state.lastUserQuery)return q;
+    const n=norm(q);
+    const explicitStart=/^(kalau|jika|terus|lalu|yang tadi|tadi|kenapa begitu|mengapa begitu|jadi|maksudnya|contohnya|fungsinya|inputnya|outputnya|dampaknya)\b/.test(n);
+    const deicticOnly=/^(itu|tersebut|yang tadi|maksudnya|kenapa|mengapa|terus|lalu|jadi|contohnya|fungsinya|inputnya|outputnya|dampaknya)(\s+(apa|bagaimana|kenapa|mengapa|gimana|untuk apa|nya))?[?.!]*$/.test(n);
+    const generic=new Set('itu tersebut yang tadi kalau jika tidak benar salah valid dampak dampaknya fungsi fungsinya input inputnya output outputnya beda bedanya perbedaan kenapa mengapa bagaimana gimana jelaskan lanjut lebih contoh contohnya maksud maksudnya terus lalu jadi proses dipakai digunakan untuk apa'.split(/\s+/));
+    const distinctive=tokens(q).filter(t=>!generic.has(t));
+    const knownTerm=/\b(wpd|wpi|wpr|pmp|eef|opa|ev|pv|ac|bac|cpi|spi|cv|sv|eac|etc|vac|tcpi|raci|dod|wbs|pert)\b/.test(n);
+    const standaloneTopic=knownTerm||distinctive.length>0;
+    const follow=(deicticOnly||(explicitStart&&!standaloneTopic));
+    return follow?state.lastUserQuery+' '+q:q;
   }
   function b64ToBytes(b64){const clean=String(b64||'').trim().replace(/\s+/g,'');const bin=atob(clean);const out=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);return out;}
   async function importKey(b64){return crypto.subtle.importKey('raw',b64ToBytes(b64),{name:'AES-GCM'},false,['decrypt']);}
@@ -130,7 +131,7 @@
       const chunks=await Promise.all(state.manifest.chunkFiles.map(p=>fetchDecrypt(p,true)));
       state.docs=chunks.flat().map(d=>({...d,full:[d.t,d.x,d.ocr].filter(Boolean).join('\n')}));
       state.docByPage=new Map(state.docs.map(d=>[d.p,d]));buildIndex();state.ready=true;
-      sessionStorage.setItem(SESSION_KEY,keyText);hideLock();setStatus(`${state.docs.length} halaman siap`);
+      sessionStorage.setItem(SESSION_KEY,keyText);hideLock();setStatus(`${state.docs.length} halaman siap`);await hydrateSources(state.els.chat);
       if(source==='manual')addMessage('bot','<div class="askme-answer-title">Materi berhasil dibuka</div><div class="askme-answer-main">AskME sudah dapat mencari teks dan menampilkan gambar halaman sumber. Kunci hanya disimpan selama tab browser ini terbuka.</div>',true);
     }catch(err){
       state.key=null;state.ready=false;setStatus('Materi terkunci','error');showLock('Kunci tidak cocok','Masukkan kunci AskME yang tersimpan di Firestore atau file privat.','Gagal membuka data: '+String(err?.message||err));
@@ -169,6 +170,8 @@
     }
     if(has(n,'wpd','work performance data')&&has(n,'pmp','project management plan')&&has(n,'compare','comparison','perbandingan','output','hasil'))return{title:'Jawaban cepat',answer:'Hasilnya adalah <b>Work Performance Information (WPI)</b>. WPD merupakan data aktual mentah; ketika WPD dibandingkan dengan <b>Project Management Plan</b>, hasil analisisnya menjadi WPI. Selanjutnya, kumpulan WPI dikompilasi menjadi <b>Work Performance Report (WPR)</b>.',keys:['work performance data','project management plan','work performance information']};
     if(has(n,'wpd','wpi','wpr')&&(has(n,'beda','difference','perbedaan','vs')||mentions('work performance data','work performance information')))return{title:'Perbedaan WPD, WPI, dan WPR',answer:'<b>WPD</b> = data aktual mentah dari pelaksanaan pekerjaan. <b>WPI</b> = WPD yang sudah dianalisis atau dibandingkan dengan rencana/baseline. <b>WPR</b> = kumpulan WPI yang disusun menjadi laporan status untuk pemangku kepentingan. Ringkasnya: <b>data → informasi → laporan</b>.',keys:['work performance data','work performance information','work performance report']};
+    if(has(n,'wpi','work performance information')&&has(n,'input','inputan','untuk apa','fungsi','digunakan','dipakai'))return{title:'WPI: berasal dari mana dan dipakai untuk apa',answer:'<p><b>Work Performance Information (WPI)</b> adalah hasil analisis WPD terhadap Project Management Plan atau baseline.</p><p>WPI menjadi <b>input untuk Monitor and Control Project Work</b>. Dalam proses tersebut, kumpulan WPI diolah menjadi <b>Work Performance Report (WPR)</b> untuk menyampaikan status jadwal, biaya, risiko, dan kemajuan proyek kepada stakeholder.</p><p>Alurnya: <b>WPD + rencana/baseline → WPI → WPR</b>.</p>',keys:['work performance information','monitor and control project work','work performance report']};
+    if(has(n,'balanced matrix','matriks seimbang','organisasi matriks seimbang'))return{title:'Balanced Matrix Organization',answer:'<p><b>Balanced matrix</b> adalah struktur organisasi matriks ketika kewenangan project manager dan functional manager relatif seimbang.</p><p>Project manager mengoordinasikan pekerjaan proyek, sedangkan functional manager tetap memiliki kewenangan atas sumber daya dan keahlian fungsional. Karena kekuasaannya terbagi, keputusan penting biasanya memerlukan koordinasi dan negosiasi keduanya.</p><p>Posisinya berada di antara <b>weak matrix</b> yang lebih dominan functional manager dan <b>strong matrix</b> yang lebih dominan project manager.</p>',keys:['balanced matrix','functional manager','project manager','matrix organization']};
     if(has(n,'work performance data','wpd')&&!has(n,'wpi','wpr'))return{title:'Work Performance Data (WPD)',answer:'<b>WPD</b> adalah data aktual mentah yang dikumpulkan saat pekerjaan proyek dilaksanakan, misalnya jam kerja, tanggal, biaya aktual, jumlah cacat, dan pekerjaan yang selesai. WPD belum dibandingkan dengan rencana.',keys:['work performance data']};
     if(has(n,'work performance information','wpi')&&!has(n,'wpr'))return{title:'Work Performance Information (WPI)',answer:'<b>WPI</b> adalah informasi hasil analisis WPD terhadap Project Management Plan atau baseline. WPI menunjukkan status dan selisih antara kinerja aktual dengan yang direncanakan.',keys:['work performance information']};
     if(has(n,'work performance report','wpr'))return{title:'Work Performance Report (WPR)',answer:'<b>WPR</b> adalah laporan status proyek yang disusun dari kumpulan WPI, misalnya status jadwal, biaya, risiko, dan kesehatan proyek. Laporan ini digunakan untuk memperbarui pemangku kepentingan.',keys:['work performance report']};
@@ -212,13 +215,13 @@
 
   function sourceHtml(results,keys){
     if(!results.length)return'';
-    return '<div class="askme-source-wrap"><div class="askme-source-label">Sumber materi ANT 2026 · klik gambar untuk memperbesar</div>'+results.slice(0,3).map(r=>`<div class="askme-source-card" data-source-page="${r.p}"><div class="askme-source-thumb" data-page-thumb="${r.p}" title="Buka halaman ${r.p}"><span>Memuat gambar…</span></div><div class="askme-source-body"><div class="askme-source-top"><div class="askme-source-title">${escapeHtml(r.t)}</div><div class="askme-source-page">Hal. ${r.p}</div></div><div class="askme-source-text">${highlight(excerpt(r,keys),keys)}</div><div class="askme-source-actions"><button class="askme-source-btn" type="button" data-open-page="${r.p}">Lihat halaman</button><button class="askme-source-btn visual" type="button" data-visual-page="${r.p}">Analisis visual lokal</button></div></div></div>`).join('')+'</div>';
+    return '<div class="askme-source-wrap"><div class="askme-source-label">Sumber materi ANT 2026 · klik gambar untuk memperbesar</div>'+results.slice(0,3).map(r=>`<div class="askme-source-card" data-source-page="${r.p}"><div class="askme-source-thumb" data-page-thumb="${r.p}" title="Buka halaman ${r.p}"><span>Memuat gambar…</span></div><div class="askme-source-body"><div class="askme-source-top"><div class="askme-source-title">${escapeHtml(r.t)}</div><div class="askme-source-page">Hal. ${r.p}</div></div><div class="askme-source-text">${highlight(excerpt(r,keys),keys)}</div><div class="askme-source-actions"><button class="askme-source-btn" type="button" data-open-page="${r.p}">Lihat halaman</button><button class="askme-source-btn visual" type="button" data-visual-page="${r.p}">Analisis halaman</button></div></div></div>`).join('')+'</div>';
   }
 
   function addMessage(role,content,save=true){
     if(!state.els.chat)return null;const wrap=document.createElement('div');wrap.className='askme-message '+role;const av=document.createElement('div');av.className='askme-avatar';av.textContent=role==='user'?'👤':'💡';const bubble=document.createElement('div');bubble.className='askme-bubble';bubble.innerHTML=content;wrap.append(av,bubble);state.els.chat.appendChild(wrap);state.els.chat.scrollTop=state.els.chat.scrollHeight;if(save)saveHistory();return wrap;
   }
-  function addGreeting(){addMessage('bot','<div class="askme-answer-title">Halo, saya AskME</div><div class="askme-answer-main"><p>Saya mencari jawaban dari materi ANT PMP 2026 dan dapat menampilkan <b>gambar halaman sumber</b>.</p><p>Mode <b>Smart</b> ringan dan langsung siap. Mode <b>AI Lokal</b> memakai model multilingual yang disimpan di IndexedDB, dengan percobaan ulang otomatis bila koneksi terputus.</p></div><div class="askme-answer-note">Contoh: “Apa itu assumption dan bagaimana mengelolanya?”</div>',false);}
+  function addGreeting(){addMessage('bot','<div class="askme-answer-title">Halo, saya AskME Smart Plus</div><div class="askme-answer-main"><p>Saya mencari, menggabungkan, dan menjelaskan materi ANT PMP 2026 dalam Bahasa Indonesia serta menampilkan <b>gambar halaman sumber</b>.</p><p>Smart Plus langsung siap, tanpa unduhan model, tanpa API berbayar, dan tetap dapat memahami singkatan serta pertanyaan lanjutan.</p></div><div class="askme-answer-note">Contoh: “WPI itu apa dan menjadi input untuk proses apa?”</div>',false);}
   function saveHistory(){try{const items=[...state.els.chat.querySelectorAll('.askme-message')].slice(-24).map(m=>({role:m.classList.contains('user')?'user':'bot',html:m.querySelector('.askme-bubble').innerHTML}));localStorage.setItem(HISTORY_KEY,JSON.stringify(items));}catch(_){}}
   function loadHistory(){try{const arr=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');if(Array.isArray(arr)&&arr.length){arr.forEach(x=>addMessage(x.role==='user'?'user':'bot',x.html,false));return;}}catch(_){}addGreeting();}
   function clear(){state.els.chat.innerHTML='';state.plainHistory=[];state.lastUserQuery='';try{localStorage.removeItem(HISTORY_KEY);}catch(_){}addGreeting();}
@@ -234,136 +237,87 @@
   async function getPageUrl(page){if(state.imageCache.has(page))return state.imageCache.get(page).url;await getPageBlob(page);return state.imageCache.get(page).url;}
   async function getPageDataUrl(page){const blob=await getPageBlob(page);return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(blob);});}
   async function hydrateSources(root){
-    const scope=root||state.els.chat;for(const el of scope.querySelectorAll('[data-page-thumb]:not([data-loaded])')){el.dataset.loaded='1';const p=Number(el.dataset.pageThumb);el.addEventListener('click',()=>openPage(p));try{const img=document.createElement('img');img.loading='lazy';img.alt='Halaman '+p;img.src=await getPageUrl(p);el.innerHTML='';el.appendChild(img);}catch(_){el.textContent='Gambar gagal dimuat';}}
-    scope.querySelectorAll('[data-open-page]:not([data-bound])').forEach(b=>{b.dataset.bound='1';b.addEventListener('click',()=>openPage(Number(b.dataset.openPage)));});
-    scope.querySelectorAll('[data-visual-page]:not([data-bound])').forEach(b=>{b.dataset.bound='1';b.addEventListener('click',()=>visualAnalyze(Number(b.dataset.visualPage),b));});
+    const scope=root||state.els.chat;if(!scope)return;
+    const thumbs=[...scope.querySelectorAll('[data-page-thumb]:not([data-loaded]):not([data-loading])')];
+    for(const el of thumbs){
+      el.dataset.loading='1';const p=Number(el.dataset.pageThumb);
+      try{
+        const img=document.createElement('img');img.loading='lazy';img.alt='Halaman '+p;img.src=await getPageUrl(p);
+        el.innerHTML='';el.appendChild(img);el.dataset.loaded='1';
+      }catch(err){
+        el.innerHTML='<span>Gambar gagal dimuat<br><small>Klik untuk membuka</small></span>';
+        el.title='Klik untuk mencoba membuka halaman '+p;
+      }finally{delete el.dataset.loading;}
+    }
   }
   async function openPage(page){
-    try{state.els.pageTitle.textContent='ANT PMP 2026 · Halaman '+page;state.els.pageImage.removeAttribute('src');state.els.pageModal.classList.add('show');state.els.pageImage.src=await getPageUrl(page);}catch(err){alert('Gagal membuka gambar halaman: '+String(err?.message||err));}
-  }
-  function closePage(){state.els.pageModal.classList.remove('show');}
-
-  function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
-  function formatBytes(bytes){
-    const n=Number(bytes)||0;if(n>=1024**3)return(n/1024**3).toFixed(1)+' GB';if(n>=1024**2)return Math.round(n/1024**2)+' MB';return Math.round(n/1024)+' KB';
-  }
-  function progressSummary(report,attempt){
-    const full=String(report?.text||'').trim();const pct=Math.max(0,Math.min(100,Math.round((Number(report?.progress)||0)*100)));
-    const fetched=full.match(/([0-9.]+\s*(?:KB|MB|GB))\s+fetched/i)?.[1];
-    const part=full.match(/cache\s*\[(\d+\/\d+)\]/i)?.[1];
-    return {pct,full,short:`AI Lokal ${pct}%${fetched?' · '+fetched:''}${part?' · '+part:''}${attempt>1?' · coba '+attempt+'/'+AI_MAX_RETRIES:''}`};
-  }
-  function isRetryableAIError(err){
-    const m=String(err?.message||err||'').toLowerCase();
-    return /network|fetch|cache\.add|failed to execute 'add'|load failed|connection|timeout|temporar|abort|http|body stream/.test(m);
-  }
-  async function prepareAIStorage(){
-    try{if(navigator.storage?.persist)await navigator.storage.persist();}catch(_){}
+    page=Number(page);
+    if(!Number.isFinite(page)||page<1){alert('Nomor halaman tidak valid.');return;}
+    if(!state.ready||!state.key){alert('Materi AskME belum siap. Tunggu sampai status halaman siap.');return;}
+    if(!state.els.pageModal||!state.els.pageImage||!state.els.pageTitle){alert('Viewer halaman belum tersedia. Muat ulang aplikasi.');return;}
     try{
-      if(navigator.storage?.estimate){
-        const e=await navigator.storage.estimate();const free=Math.max(0,(e.quota||0)-(e.usage||0));
-        if(e.quota&&free<AI_MIN_FREE_BYTES)throw new Error(`Ruang penyimpanan browser tersisa sekitar ${formatBytes(free)}. Sediakan minimal sekitar 850 MB untuk AI Lokal.`);
-      }
-    }catch(err){if(/Sediakan minimal/.test(String(err?.message||err)))throw err;}
-  }
-  async function loadWebLLM(){
-    if(state.webllm)return state.webllm;let lastErr;
-    for(const url of WEBLLM_URLS){
-      try{state.webllm=await import(url);return state.webllm;}catch(err){lastErr=err;}
-    }
-    throw new Error('Library AI lokal gagal dimuat dari CDN. '+String(lastErr?.message||lastErr||''));
-  }
-  function isEngineStateError(err){
-    const m=String(err?.message||err||'').toLowerCase();
-    return /disposed|model not loaded|not loaded before|device lost|webgpu device|invalid device|runtime.*closed/.test(m);
-  }
-  async function resetAIEngine(){
-    const old=state.aiEngine;state.aiEngine=null;state.aiLoading=null;
-    if(!old)return;
-    try{if(typeof old.unload==='function')await old.unload();}catch(_){}
-    try{if(typeof old.dispose==='function')old.dispose();}catch(_){}
-  }
-  async function createAIEngine(webllm,attempt){
-    const appConfig={...webllm.prebuiltAppConfig,cacheBackend:'indexeddb'};
-    const engine=new webllm.MLCEngine({
-      appConfig,
-      initProgressCallback:(p)=>{
-        const info=progressSummary(p,attempt);setProgress(info.pct);setStatus(info.short,'loading',info.full||info.short);
-      }
-    });
-    try{
-      await engine.reload(LOCAL_AI_MODEL,{context_window_size:AI_CONTEXT_WINDOW});
-      return engine;
+      state.els.pageTitle.textContent='ANT PMP 2026 · Halaman '+page;
+      state.els.pageImage.removeAttribute('src');
+      state.els.pageImage.alt='Memuat halaman '+page+'…';
+      state.els.pageModal.classList.add('show');
+      const url=await getPageUrl(page);
+      state.els.pageImage.onload=()=>{state.els.pageImage.alt='Halaman '+page+' materi ANT PMP 2026';};
+      state.els.pageImage.onerror=()=>{state.els.pageImage.alt='Gambar halaman '+page+' gagal ditampilkan';};
+      state.els.pageImage.src=url;
     }catch(err){
-      try{if(typeof engine.unload==='function')await engine.unload();}catch(_){}
-      try{if(typeof engine.dispose==='function')engine.dispose();}catch(_){}
-      throw err;
+      state.els.pageModal.classList.remove('show');
+      alert('Gagal membuka gambar halaman '+page+': '+String(err?.message||err));
     }
   }
-  async function ensureAI(forceReload=false){
-    if(forceReload)await resetAIEngine();
-    if(state.aiEngine)return state.aiEngine;if(state.aiLoading)return state.aiLoading;if(!navigator.gpu)throw new Error('WebGPU tidak tersedia pada browser/perangkat ini.');
-    state.aiLoading=(async()=>{
-      await prepareAIStorage();setStatus('Menyiapkan AI Lokal…','loading');setProgress(1);
-      const webllm=await loadWebLLM();let lastErr;
-      for(let attempt=1;attempt<=AI_MAX_RETRIES;attempt++){
-        try{
-          if(attempt>1){setStatus(`Memulihkan AI Lokal · coba ${attempt}/${AI_MAX_RETRIES}`,'loading');await sleep(1200*attempt);}
-          const engine=await createAIEngine(webllm,attempt);state.aiEngine=engine;setProgress(100);setStatus(`AI Lokal siap · ${LOCAL_AI_LABEL}`);return engine;
-        }catch(err){
-          lastErr=err;await resetAIEngine();
-          if(attempt>=AI_MAX_RETRIES||(!isRetryableAIError(err)&&!isEngineStateError(err)))throw err;
-        }
-      }
-      throw lastErr||new Error('AI Lokal gagal dimuat.');
-    })().then(engine=>{state.aiLoading=null;return engine;}).catch(err=>{
-      state.aiLoading=null;state.aiEngine=null;setProgress(0);setStatus('AI Lokal gagal · Smart tetap siap','error',String(err?.message||err));
-      throw err;
-    });
-    return state.aiLoading;
-  }
+  function closePage(){state.els.pageModal?.classList.remove('show');}
+
   async function setMode(mode){
-    if(mode==='ai'){
-      if(!navigator.gpu){alert('AI Lokal memerlukan browser dengan WebGPU. Mode Smart tetap dapat digunakan.');return;}
-      if(!state.aiEngine){
-        const ok=confirm(`AI Lokal (${LOCAL_AI_LABEL}) akan mengunduh model ke IndexedDB browser. Unduhan dapat dilanjutkan otomatis hingga ${AI_MAX_RETRIES} kali jika koneksi terputus. Semua proses berjalan di perangkat. Lanjutkan?`);
-        if(!ok)return;
-        state.els.modeAI.disabled=true;state.els.modeAI.textContent='⏳ Menyiapkan…';
-        try{await ensureAI();}catch(err){state.mode='smart';localStorage.setItem(MODE_KEY,'smart');updateModeUI();alert('Gagal memuat AI lokal: '+String(err?.message||err)+'\n\nMode Smart tetap aktif.');return;}finally{state.els.modeAI.disabled=false;state.els.modeAI.textContent='🧠 AI Lokal';}
-      }
-    }
-    state.mode=mode;localStorage.setItem(MODE_KEY,mode);updateModeUI();
+    state.mode='smart';localStorage.setItem(MODE_KEY,'smart');updateModeUI();
+    if(mode==='ai')alert('AI Lokal telah dinonaktifkan. AskME menggunakan Smart Plus yang gratis, privat, dan langsung siap.');
   }
-  function updateModeUI(){state.els.modeSmart?.classList.toggle('active',state.mode==='smart');state.els.modeAI?.classList.toggle('active',state.mode==='ai');if(state.els.modeInfo)state.els.modeInfo.textContent=state.mode==='ai'?`AI lokal ${LOCAL_AI_LABEL} menyusun jawaban dari halaman yang ditemukan.`:'Pencarian pintar ringan tanpa unduhan model.';}
-  function buildContext(results){return results.slice(0,3).map(r=>`[HALAMAN ${r.p} — ${r.t}]\n${String(r.full||'').slice(0,1500)}`).join('\n\n').slice(0,4800);}
-  async function aiAnswer(question,results){
-    const context=buildContext(results);const prior=state.plainHistory.slice(-2).map(x=>({role:x.role,content:x.content}));
-    const messages=[{role:'system',content:'Anda adalah tutor PMP berbahasa Indonesia. Jawab hanya berdasarkan KONTEKS MATERI ANT yang diberikan. Berikan jawaban langsung, lalu penjelasan ringkas. Jangan mengarang. Jika konteks tidak cukup, katakan bahwa materi yang ditemukan belum cukup. Sebut nomor halaman yang mendukung, tetapi jangan membuat nomor halaman baru.'},...prior,{role:'user',content:`PERTANYAAN:\n${question}\n\nKONTEKS MATERI ANT:\n${context}`}];
-    const complete=async(engine)=>{const out=await engine.chat.completions.create({messages,temperature:0.15,max_tokens:AI_MAX_OUTPUT_TOKENS});return out?.choices?.[0]?.message?.content||'';};
-    let engine=await ensureAI();
-    try{return await complete(engine);}catch(err){
-      if(!isEngineStateError(err))throw err;
-      setStatus('Memulihkan model AI Lokal…','loading',String(err?.message||err));
-      engine=await ensureAI(true);
-      return complete(engine);
-    }
+  function updateModeUI(){
+    state.mode='smart';localStorage.setItem(MODE_KEY,'smart');
+    state.els.modeSmart?.classList.add('active');
+    if(state.els.modeSmart)state.els.modeSmart.textContent='⚡ Smart Plus';
+    if(state.els.modeAI)state.els.modeAI.style.display='none';
+    if(state.els.modeInfo)state.els.modeInfo.textContent='Jawaban berbasis materi ANT, tanpa unduhan model dan tanpa API berbayar.';
   }
 
-  function ensureVisionWorker(){
-    if(state.visionWorker)return state.visionWorker;if(!navigator.gpu)throw new Error('WebGPU tidak tersedia.');
-    const w=new Worker(BASE+'vision-worker.js',{type:'module'});state.visionWorker=w;return w;
+  function pageAnalysisText(doc,question){
+    const qTokens=tokens(question||'');const candidates=sentenceCandidates(doc?.full||'',qTokens);
+    const selected=[];const seen=new Set();
+    for(const item of candidates){
+      const key=norm(item.s).slice(0,180);if(!key||seen.has(key))continue;seen.add(key);selected.push(translateLite(item.s));if(selected.length>=4)break;
+    }
+    if(!selected.length){
+      const fallback=String(doc?.x||doc?.ocr||'').replace(/\s+/g,' ').trim();
+      if(fallback&&norm(fallback)!==norm(doc?.t))selected.push(translateLite(fallback.slice(0,900)));
+    }
+    const intro=doc?.visual
+      ? 'Halaman ini terdeteksi memuat elemen visual, diagram, tabel, atau slide bergambar.'
+      : 'Halaman ini terutama dianalisis dari teks yang berhasil diekstrak.';
+    const limits='Analisis ini diproses lokal dari teks/OCR yang tersedia, bukan pembacaan piksel oleh vision AI. Gunakan gambar halaman untuk memeriksa tata letak, panah, tabel, atau detail visual.';
+    return {intro,selected,limits};
   }
   async function visualAnalyze(page,button){
-    if(!navigator.gpu){alert('Analisis visual lokal memerlukan WebGPU. Gambar halaman tetap dapat dibuka melalui tombol Lihat halaman.');return;}
-    const doc=state.docByPage.get(page);const question=state.lastUserQuery||'Jelaskan isi utama halaman ini.';button.disabled=true;button.textContent='Menyiapkan visual AI…';
+    page=Number(page);const doc=state.docByPage.get(page);
+    if(!doc){alert('Data halaman '+page+' tidak ditemukan.');return;}
+    const original=button?.textContent||'Analisis halaman';
+    if(button){button.disabled=true;button.textContent='Menganalisis…';}
     try{
-      const worker=ensureVisionWorker();const image=await getPageDataUrl(page);const prompt=`Analisis halaman materi PMP ini untuk membantu menjawab pertanyaan: "${question}". Jawab dalam Bahasa Indonesia. Gunakan informasi yang benar-benar terlihat pada gambar dan konteks teks berikut. Jika teks kecil tidak terbaca, katakan keterbatasannya.\n\nKonteks teks halaman: ${String(doc?.full||'').slice(0,2200)}`;
-      const result=await new Promise((resolve,reject)=>{
-        const handler=(e)=>{const d=e.data||{};if(d.status==='loading'){setStatus(d.message||'Memuat model visual…','loading');}else if(d.status==='progress'){const p=d.data?.progress;if(typeof p==='number')setProgress(p);}else if(d.status==='ready'){state.visionReady=true;setStatus('Model visual siap');}else if(d.status==='complete'){worker.removeEventListener('message',handler);resolve(d.output||'');}else if(d.status==='error'){worker.removeEventListener('message',handler);reject(new Error(d.message||'Visual AI error'));}};
-        worker.addEventListener('message',handler);worker.postMessage({type:'analyze',data:{image,prompt}});
-      });
-      const card=document.createElement('div');card.className='askme-source-card visual-result';card.innerHTML='<div class="askme-source-top"><div class="askme-source-title">Analisis visual · Halaman '+page+'</div></div><div class="askme-visual-text">'+renderSimpleMarkdown(result)+'</div>';button.closest('.askme-source-card')?.after(card);setStatus(`${state.docs.length} halaman siap`);saveHistory();
-    }catch(err){alert('Analisis visual gagal: '+String(err?.message||err));setStatus('Materi siap');}finally{button.disabled=false;button.textContent='Analisis visual lokal';}
+      const question=state.lastUserQuery||'Jelaskan isi utama halaman ini.';
+      const result=pageAnalysisText(doc,question);
+      const old=button?.closest('.askme-source-card')?.nextElementSibling;
+      if(old?.classList.contains('visual-result')&&old.dataset.analysisPage===String(page))old.remove();
+      const card=document.createElement('div');card.className='askme-source-card visual-result';card.dataset.analysisPage=String(page);
+      const bullets=result.selected.length
+        ? '<ul>'+result.selected.map(x=>'<li>'+escapeHtml(x)+'</li>').join('')+'</ul>'
+        : '<p>Teks pada halaman ini sangat terbatas. Buka gambar halaman untuk membaca diagram atau tabel secara langsung.</p>';
+      card.innerHTML='<div class="askme-source-top"><div class="askme-source-title">Analisis halaman · Hal. '+page+'</div></div><div class="askme-visual-text"><p>'+escapeHtml(result.intro)+'</p>'+bullets+'<p><small>'+escapeHtml(result.limits)+'</small></p><button class="askme-source-btn" type="button" data-open-page="'+page+'">Buka gambar halaman</button></div>';
+      button?.closest('.askme-source-card')?.after(card);
+      saveHistory();
+    }catch(err){alert('Analisis halaman gagal: '+String(err?.message||err));}
+    finally{if(button){button.disabled=false;button.textContent=original;}}
   }
 
   async function askText(q){
@@ -372,17 +326,7 @@
     const typing=addMessage('bot','<div class="askme-typing" aria-label="Mencari jawaban"><span></span><span></span><span></span></div>',false);
     try{
       const results=search(retrievalQuery,6);let title,body,keys=tokens(retrievalQuery),answerPlain='';
-      if(state.mode==='ai'){
-        try{
-          answerPlain=await aiAnswer(q,results);title='Jawaban AI Lokal';body=renderSimpleMarkdown(answerPlain);
-        }catch(aiErr){
-          console.warn('AskME AI Lokal gagal, menggunakan Smart',aiErr);await resetAIEngine();state.mode='smart';localStorage.setItem(MODE_KEY,'smart');updateModeUI();
-          const fact=factAnswer(retrievalQuery),ans=fact||genericAnswer(retrievalQuery,results);title=ans.title+' · Mode Smart';body=ans.answer;keys=ans.keys?.length?ans.keys:keys;answerPlain=body.replace(/<[^>]+>/g,' ');
-          body+='<p class="askme-ai-fallback-note"><b>AI Lokal terputus.</b> Pertanyaan ini tetap dijawab dengan Mode Smart. Klik AI Lokal lagi setelah halaman dimuat ulang untuk mencoba kembali.</p>';
-        }
-      }else{
-        const fact=factAnswer(retrievalQuery),ans=fact||genericAnswer(retrievalQuery,results);title=ans.title;body=ans.answer;keys=ans.keys?.length?ans.keys:keys;answerPlain=body.replace(/<[^>]+>/g,' ');
-      }
+      const fact=factAnswer(retrievalQuery),ans=fact||genericAnswer(retrievalQuery,results);title=ans.title;body=ans.answer;keys=ans.keys?.length?ans.keys:keys;answerPlain=body.replace(/<[^>]+>/g,' ');
       const html='<div class="askme-answer-title">'+escapeHtml(title)+'</div><div class="askme-answer-main">'+body+'</div><div class="askme-answer-note">Jawaban dibatasi pada materi ANT yang ditemukan. Buka gambar sumber untuk memeriksa diagram/tabel aslinya.</div>'+sourceHtml(results,keys);
       typing.querySelector('.askme-bubble').innerHTML=html;state.plainHistory.push({role:'assistant',content:answerPlain.slice(0,1800)});await hydrateSources(typing);saveHistory();
     }catch(err){typing.querySelector('.askme-bubble').innerHTML='<div class="askme-answer-title">Terjadi kendala</div><div class="askme-answer-main">'+escapeHtml(String(err?.message||err))+'</div><div class="askme-answer-note">Mode Smart dapat dipakai tanpa model AI.</div>';}
@@ -408,18 +352,24 @@
       chat:document.getElementById('askme-chat'),compose:document.getElementById('askme-compose'),tools:document.getElementById('askme-tools'),modebar:document.getElementById('askme-modebar'),input:document.getElementById('askme-input'),send:document.getElementById('askme-send'),clear:document.getElementById('askme-clear'),modeSmart:document.getElementById('askme-mode-smart'),modeAI:document.getElementById('askme-mode-ai'),modeInfo:document.getElementById('askme-mode-info'),
       pageModal:document.getElementById('askme-page-modal'),pageImage:document.getElementById('askme-page-image'),pageTitle:document.getElementById('askme-page-title'),pageClose:document.getElementById('askme-page-close')
     };
-    if(!state.els.chat)return false;loadHistory();updateModeUI();if(!navigator.gpu){state.els.modeAI.disabled=true;state.els.modeAI.title='WebGPU tidak tersedia';}
+    if(!state.els.chat)return false;localStorage.setItem(MODE_KEY,'smart');state.mode='smart';loadHistory();updateModeUI();if(state.els.modeAI)state.els.modeAI.style.display='none';
     state.els.send.addEventListener('click',()=>askText(state.els.input.value));state.els.input.addEventListener('input',resizeInput);state.els.input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();askText(state.els.input.value);}});state.els.clear.addEventListener('click',clear);
     state.els.unlockBtn.addEventListener('click',()=>unlockWithKey(state.els.unlockInput.value,'manual'));state.els.unlockInput.addEventListener('keydown',e=>{if(e.key==='Enter')unlockWithKey(state.els.unlockInput.value,'manual');});
-    state.els.modeSmart.addEventListener('click',()=>setMode('smart'));state.els.modeAI.addEventListener('click',()=>setMode('ai'));state.els.pageClose.addEventListener('click',closePage);state.els.pageModal.addEventListener('click',e=>{if(e.target===state.els.pageModal)closePage();});document.addEventListener('keydown',e=>{if(e.key==='Escape')closePage();});
+    state.els.modeSmart?.addEventListener('click',()=>setMode('smart'));state.els.modeAI?.addEventListener('click',()=>setMode('ai'));state.els.pageClose?.addEventListener('click',closePage);state.els.pageModal?.addEventListener('click',e=>{if(e.target===state.els.pageModal)closePage();});document.addEventListener('keydown',e=>{if(e.key==='Escape')closePage();});
+    state.els.chat.addEventListener('click',e=>{
+      const visual=e.target.closest('[data-visual-page]');
+      if(visual){e.preventDefault();visualAnalyze(Number(visual.dataset.visualPage),visual);return;}
+      const open=e.target.closest('[data-open-page]');
+      if(open){e.preventDefault();openPage(Number(open.dataset.openPage));return;}
+      const thumb=e.target.closest('[data-page-thumb]');
+      if(thumb){e.preventDefault();openPage(Number(thumb.dataset.pageThumb));}
+    });
     document.querySelectorAll('[data-askme-question]').forEach(btn=>btn.addEventListener('click',()=>askText(btn.getAttribute('data-askme-question'))));
     return true;
   }
-  function init(){if(!bindUI())return;showLock('Menyiapkan AskME','Memeriksa login dan kunci materi…');startAuth();}
+  function init(){try{if(localStorage.getItem(STABLE_MIGRATION_KEY)!=='1'){localStorage.removeItem(HISTORY_KEY);localStorage.setItem(STABLE_MIGRATION_KEY,'1');}}catch(_){}if(!bindUI())return;showLock('Menyiapkan AskME','Memeriksa login dan kunci materi…');startAuth();}
 
-  async function resetLocalAI(){
-    state.aiEngine=null;state.aiLoading=null;state.webllm=null;localStorage.setItem(MODE_KEY,'smart');state.mode='smart';updateModeUI();setProgress(0);setStatus(state.ready?`${state.docs.length} halaman siap`:'Materi siap');
-  }
+  async function resetLocalAI(){localStorage.setItem(MODE_KEY,'smart');state.mode='smart';updateModeUI();setProgress(0);setStatus(state.ready?`${state.docs.length} halaman siap`:'Materi siap');}
   window.AskME={init,search,askText,clear,openPage,unlock:unlockWithKey,setMode,resetLocalAI};
   document.addEventListener('DOMContentLoaded',init);
 })();

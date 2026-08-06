@@ -1198,7 +1198,7 @@
   }
 
 </style>
-<link rel="stylesheet" href="data/askme/askme-v3.css?v=3.1.0">
+<link rel="stylesheet" href="data/askme/askme-v3.css?v=3.5.0">
 <!-- Firebase (cloud progress sync) -->
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
@@ -1597,7 +1597,7 @@
         <div class="askme-logo" aria-hidden="true">💬</div>
         <div>
           <div class="askme-title">AskME</div>
-          <div class="askme-subtitle">Chatbot materi <b>ANT PMP Exam Preparation 2026-v8</b>. Pencarian, dekripsi, dan AI lokal berjalan di browser; jawaban serta gambar halaman sumber ditampilkan dalam Bahasa Indonesia.</div>
+          <div class="askme-subtitle">Chatbot materi <b>ANT PMP Exam Preparation 2026-v8</b>. Smart Plus mencari, merangkum, dan menampilkan gambar halaman sumber langsung di browser dalam Bahasa Indonesia.</div>
         </div>
       </div>
       <div class="askme-status" id="askme-status"><span class="askme-status-dot"></span><span id="askme-status-text">Menyiapkan materi…</span></div>
@@ -1607,11 +1607,10 @@
 
     <div class="askme-modebar" id="askme-modebar">
       <span class="askme-mode-label">Mode jawaban</span>
-      <button class="askme-mode-btn active" id="askme-mode-smart" type="button">⚡ Smart</button>
-      <button class="askme-mode-btn" id="askme-mode-ai" type="button">🧠 AI Lokal</button>
-      <span class="askme-mode-info" id="askme-mode-info">Pencarian pintar ringan tanpa unduhan model.</span>
+      <button class="askme-mode-btn active" id="askme-mode-smart" type="button">⚡ Smart Plus</button>
+      <span class="askme-mode-info" id="askme-mode-info">Jawaban berbasis materi ANT, tanpa unduhan model dan tanpa API berbayar.</span>
     </div>
-    <div class="askme-ai-notice"><strong>Smart</strong> langsung siap. <strong>AI Lokal</strong> memakai model Qwen2.5 0.5B, disimpan di IndexedDB, memuat model secara eksplisit, dan otomatis kembali ke Smart jika runtime WebGPU terputus. Analisis gambar lokal memerlukan browser yang mendukung WebGPU.</div>
+    <div class="askme-ai-notice"><strong>Smart Plus</strong> langsung siap, gratis, dan privat. AskME memahami singkatan, pertanyaan lanjutan, hubungan input-output, serta menampilkan halaman sumber. Analisis halaman menggunakan teks/OCR lokal; tidak ada unduhan model AI.</div>
 
     <div class="askme-tools" id="askme-tools">
       <div class="askme-chip-row" aria-label="Contoh pertanyaan AskME">
@@ -1641,7 +1640,7 @@
         <textarea class="askme-input" id="askme-input" rows="1" placeholder="Tanyakan konsep, proses, rumus, output, tabel, atau diagram dalam materi ANT…" aria-label="Pertanyaan untuk AskME"></textarea>
         <button class="askme-send" id="askme-send" type="button" aria-label="Kirim pertanyaan" title="Kirim">➤</button>
       </div>
-      <div class="askme-foot">Enter untuk mengirim · Shift+Enter untuk baris baru · Klik gambar sumber untuk memperbesar halaman.</div>
+      <div class="askme-foot">Enter untuk mengirim · Shift+Enter untuk baris baru · Klik gambar sumber atau tombol Lihat halaman untuk memperbesar halaman.</div>
     </div>
   </div>
 
@@ -18773,7 +18772,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 </script>
 
-<script src="data/askme/askme-v3.js?v=3.2.0"></script>
+<script src="data/askme/askme-v3.js?v=3.5.0"></script>
 
 <footer style="text-align:center;padding:18px 12px 24px;font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);">
   © 2026 Atitya Pritasari. All rights reserved.
