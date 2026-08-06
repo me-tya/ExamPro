@@ -1611,7 +1611,7 @@
       <button class="askme-mode-btn" id="askme-mode-ai" type="button">🧠 AI Lokal</button>
       <span class="askme-mode-info" id="askme-mode-info">Pencarian pintar ringan tanpa unduhan model.</span>
     </div>
-    <div class="askme-ai-notice"><strong>Smart</strong> langsung siap. <strong>AI Lokal</strong> memakai model Qwen2.5 0.5B, disimpan di IndexedDB, dan mencoba ulang otomatis jika unduhan terputus. Analisis gambar lokal memerlukan browser yang mendukung WebGPU.</div>
+    <div class="askme-ai-notice"><strong>Smart</strong> langsung siap. <strong>AI Lokal</strong> memakai model Qwen2.5 0.5B, disimpan di IndexedDB, memuat model secara eksplisit, dan otomatis kembali ke Smart jika runtime WebGPU terputus. Analisis gambar lokal memerlukan browser yang mendukung WebGPU.</div>
 
     <div class="askme-tools" id="askme-tools">
       <div class="askme-chip-row" aria-label="Contoh pertanyaan AskME">
@@ -18773,7 +18773,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 </script>
 
-<script src="data/askme/askme-v3.js?v=3.1.0"></script>
+<script src="data/askme/askme-v3.js?v=3.2.0"></script>
 
 <footer style="text-align:center;padding:18px 12px 24px;font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);">
   © 2026 Atitya Pritasari. All rights reserved.

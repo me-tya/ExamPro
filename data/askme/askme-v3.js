@@ -1,4 +1,4 @@
-/* AskME v3 - encrypted document search, local AI, and visual page analysis */
+/* AskME v3.2 - resilient local AI, encrypted document search, and visual page analysis */
 (() => {
   'use strict';
 
@@ -15,6 +15,8 @@
   const LOCAL_AI_LABEL = 'Qwen2.5 0.5B';
   const AI_MAX_RETRIES = 3;
   const AI_MIN_FREE_BYTES = 850 * 1024 * 1024;
+  const AI_CONTEXT_WINDOW = 2048;
+  const AI_MAX_OUTPUT_TOKENS = 280;
   const STOP = new Set(('yang dan atau dengan dari untuk pada di ke dalam adalah itu ini apa apakah bagaimana mengapa kenapa siapa kapan dimana mana berapa sebuah suatu antara hasil keluaran output masukan input the a an and or of to in on for is are was were be been being what which how why when where does do did project proyek management manajemen tentang jelaskan tolong materi').split(/\s+/));
   const ACRONYM = {
     wpd:'work performance data',wpi:'work performance information',wpr:'work performance report',
@@ -271,33 +273,51 @@
     }
     throw new Error('Library AI lokal gagal dimuat dari CDN. '+String(lastErr?.message||lastErr||''));
   }
+  function isEngineStateError(err){
+    const m=String(err?.message||err||'').toLowerCase();
+    return /disposed|model not loaded|not loaded before|device lost|webgpu device|invalid device|runtime.*closed/.test(m);
+  }
+  async function resetAIEngine(){
+    const old=state.aiEngine;state.aiEngine=null;state.aiLoading=null;
+    if(!old)return;
+    try{if(typeof old.unload==='function')await old.unload();}catch(_){}
+    try{if(typeof old.dispose==='function')old.dispose();}catch(_){}
+  }
   async function createAIEngine(webllm,attempt){
     const appConfig={...webllm.prebuiltAppConfig,cacheBackend:'indexeddb'};
-    return webllm.CreateMLCEngine(LOCAL_AI_MODEL,{
+    const engine=new webllm.MLCEngine({
       appConfig,
       initProgressCallback:(p)=>{
         const info=progressSummary(p,attempt);setProgress(info.pct);setStatus(info.short,'loading',info.full||info.short);
       }
     });
+    try{
+      await engine.reload(LOCAL_AI_MODEL,{context_window_size:AI_CONTEXT_WINDOW});
+      return engine;
+    }catch(err){
+      try{if(typeof engine.unload==='function')await engine.unload();}catch(_){}
+      try{if(typeof engine.dispose==='function')engine.dispose();}catch(_){}
+      throw err;
+    }
   }
-  async function ensureAI(){
+  async function ensureAI(forceReload=false){
+    if(forceReload)await resetAIEngine();
     if(state.aiEngine)return state.aiEngine;if(state.aiLoading)return state.aiLoading;if(!navigator.gpu)throw new Error('WebGPU tidak tersedia pada browser/perangkat ini.');
     state.aiLoading=(async()=>{
       await prepareAIStorage();setStatus('Menyiapkan AI Lokal…','loading');setProgress(1);
       const webllm=await loadWebLLM();let lastErr;
       for(let attempt=1;attempt<=AI_MAX_RETRIES;attempt++){
         try{
-          if(attempt>1){setStatus(`Koneksi terputus · melanjutkan coba ${attempt}/${AI_MAX_RETRIES}`,'loading');await sleep(1200*attempt);}
-          state.aiEngine=await createAIEngine(webllm,attempt);setProgress(100);setStatus(`AI Lokal siap · ${LOCAL_AI_LABEL}`);return state.aiEngine;
+          if(attempt>1){setStatus(`Memulihkan AI Lokal · coba ${attempt}/${AI_MAX_RETRIES}`,'loading');await sleep(1200*attempt);}
+          const engine=await createAIEngine(webllm,attempt);state.aiEngine=engine;setProgress(100);setStatus(`AI Lokal siap · ${LOCAL_AI_LABEL}`);return engine;
         }catch(err){
-          lastErr=err;state.aiEngine=null;
-          if(attempt>=AI_MAX_RETRIES||!isRetryableAIError(err))throw err;
+          lastErr=err;await resetAIEngine();
+          if(attempt>=AI_MAX_RETRIES||(!isRetryableAIError(err)&&!isEngineStateError(err)))throw err;
         }
       }
       throw lastErr||new Error('AI Lokal gagal dimuat.');
-    })().catch(err=>{
+    })().then(engine=>{state.aiLoading=null;return engine;}).catch(err=>{
       state.aiLoading=null;state.aiEngine=null;setProgress(0);setStatus('AI Lokal gagal · Smart tetap siap','error',String(err?.message||err));
-      if(isRetryableAIError(err))throw new Error('Unduhan model terputus setelah 3 percobaan. Klik AI Lokal lagi saat koneksi lebih stabil; bagian yang telah tersimpan di IndexedDB biasanya tidak perlu diunduh ulang.');
       throw err;
     });
     return state.aiLoading;
@@ -309,17 +329,24 @@
         const ok=confirm(`AI Lokal (${LOCAL_AI_LABEL}) akan mengunduh model ke IndexedDB browser. Unduhan dapat dilanjutkan otomatis hingga ${AI_MAX_RETRIES} kali jika koneksi terputus. Semua proses berjalan di perangkat. Lanjutkan?`);
         if(!ok)return;
         state.els.modeAI.disabled=true;state.els.modeAI.textContent='⏳ Menyiapkan…';
-        try{await ensureAI();}catch(err){alert('Gagal memuat AI lokal: '+String(err?.message||err));return;}finally{state.els.modeAI.disabled=false;state.els.modeAI.textContent='🧠 AI Lokal';}
+        try{await ensureAI();}catch(err){state.mode='smart';localStorage.setItem(MODE_KEY,'smart');updateModeUI();alert('Gagal memuat AI lokal: '+String(err?.message||err)+'\n\nMode Smart tetap aktif.');return;}finally{state.els.modeAI.disabled=false;state.els.modeAI.textContent='🧠 AI Lokal';}
       }
     }
     state.mode=mode;localStorage.setItem(MODE_KEY,mode);updateModeUI();
   }
   function updateModeUI(){state.els.modeSmart?.classList.toggle('active',state.mode==='smart');state.els.modeAI?.classList.toggle('active',state.mode==='ai');if(state.els.modeInfo)state.els.modeInfo.textContent=state.mode==='ai'?`AI lokal ${LOCAL_AI_LABEL} menyusun jawaban dari halaman yang ditemukan.`:'Pencarian pintar ringan tanpa unduhan model.';}
-  function buildContext(results){return results.slice(0,5).map(r=>`[HALAMAN ${r.p} — ${r.t}]\n${String(r.full||'').slice(0,2600)}`).join('\n\n').slice(0,10500);}
+  function buildContext(results){return results.slice(0,3).map(r=>`[HALAMAN ${r.p} — ${r.t}]\n${String(r.full||'').slice(0,1500)}`).join('\n\n').slice(0,4800);}
   async function aiAnswer(question,results){
-    const engine=await ensureAI();const context=buildContext(results);const prior=state.plainHistory.slice(-4).map(x=>({role:x.role,content:x.content}));
+    const context=buildContext(results);const prior=state.plainHistory.slice(-2).map(x=>({role:x.role,content:x.content}));
     const messages=[{role:'system',content:'Anda adalah tutor PMP berbahasa Indonesia. Jawab hanya berdasarkan KONTEKS MATERI ANT yang diberikan. Berikan jawaban langsung, lalu penjelasan ringkas. Jangan mengarang. Jika konteks tidak cukup, katakan bahwa materi yang ditemukan belum cukup. Sebut nomor halaman yang mendukung, tetapi jangan membuat nomor halaman baru.'},...prior,{role:'user',content:`PERTANYAAN:\n${question}\n\nKONTEKS MATERI ANT:\n${context}`}];
-    const out=await engine.chat.completions.create({messages,temperature:0.15,max_tokens:520});return out?.choices?.[0]?.message?.content||'';
+    const complete=async(engine)=>{const out=await engine.chat.completions.create({messages,temperature:0.15,max_tokens:AI_MAX_OUTPUT_TOKENS});return out?.choices?.[0]?.message?.content||'';};
+    let engine=await ensureAI();
+    try{return await complete(engine);}catch(err){
+      if(!isEngineStateError(err))throw err;
+      setStatus('Memulihkan model AI Lokal…','loading',String(err?.message||err));
+      engine=await ensureAI(true);
+      return complete(engine);
+    }
   }
 
   function ensureVisionWorker(){
@@ -346,7 +373,13 @@
     try{
       const results=search(retrievalQuery,6);let title,body,keys=tokens(retrievalQuery),answerPlain='';
       if(state.mode==='ai'){
-        answerPlain=await aiAnswer(q,results);title='Jawaban AI Lokal';body=renderSimpleMarkdown(answerPlain);
+        try{
+          answerPlain=await aiAnswer(q,results);title='Jawaban AI Lokal';body=renderSimpleMarkdown(answerPlain);
+        }catch(aiErr){
+          console.warn('AskME AI Lokal gagal, menggunakan Smart',aiErr);await resetAIEngine();state.mode='smart';localStorage.setItem(MODE_KEY,'smart');updateModeUI();
+          const fact=factAnswer(retrievalQuery),ans=fact||genericAnswer(retrievalQuery,results);title=ans.title+' · Mode Smart';body=ans.answer;keys=ans.keys?.length?ans.keys:keys;answerPlain=body.replace(/<[^>]+>/g,' ');
+          body+='<p class="askme-ai-fallback-note"><b>AI Lokal terputus.</b> Pertanyaan ini tetap dijawab dengan Mode Smart. Klik AI Lokal lagi setelah halaman dimuat ulang untuk mencoba kembali.</p>';
+        }
       }else{
         const fact=factAnswer(retrievalQuery),ans=fact||genericAnswer(retrievalQuery,results);title=ans.title;body=ans.answer;keys=ans.keys?.length?ans.keys:keys;answerPlain=body.replace(/<[^>]+>/g,' ');
       }
