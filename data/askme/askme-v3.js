@@ -1,4 +1,4 @@
-/* AskME v3.5 Audited Stable - Smart Plus encrypted search with reliable page viewer and local page analysis */
+/* AskME v3.6 Audited Stable - Smart Plus encrypted search with reliable page viewer and local page analysis */
 (() => {
   'use strict';
 
@@ -6,7 +6,8 @@
   const HISTORY_KEY = 'pmp_askme_history_v3';
   const MODE_KEY = 'pmp_askme_mode_v3';
   const SESSION_KEY = 'pmp_askme_session_key_v3';
-  const STABLE_MIGRATION_KEY = 'pmp_askme_stable_v35';
+  const STABLE_MIGRATION_KEY = 'pmp_askme_stable_v36';
+  const BUILD = 'v3.6';
   const AAD = new TextEncoder().encode('askme-v3');
   const STOP = new Set(('yang dan atau dengan dari untuk pada di ke dalam adalah itu ini apa apakah bagaimana mengapa kenapa siapa kapan dimana mana berapa sebuah suatu antara hasil keluaran output masukan input the a an and or of to in on for is are was were be been being what which how why when where does do did project proyek management manajemen tentang jelaskan tolong materi').split(/\s+/));
   const ACRONYM = {
@@ -37,7 +38,10 @@
     'kontrol perubahan terintegrasi':'integrated change control','definisi selesai':'definition of done',
     'asumsi':'assumption assumptions assumption log basis of estimates constraint constraints',
     'anggapan':'assumption assumptions assumption log','batasan':'constraint constraints assumption log',
-    'matriks seimbang':'balanced matrix organization','organisasi matriks seimbang':'balanced matrix organization'
+    'matriks seimbang':'balanced matrix organization','organisasi matriks seimbang':'balanced matrix organization',
+    'arah pengaruh':'direction of influence','pengaruh ke samping':'sideward direction of influence',
+    'pengaruh ke atas':'upward direction of influence','pengaruh ke bawah':'downward direction of influence',
+    'pengaruh keluar':'outward direction of influence'
   };
   const TERM_ID = {
     'work performance reports':'laporan kinerja pekerjaan','project documents':'dokumen proyek','project plan':'rencana proyek',
@@ -77,13 +81,14 @@
   function effectiveQuery(q){
     if(!state.lastUserQuery)return q;
     const n=norm(q);
-    const explicitStart=/^(kalau|jika|terus|lalu|yang tadi|tadi|kenapa begitu|mengapa begitu|jadi|maksudnya|contohnya|fungsinya|inputnya|outputnya|dampaknya)\b/.test(n);
-    const deicticOnly=/^(itu|tersebut|yang tadi|maksudnya|kenapa|mengapa|terus|lalu|jadi|contohnya|fungsinya|inputnya|outputnya|dampaknya)(\s+(apa|bagaimana|kenapa|mengapa|gimana|untuk apa|nya))?[?.!]*$/.test(n);
-    const generic=new Set('itu tersebut yang tadi kalau jika tidak benar salah valid dampak dampaknya fungsi fungsinya input inputnya output outputnya beda bedanya perbedaan kenapa mengapa bagaimana gimana jelaskan lanjut lebih contoh contohnya maksud maksudnya terus lalu jadi proses dipakai digunakan untuk apa'.split(/\s+/));
+    // Context is only reused for genuinely anaphoric follow-ups. Any named term,
+    // acronym, or distinctive word starts a fresh topic, even when the query is short.
+    const generic=new Set('itu tersebut yang tadi kalau jika tidak benar salah valid dampak dampaknya fungsi fungsinya input inputnya output outputnya beda bedanya perbedaan kenapa mengapa bagaimana gimana jelaskan lanjut lebih contoh contohnya maksud maksudnya terus lalu jadi proses dipakai digunakan untuk apa nya'.split(/\s+/));
     const distinctive=tokens(q).filter(t=>!generic.has(t));
-    const knownTerm=/\b(wpd|wpi|wpr|pmp|eef|opa|ev|pv|ac|bac|cpi|spi|cv|sv|eac|etc|vac|tcpi|raci|dod|wbs|pert)\b/.test(n);
-    const standaloneTopic=knownTerm||distinctive.length>0;
-    const follow=(deicticOnly||(explicitStart&&!standaloneTopic));
+    const namedTerm=/\b(wpd|wpi|wpr|pmp|eef|opa|ev|pv|ac|bac|cpi|spi|cv|sv|eac|etc|vac|tcpi|raci|dod|wbs|pert|sideward|upward|downward|outward|norming|forming|storming|performing|balanced|matrix)\b/.test(n);
+    if(namedTerm||distinctive.length>0)return q;
+    const follow=/^(itu|tersebut|yang tadi|tadi|kalau begitu|jika begitu|maksudnya|kenapa begitu|mengapa begitu|terus|lalu|jadi|contohnya|fungsinya|inputnya|outputnya|dampaknya|bedanya)(\b|\s)/.test(n)
+      || /^(apa|bagaimana|gimana|kenapa|mengapa) (maksud|fungsi|input|output|dampak|bedanya)(nya)?[?.!]*$/.test(n);
     return follow?state.lastUserQuery+' '+q:q;
   }
   function b64ToBytes(b64){const clean=String(b64||'').trim().replace(/\s+/g,'');const bin=atob(clean);const out=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);return out;}
@@ -131,7 +136,7 @@
       const chunks=await Promise.all(state.manifest.chunkFiles.map(p=>fetchDecrypt(p,true)));
       state.docs=chunks.flat().map(d=>({...d,full:[d.t,d.x,d.ocr].filter(Boolean).join('\n')}));
       state.docByPage=new Map(state.docs.map(d=>[d.p,d]));buildIndex();state.ready=true;
-      sessionStorage.setItem(SESSION_KEY,keyText);hideLock();setStatus(`${state.docs.length} halaman siap`);await hydrateSources(state.els.chat);
+      sessionStorage.setItem(SESSION_KEY,keyText);hideLock();setStatus(`${state.docs.length} halaman siap · ${BUILD}`);await hydrateSources(state.els.chat);
       if(source==='manual')addMessage('bot','<div class="askme-answer-title">Materi berhasil dibuka</div><div class="askme-answer-main">AskME sudah dapat mencari teks dan menampilkan gambar halaman sumber. Kunci hanya disimpan selama tab browser ini terbuka.</div>',true);
     }catch(err){
       state.key=null;state.ready=false;setStatus('Materi terkunci','error');showLock('Kunci tidak cocok','Masukkan kunci AskME yang tersimpan di Firestore atau file privat.','Gagal membuka data: '+String(err?.message||err));
@@ -171,7 +176,9 @@
     if(has(n,'wpd','work performance data')&&has(n,'pmp','project management plan')&&has(n,'compare','comparison','perbandingan','output','hasil'))return{title:'Jawaban cepat',answer:'Hasilnya adalah <b>Work Performance Information (WPI)</b>. WPD merupakan data aktual mentah; ketika WPD dibandingkan dengan <b>Project Management Plan</b>, hasil analisisnya menjadi WPI. Selanjutnya, kumpulan WPI dikompilasi menjadi <b>Work Performance Report (WPR)</b>.',keys:['work performance data','project management plan','work performance information']};
     if(has(n,'wpd','wpi','wpr')&&(has(n,'beda','difference','perbedaan','vs')||mentions('work performance data','work performance information')))return{title:'Perbedaan WPD, WPI, dan WPR',answer:'<b>WPD</b> = data aktual mentah dari pelaksanaan pekerjaan. <b>WPI</b> = WPD yang sudah dianalisis atau dibandingkan dengan rencana/baseline. <b>WPR</b> = kumpulan WPI yang disusun menjadi laporan status untuk pemangku kepentingan. Ringkasnya: <b>data → informasi → laporan</b>.',keys:['work performance data','work performance information','work performance report']};
     if(has(n,'wpi','work performance information')&&has(n,'input','inputan','untuk apa','fungsi','digunakan','dipakai'))return{title:'WPI: berasal dari mana dan dipakai untuk apa',answer:'<p><b>Work Performance Information (WPI)</b> adalah hasil analisis WPD terhadap Project Management Plan atau baseline.</p><p>WPI menjadi <b>input untuk Monitor and Control Project Work</b>. Dalam proses tersebut, kumpulan WPI diolah menjadi <b>Work Performance Report (WPR)</b> untuk menyampaikan status jadwal, biaya, risiko, dan kemajuan proyek kepada stakeholder.</p><p>Alurnya: <b>WPD + rencana/baseline → WPI → WPR</b>.</p>',keys:['work performance information','monitor and control project work','work performance report']};
-    if(has(n,'balanced matrix','matriks seimbang','organisasi matriks seimbang'))return{title:'Balanced Matrix Organization',answer:'<p><b>Balanced matrix</b> adalah struktur organisasi matriks ketika kewenangan project manager dan functional manager relatif seimbang.</p><p>Project manager mengoordinasikan pekerjaan proyek, sedangkan functional manager tetap memiliki kewenangan atas sumber daya dan keahlian fungsional. Karena kekuasaannya terbagi, keputusan penting biasanya memerlukan koordinasi dan negosiasi keduanya.</p><p>Posisinya berada di antara <b>weak matrix</b> yang lebih dominan functional manager dan <b>strong matrix</b> yang lebih dominan project manager.</p>',keys:['balanced matrix','functional manager','project manager','matrix organization']};
+    if(has(n,'sideward','pengaruh ke samping'))return{title:'Sideward — Direction of Influence',answer:'<p><b>Sideward</b> adalah arah pengaruh dari <b>rekan sejawat, manajer lain, atau departemen lain</b> yang masih berada di dalam organisasi tetapi di luar tim proyek.</p><p>Contohnya, departemen marketing yang menyampaikan kebutuhan kepada project manager termasuk pengaruh <b>sideward</b>, karena posisinya merupakan unit sejajar di organisasi, bukan atasan, bawahan, atau pihak eksternal.</p><p>Perbandingan singkat: <b>upward</b> = manajemen senior/sponsor; <b>downward</b> = anggota tim; <b>outward</b> = pelanggan, vendor, regulator, atau publik.</p>',keys:['sideward','direction of influence','peers','other managers','departments'],sourcePages:[671,762]};
+    if(has(n,'direction of influence','arah pengaruh')&&has(n,'upward','downward','outward','sideward'))return{title:'Direction of Influence',answer:'<p>Klasifikasi arah pengaruh stakeholder terdiri dari:</p><ul><li><b>Upward</b>: manajemen senior, sponsor, atau steering body.</li><li><b>Downward</b>: anggota tim atau orang di bawah struktur proyek.</li><li><b>Outward</b>: pihak eksternal seperti pelanggan, vendor, regulator, atau publik.</li><li><b>Sideward</b>: rekan sejawat, manajer lain, atau departemen lain di dalam organisasi.</li></ul>',keys:['direction of influence','upward','downward','outward','sideward'],sourcePages:[671]};
+    if(has(n,'balanced matrix','matriks seimbang','organisasi matriks seimbang'))return{title:'Balanced Matrix Organization',answer:'<p><b>Balanced matrix</b> adalah struktur organisasi matriks ketika kewenangan project manager dan functional manager relatif seimbang.</p><p>Project manager mengoordinasikan pekerjaan proyek, sedangkan functional manager tetap memiliki kewenangan atas sumber daya dan keahlian fungsional. Karena kekuasaannya terbagi, keputusan penting biasanya memerlukan koordinasi dan negosiasi keduanya.</p><p>Posisinya berada di antara <b>weak matrix</b> yang lebih dominan functional manager dan <b>strong matrix</b> yang lebih dominan project manager.</p>',keys:['balanced matrix','functional manager','project manager','matrix organization'],sourcePages:[125]};
     if(has(n,'work performance data','wpd')&&!has(n,'wpi','wpr'))return{title:'Work Performance Data (WPD)',answer:'<b>WPD</b> adalah data aktual mentah yang dikumpulkan saat pekerjaan proyek dilaksanakan, misalnya jam kerja, tanggal, biaya aktual, jumlah cacat, dan pekerjaan yang selesai. WPD belum dibandingkan dengan rencana.',keys:['work performance data']};
     if(has(n,'work performance information','wpi')&&!has(n,'wpr'))return{title:'Work Performance Information (WPI)',answer:'<b>WPI</b> adalah informasi hasil analisis WPD terhadap Project Management Plan atau baseline. WPI menunjukkan status dan selisih antara kinerja aktual dengan yang direncanakan.',keys:['work performance information']};
     if(has(n,'work performance report','wpr'))return{title:'Work Performance Report (WPR)',answer:'<b>WPR</b> adalah laporan status proyek yang disusun dari kumpulan WPI, misalnya status jadwal, biaya, risiko, dan kesehatan proyek. Laporan ini digunakan untuk memperbarui pemangku kepentingan.',keys:['work performance report']};
@@ -183,7 +190,7 @@
     if(has(n,'resource leveling','resource smoothing')&&has(n,'beda','difference','perbedaan','vs'))return{title:'Resource Leveling vs Smoothing',answer:'<b>Resource leveling</b> menyesuaikan jadwal berdasarkan keterbatasan sumber daya dan dapat mengubah critical path atau memperpanjang durasi proyek. <b>Resource smoothing</b> menggeser aktivitas hanya dalam float yang tersedia sehingga tanggal selesai proyek tidak berubah.',keys:['resource leveling','resource smoothing']};
     if(has(n,'crashing','fast tracking')&&has(n,'beda','difference','perbedaan','vs'))return{title:'Crashing vs Fast-Tracking',answer:'<b>Crashing</b> menambah sumber daya/biaya pada aktivitas critical path untuk memperpendek durasi. <b>Fast-tracking</b> menjalankan aktivitas yang semula berurutan secara tumpang tindih, sehingga meningkatkan risiko rework.',keys:['crashing','fast tracking','schedule compression']};
     if(has(n,'definition of done','dod','definisi selesai'))return{title:'Definition of Done',answer:'<b>Definition of Done</b> adalah kriteria kualitas bersama yang harus dipenuhi agar increment benar-benar dianggap selesai dan siap digunakan/dirilis.',keys:['definition of done','increment']};
-    if(has(n,'tuckman','forming','storming','norming','performing'))return{title:'Tahapan Tuckman',answer:'Urutannya adalah <b>Forming → Storming → Norming → Performing</b>, dan dapat diakhiri dengan <b>Adjourning</b>.',keys:['forming','storming','norming','performing']};
+    if(has(n,'tuckman','forming','storming','norming','performing'))return{title:'Tahapan Tuckman',answer:'Urutannya adalah <b>Forming → Storming → Norming → Performing</b>, dan dapat diakhiri dengan <b>Adjourning</b>.',keys:['forming','storming','norming','performing'],sourcePages:[885]};
     if(has(n,'communication channels','saluran komunikasi','n(n-1)','jumlah komunikasi'))return{title:'Communication Channels',answer:'Jumlah saluran komunikasi dihitung dengan rumus <b>n(n−1) ÷ 2</b>, dengan n = jumlah orang yang berkomunikasi.',keys:['communication channels']};
     if(has(n,'pert','three point','tiga titik')&&has(n,'formula','rumus'))return{title:'Rumus PERT',answer:'Estimasi PERT berbobot: <b>(O + 4M + P) ÷ 6</b>, dengan O = optimistic, M = most likely, dan P = pessimistic.',keys:['pert','optimistic','most likely','pessimistic']};
     if(has(n,'raci'))return{title:'RACI',answer:'<b>R</b>esponsible = pelaksana; <b>A</b>ccountable = pemilik akuntabilitas akhir; <b>C</b>onsulted = dimintai masukan dua arah; <b>I</b>nformed = diberi informasi satu arah.',keys:['raci','responsible','accountable','consulted','informed']};
@@ -201,7 +208,7 @@
     return out.replace(/^[-▪•❖❑\s]+/,'').trim();
   }
   function genericAnswer(query,results){
-    if(!results.length)return{title:'Belum ditemukan',answer:'Saya belum menemukan kecocokan yang cukup kuat dalam materi ANT 2026. Gunakan istilah proses, singkatan, atau kata kunci PMP yang lebih spesifik.',keys:[]};
+    if(!results.length)return{title:'Belum ditemukan',answer:'Saya belum menemukan istilah tersebut dalam teks/OCR materi ANT 2026. Saya tidak akan memakai topik pertanyaan sebelumnya. Coba cek ejaan atau gunakan istilah Inggris yang tertulis di materi.',keys:[]};
     const qt=tokens(query),seen=new Set(),parts=[];
     for(const r of results.slice(0,4)){
       for(const c of sentenceCandidates(r.full,qt)){const k=norm(c.s).slice(0,150);if(seen.has(k))continue;seen.add(k);parts.push(translateLite(c.s));if(parts.length>=3)break;}
@@ -215,13 +222,13 @@
 
   function sourceHtml(results,keys){
     if(!results.length)return'';
-    return '<div class="askme-source-wrap"><div class="askme-source-label">Sumber materi ANT 2026 · klik gambar untuk memperbesar</div>'+results.slice(0,3).map(r=>`<div class="askme-source-card" data-source-page="${r.p}"><div class="askme-source-thumb" data-page-thumb="${r.p}" title="Buka halaman ${r.p}"><span>Memuat gambar…</span></div><div class="askme-source-body"><div class="askme-source-top"><div class="askme-source-title">${escapeHtml(r.t)}</div><div class="askme-source-page">Hal. ${r.p}</div></div><div class="askme-source-text">${highlight(excerpt(r,keys),keys)}</div><div class="askme-source-actions"><button class="askme-source-btn" type="button" data-open-page="${r.p}">Lihat halaman</button><button class="askme-source-btn visual" type="button" data-visual-page="${r.p}">Analisis halaman</button></div></div></div>`).join('')+'</div>';
+    return '<div class="askme-source-wrap"><div class="askme-source-label">Sumber materi ANT 2026 · klik gambar untuk memperbesar</div>'+results.slice(0,3).map(r=>`<div class="askme-source-card" data-source-page="${r.p}"><div class="askme-source-thumb" data-page-thumb="${r.p}" title="Buka halaman ${r.p}"><span>Memuat gambar…</span></div><div class="askme-source-body"><div class="askme-source-top"><div class="askme-source-title">${escapeHtml(r.t)}</div><div class="askme-source-page">Hal. ${r.p}</div></div><div class="askme-source-text">${highlight(excerpt(r,keys),keys)}</div><div class="askme-source-actions"><button class="askme-source-btn" type="button" data-open-page="${r.p}">Lihat halaman</button><button class="askme-source-btn visual" type="button" data-visual-page="${r.p}">Analisis halaman (OCR)</button></div></div></div>`).join('')+'</div>';
   }
 
   function addMessage(role,content,save=true){
     if(!state.els.chat)return null;const wrap=document.createElement('div');wrap.className='askme-message '+role;const av=document.createElement('div');av.className='askme-avatar';av.textContent=role==='user'?'👤':'💡';const bubble=document.createElement('div');bubble.className='askme-bubble';bubble.innerHTML=content;wrap.append(av,bubble);state.els.chat.appendChild(wrap);state.els.chat.scrollTop=state.els.chat.scrollHeight;if(save)saveHistory();return wrap;
   }
-  function addGreeting(){addMessage('bot','<div class="askme-answer-title">Halo, saya AskME Smart Plus</div><div class="askme-answer-main"><p>Saya mencari, menggabungkan, dan menjelaskan materi ANT PMP 2026 dalam Bahasa Indonesia serta menampilkan <b>gambar halaman sumber</b>.</p><p>Smart Plus langsung siap, tanpa unduhan model, tanpa API berbayar, dan tetap dapat memahami singkatan serta pertanyaan lanjutan.</p></div><div class="askme-answer-note">Contoh: “WPI itu apa dan menjadi input untuk proses apa?”</div>',false);}
+  function addGreeting(){addMessage('bot','<div class="askme-answer-title">Halo, saya AskME Smart Plus '+BUILD+'</div><div class="askme-answer-main"><p>Saya mencari, menggabungkan, dan menjelaskan materi ANT PMP 2026 dalam Bahasa Indonesia serta menampilkan <b>gambar halaman sumber</b>.</p><p>Setiap istilah baru diperlakukan sebagai topik baru. Konteks lama hanya digunakan untuk pertanyaan lanjutan seperti “itu maksudnya apa?”.</p></div><div class="askme-answer-note">Contoh: “Sideward itu apa?” atau “WPI menjadi input untuk proses apa?”</div>',false);}
   function saveHistory(){try{const items=[...state.els.chat.querySelectorAll('.askme-message')].slice(-24).map(m=>({role:m.classList.contains('user')?'user':'bot',html:m.querySelector('.askme-bubble').innerHTML}));localStorage.setItem(HISTORY_KEY,JSON.stringify(items));}catch(_){}}
   function loadHistory(){try{const arr=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');if(Array.isArray(arr)&&arr.length){arr.forEach(x=>addMessage(x.role==='user'?'user':'bot',x.html,false));return;}}catch(_){}addGreeting();}
   function clear(){state.els.chat.innerHTML='';state.plainHistory=[];state.lastUserQuery='';try{localStorage.removeItem(HISTORY_KEY);}catch(_){}addGreeting();}
@@ -325,8 +332,12 @@
     addMessage('user',escapeHtml(q));state.plainHistory.push({role:'user',content:q});state.els.input.value='';resizeInput();state.els.send.disabled=true;
     const typing=addMessage('bot','<div class="askme-typing" aria-label="Mencari jawaban"><span></span><span></span><span></span></div>',false);
     try{
-      const results=search(retrievalQuery,6);let title,body,keys=tokens(retrievalQuery),answerPlain='';
+      let results=search(retrievalQuery,6);let title,body,keys=tokens(retrievalQuery),answerPlain='';
       const fact=factAnswer(retrievalQuery),ans=fact||genericAnswer(retrievalQuery,results);title=ans.title;body=ans.answer;keys=ans.keys?.length?ans.keys:keys;answerPlain=body.replace(/<[^>]+>/g,' ');
+      // Sources must support the answer. For curated facts use pinned pages first,
+      // otherwise rerun retrieval with the fact's own key terms. Never show stale/unrelated cards.
+      if(fact?.sourcePages?.length){results=fact.sourcePages.map(p=>state.docByPage.get(p)).filter(Boolean);}
+      else if(fact?.keys?.length){results=search(fact.keys.join(' '),6);}
       const html='<div class="askme-answer-title">'+escapeHtml(title)+'</div><div class="askme-answer-main">'+body+'</div><div class="askme-answer-note">Jawaban dibatasi pada materi ANT yang ditemukan. Buka gambar sumber untuk memeriksa diagram/tabel aslinya.</div>'+sourceHtml(results,keys);
       typing.querySelector('.askme-bubble').innerHTML=html;state.plainHistory.push({role:'assistant',content:answerPlain.slice(0,1800)});await hydrateSources(typing);saveHistory();
     }catch(err){typing.querySelector('.askme-bubble').innerHTML='<div class="askme-answer-title">Terjadi kendala</div><div class="askme-answer-main">'+escapeHtml(String(err?.message||err))+'</div><div class="askme-answer-note">Mode Smart dapat dipakai tanpa model AI.</div>';}
@@ -369,7 +380,7 @@
   }
   function init(){try{if(localStorage.getItem(STABLE_MIGRATION_KEY)!=='1'){localStorage.removeItem(HISTORY_KEY);localStorage.setItem(STABLE_MIGRATION_KEY,'1');}}catch(_){}if(!bindUI())return;showLock('Menyiapkan AskME','Memeriksa login dan kunci materi…');startAuth();}
 
-  async function resetLocalAI(){localStorage.setItem(MODE_KEY,'smart');state.mode='smart';updateModeUI();setProgress(0);setStatus(state.ready?`${state.docs.length} halaman siap`:'Materi siap');}
+  async function resetLocalAI(){localStorage.setItem(MODE_KEY,'smart');state.mode='smart';updateModeUI();setProgress(0);setStatus(state.ready?`${state.docs.length} halaman siap · ${BUILD}`:'Materi siap');}
   window.AskME={init,search,askText,clear,openPage,unlock:unlockWithKey,setMode,resetLocalAI};
   document.addEventListener('DOMContentLoaded',init);
 })();
