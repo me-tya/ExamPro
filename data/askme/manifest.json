@@ -1,0 +1,29 @@
+{
+  "version": 3,
+  "source": "ANT-PMP-ExamPrepv2026-v8",
+  "pages": 1086,
+  "encrypted": true,
+  "cipher": "AES-GCM-256",
+  "aad": "askme-v3",
+  "chunkFiles": [
+    "kb/kb-0001-0100.json.bin",
+    "kb/kb-0101-0200.json.bin",
+    "kb/kb-0201-0300.json.bin",
+    "kb/kb-0301-0400.json.bin",
+    "kb/kb-0401-0500.json.bin",
+    "kb/kb-0501-0600.json.bin",
+    "kb/kb-0601-0700.json.bin",
+    "kb/kb-0701-0800.json.bin",
+    "kb/kb-0801-0900.json.bin",
+    "kb/kb-0901-1000.json.bin",
+    "kb/kb-1001-1086.json.bin"
+  ],
+  "imagePattern": "pages/{bucket}/page-{page4}.webp.bin",
+  "imageWidth": 900,
+  "imageFormat": "image/webp",
+  "keyDocument": "appConfig/askme",
+  "keyField": "knowledgeKeyB64",
+  "createdAt": "2026-08-06T06:40:00.802297+00:00",
+  "contentFingerprint": "ac8aee269b1b0052b72e890519cb0b31064719cfb4e4b9a41483c30df14194df",
+  "ocrPages": 1
+}

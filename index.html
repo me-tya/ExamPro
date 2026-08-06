@@ -4,6 +4,7 @@
   Project Management Exam Lab — PMP & CAPM Practice
   © 2026 Atitya Pritasari. All rights reserved.
   Original author: Atitya Pritasari — https://github.com/me-tya/pmp-prep
+  AskME local knowledge search added from ANT-PMP-ExamPrepv2026-v8
 -->
 <html lang="id">
 <head>
@@ -1134,7 +1135,69 @@
     .pmp-search-summary{align-items:flex-start;flex-direction:column;gap:3px;}
   }
 
+
+  /* ─── ASKME — LOCAL ANT 2026 KNOWLEDGE SEARCH ─── */
+  #tab-askme{max-width:940px;}
+  .askme-shell{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:rgba(16,26,51,.78);box-shadow:0 24px 60px rgba(0,0,0,.28);}
+  .askme-head{padding:18px 20px;background:linear-gradient(120deg,rgba(63,182,138,.17),rgba(107,138,235,.13),rgba(23,35,70,.96));border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
+  .askme-brand{display:flex;gap:12px;align-items:flex-start;min-width:0;}
+  .askme-logo{width:43px;height:43px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:rgba(63,182,138,.16);border:1px solid rgba(63,182,138,.38);font-size:21px;flex:0 0 auto;}
+  .askme-title{font-family:'Source Serif 4',serif;font-size:21px;color:var(--paper);font-weight:600;line-height:1.1;}
+  .askme-subtitle{font-size:12px;color:var(--muted);line-height:1.5;margin-top:5px;max-width:620px;}
+  .askme-status{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(63,182,138,.32);background:rgba(63,182,138,.10);color:var(--teal);border-radius:999px;padding:6px 10px;font-family:'Space Mono',monospace;font-size:9.5px;white-space:nowrap;}
+  .askme-status-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 3px rgba(63,182,138,.12);}
+  .askme-tools{padding:12px 16px 5px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .askme-chip-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin;flex:1 1 620px;}
+  .askme-chip{flex:0 0 auto;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);border-radius:999px;padding:7px 10px;font-size:10.5px;font-family:'Inter',sans-serif;cursor:pointer;transition:.15s;white-space:nowrap;}
+  .askme-chip:hover{border-color:var(--teal);background:rgba(63,182,138,.10);color:var(--teal);}
+  .askme-clear{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:7px 10px;font-size:10.5px;font-family:'Inter',sans-serif;cursor:pointer;white-space:nowrap;}
+  .askme-clear:hover{color:var(--coral);border-color:rgba(226,96,79,.45);}
+  .askme-chat{height:min(58vh,570px);min-height:390px;overflow-y:auto;padding:14px 16px 20px;display:flex;flex-direction:column;gap:13px;scroll-behavior:smooth;}
+  .askme-message{display:flex;gap:9px;align-items:flex-start;max-width:88%;}
+  .askme-message.user{align-self:flex-end;flex-direction:row-reverse;}
+  .askme-avatar{width:29px;height:29px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:14px;border:1px solid var(--line);background:var(--navy-3);}
+  .askme-message.bot .askme-avatar{background:rgba(63,182,138,.13);border-color:rgba(63,182,138,.33);}
+  .askme-bubble{border:1px solid var(--line);border-radius:15px;padding:11px 13px;font-size:13px;line-height:1.6;word-break:break-word;}
+  .askme-message.bot .askme-bubble{background:rgba(255,255,255,.055);border-top-left-radius:5px;color:var(--ink);}
+  .askme-message.user .askme-bubble{background:var(--paper);color:#20243A;border-color:var(--paper-dim);border-top-right-radius:5px;}
+  .askme-answer-title{font-size:12px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:.075em;margin-bottom:5px;font-family:'Space Mono',monospace;}
+  .askme-answer-main{font-size:14px;color:var(--paper);line-height:1.6;}
+  .askme-answer-main b{color:var(--amber);}
+  .askme-answer-note{font-size:11px;color:var(--muted);margin-top:7px;line-height:1.45;}
+  .askme-source-wrap{margin-top:10px;border-top:1px dashed var(--line);padding-top:9px;}
+  .askme-source-label{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--muted);letter-spacing:.09em;text-transform:uppercase;margin-bottom:7px;}
+  .askme-source-card{background:rgba(11,18,38,.55);border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-top:6px;}
+  .askme-source-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;}
+  .askme-source-title{font-size:11px;font-weight:700;color:var(--paper);line-height:1.35;}
+  .askme-source-page{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--amber);white-space:nowrap;}
+  .askme-source-text{font-size:10.8px;color:var(--muted);line-height:1.5;margin-top:5px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;}
+  .askme-source-text mark{background:rgba(232,163,61,.25);color:var(--paper);padding:0 1px;border-radius:2px;}
+  .askme-typing{display:inline-flex;gap:4px;align-items:center;min-width:42px;}
+  .askme-typing span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:askmePulse 1s infinite ease-in-out;}
+  .askme-typing span:nth-child(2){animation-delay:.14s}.askme-typing span:nth-child(3){animation-delay:.28s}
+  @keyframes askmePulse{0%,70%,100%{opacity:.25;transform:translateY(0)}35%{opacity:1;transform:translateY(-3px)}}
+  .askme-compose{border-top:1px solid var(--line);padding:12px;background:rgba(11,18,38,.72);}
+  .askme-input-box{display:flex;align-items:flex-end;gap:8px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.055);padding:8px 8px 8px 12px;transition:.16s;}
+  .askme-input-box:focus-within{border-color:rgba(63,182,138,.65);box-shadow:0 0 0 3px rgba(63,182,138,.08);}
+  .askme-input{flex:1;resize:none;max-height:120px;min-height:24px;background:transparent;border:none;outline:none;color:var(--paper);font-family:'Inter',sans-serif;font-size:13px;line-height:1.5;padding:4px 0;}
+  .askme-input::placeholder{color:var(--muted);}
+  .askme-send{width:38px;height:38px;display:flex;align-items:center;justify-content:center;border:none;border-radius:11px;background:var(--teal);color:#071A13;font-weight:800;cursor:pointer;font-size:16px;flex:0 0 auto;transition:.15s;}
+  .askme-send:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  .askme-send:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+  .askme-foot{font-size:9.8px;color:var(--muted);margin-top:7px;text-align:center;line-height:1.4;}
+  @media(max-width:620px){
+    #tab-askme{padding:12px 8px 24px;}
+    .askme-head{padding:14px;display:block;}
+    .askme-status{margin-top:10px;}
+    .askme-chat{height:calc(100dvh - 470px);min-height:220px;max-height:420px;padding:12px 10px 16px;}
+    .askme-message{max-width:96%;}
+    .askme-tools{padding:9px 10px 3px;}
+    .askme-clear{display:none;}
+    .askme-compose{padding:9px;}
+  }
+
 </style>
+<link rel="stylesheet" href="data/askme/askme-v3.css">
 <!-- Firebase (cloud progress sync) -->
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
@@ -1167,6 +1230,7 @@
 <button class="tab-btn active" onclick="switchTab('overview')">📊 Overview</button>
 <button class="tab-btn" onclick="switchTab('pmp')">📘 PMP</button>
 <button class="tab-btn" onclick="switchTab('capm')">📗 CAPM</button>
+<button class="tab-btn" onclick="switchTab('askme')">💬 AskME</button>
 <button class="tab-btn" onclick="switchTab('review')">🔍 Review</button>
 <button class="tab-btn" onclick="switchTab('cheatsheet')">📑 Cheatsheet</button>
 <button class="tab-btn" onclick="switchTab('exam')">📝 Exam</button>
@@ -1523,6 +1587,71 @@
 <div class="subtab-content" id="tab-capm3"></div>
 <div class="subtab-content" id="tab-capm4"></div>
 </section>
+
+<!-- ASKME TAB -->
+<section class="tab-content" id="tab-askme">
+  <div class="askme-shell">
+    <div class="askme-head">
+      <div class="askme-brand">
+        <div class="askme-logo" aria-hidden="true">💬</div>
+        <div>
+          <div class="askme-title">AskME</div>
+          <div class="askme-subtitle">Chatbot materi <b>ANT PMP Exam Preparation 2026-v8</b>. Pencarian, dekripsi, dan AI lokal berjalan di browser; jawaban serta gambar halaman sumber ditampilkan dalam Bahasa Indonesia.</div>
+        </div>
+      </div>
+      <div class="askme-status" id="askme-status"><span class="askme-status-dot"></span><span id="askme-status-text">Menyiapkan materi…</span></div>
+    </div>
+
+    <div class="askme-progress" id="askme-progress" aria-hidden="true"><div class="askme-progress-bar" id="askme-progress-bar"></div></div>
+
+    <div class="askme-modebar" id="askme-modebar">
+      <span class="askme-mode-label">Mode jawaban</span>
+      <button class="askme-mode-btn active" id="askme-mode-smart" type="button">⚡ Smart</button>
+      <button class="askme-mode-btn" id="askme-mode-ai" type="button">🧠 AI Lokal</button>
+      <span class="askme-mode-info" id="askme-mode-info">Pencarian pintar ringan tanpa unduhan model.</span>
+    </div>
+    <div class="askme-ai-notice"><strong>Smart</strong> langsung siap. <strong>AI Lokal</strong> bersifat opsional, gratis, dan mengunduh model ke perangkat pada pemakaian pertama. Analisis gambar lokal memerlukan browser yang mendukung WebGPU.</div>
+
+    <div class="askme-tools" id="askme-tools">
+      <div class="askme-chip-row" aria-label="Contoh pertanyaan AskME">
+        <button class="askme-chip" type="button" data-askme-question="Apa itu assumption dan bagaimana mengelolanya?">Assumption &amp; Assumption Log</button>
+        <button class="askme-chip" type="button" data-askme-question="Perbandingan antara project management plan dan WPD menghasilkan apa?">PMP + WPD → ?</button>
+        <button class="askme-chip" type="button" data-askme-question="Apa perbedaan WPD, WPI, dan WPR?">WPD vs WPI vs WPR</button>
+        <button class="askme-chip" type="button" data-askme-question="Apa rumus CPI dan SPI serta cara membacanya?">Rumus CPI &amp; SPI</button>
+        <button class="askme-chip" type="button" data-askme-question="Apa beda resource leveling dan resource smoothing?">Leveling vs Smoothing</button>
+      </div>
+      <button class="askme-clear" id="askme-clear" type="button">Hapus percakapan</button>
+    </div>
+
+    <div class="askme-lock show" id="askme-lock">
+      <div class="askme-lock-icon">🔐</div>
+      <div class="askme-lock-title" id="askme-lock-title">Menyiapkan AskME</div>
+      <div class="askme-lock-text" id="askme-lock-text">Memeriksa login Google dan kunci materi di Firestore…</div>
+      <div class="askme-unlock-row">
+        <input class="askme-key-input" id="askme-key-input" type="password" autocomplete="off" placeholder="Kunci privat AskME (untuk pengujian manual)">
+        <button class="askme-unlock-btn" id="askme-unlock-btn" type="button">Buka materi</button>
+      </div>
+      <div class="askme-unlock-error" id="askme-unlock-error" role="alert"></div>
+    </div>
+
+    <div class="askme-chat locked" id="askme-chat" role="log" aria-live="polite" aria-label="Percakapan AskME"></div>
+    <div class="askme-compose locked" id="askme-compose">
+      <div class="askme-input-box">
+        <textarea class="askme-input" id="askme-input" rows="1" placeholder="Tanyakan konsep, proses, rumus, output, tabel, atau diagram dalam materi ANT…" aria-label="Pertanyaan untuk AskME"></textarea>
+        <button class="askme-send" id="askme-send" type="button" aria-label="Kirim pertanyaan" title="Kirim">➤</button>
+      </div>
+      <div class="askme-foot">Enter untuk mengirim · Shift+Enter untuk baris baru · Klik gambar sumber untuk memperbesar halaman.</div>
+    </div>
+  </div>
+
+  <div class="askme-page-modal" id="askme-page-modal" role="dialog" aria-modal="true" aria-label="Halaman sumber ANT">
+    <div class="askme-page-dialog">
+      <div class="askme-page-top"><span id="askme-page-title">Halaman sumber</span><button class="askme-page-close" id="askme-page-close" type="button" aria-label="Tutup">×</button></div>
+      <div class="askme-page-scroll"><img id="askme-page-image" alt="Halaman materi ANT PMP 2026"></div>
+    </div>
+  </div>
+</section>
+
 <!-- REVIEW TAB -->
 <section class="tab-content" id="tab-review">
 <div id="review-content" style="color:var(--ink);">
@@ -12084,11 +12213,13 @@ function switchTab(id){
   document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
-  const idx=['overview','pmp','capm','review','cheatsheet','exam','pmbok'].indexOf(id);
+  const idx=['overview','pmp','capm','askme','review','cheatsheet','exam','pmbok'].indexOf(id);
   const activeBtn=document.querySelectorAll('.tab-btn')[idx]; if(activeBtn) activeBtn.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
   if(id==='overview'){
     refreshDashboard();
+  } else if(id==='askme'){
+    // AskME v3 is initialized once on DOMContentLoaded.
   } else if(id==='review'){
     refreshReview();
   } else if(id==='exam'){
@@ -18640,6 +18771,9 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 </script>
+
+<script src="data/askme/askme-v3.js"></script>
+
 <footer style="text-align:center;padding:18px 12px 24px;font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);">
   © 2026 Atitya Pritasari. All rights reserved.
 </footer>
