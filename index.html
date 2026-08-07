@@ -414,6 +414,16 @@
   .cs-rb-item:last-child{border-bottom:none;}
   .cs-rb-item b{color:var(--paper);}
 
+  /* Source-specific ANT PMP exam tips inserted across the Cheatsheet. */
+  .ant-exam-tip{margin:10px 0 4px;background:#F5F0FF;border:1px solid #D7C8F0;
+    border-left:4px solid #7654A8;border-radius:0 9px 9px 0;padding:10px 12px;color:#28213A;}
+  .ant-exam-tip-title{font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;
+    letter-spacing:.08em;text-transform:uppercase;color:#69489A;margin-bottom:6px;}
+  .ant-exam-tip-item{font-size:12.3px;line-height:1.5;padding:3px 0;border-bottom:1px solid rgba(105,72,154,.10);}
+  .ant-exam-tip-item:last-child{border-bottom:none;}
+  .ant-exam-tip-item b{color:#4E337A;}
+  .ant-source-note{font-size:10.5px;color:#6E6480;margin-top:7px;font-style:italic;line-height:1.45;}
+
 
   .rv-set-panel{margin-bottom:12px;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
   .rv-set-header{background:var(--navy-2);padding:12px 14px;cursor:pointer;
@@ -1197,6 +1207,185 @@
     .askme-compose{padding:9px;}
   }
 
+
+
+/* ===== Cheatsheet compact responsive columns — 2026-08-07 =====
+   Goal: no horizontal table scrollbar; use available width for text-heavy columns. */
+#tab-cheatsheet .cs-table-scroll{
+  overflow-x:hidden !important;
+  overflow-y:visible !important;
+  scrollbar-width:none !important;
+}
+#tab-cheatsheet .cs-table-scroll::-webkit-scrollbar{display:none !important;}
+#tab-cheatsheet .cs-table-scroll > table,
+#tab-cheatsheet table.cs-table,
+#tab-cheatsheet table.uc-table{
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  table-layout:fixed !important;
+}
+#tab-cheatsheet .cs-domain-question-map{min-width:0 !important;}
+#tab-cheatsheet table.cs-polished th,
+#tab-cheatsheet table.cs-polished td{
+  white-space:normal !important;
+  overflow-wrap:break-word !important;
+  word-break:normal !important;
+  hyphens:none;
+}
+/* Slightly tighter cells: more usable width, less empty padding. */
+#tab-cheatsheet table.cs-polished thead th,
+#tab-cheatsheet table.cs-polished tr:first-child th{
+  padding:9px 9px !important;
+}
+#tab-cheatsheet table.cs-polished td{
+  padding:9px 9px !important;
+  line-height:1.40 !important;
+}
+#tab-cheatsheet table.cs-polished th:first-child,
+#tab-cheatsheet table.cs-polished td:first-child{
+  overflow-wrap:normal !important;
+  word-break:normal !important;
+  hyphens:none !important;
+}
+
+/* Delivery-approach flags: Agile / Predictive / Hybrid */
+#tab-cheatsheet .approach-flags{display:inline-flex;align-items:center;gap:3px;flex-wrap:wrap;margin-left:5px;vertical-align:middle;}
+#tab-cheatsheet td:first-child > .approach-flags{display:flex;margin:4px 0 0 0;gap:3px;}
+#tab-cheatsheet .approach-flag{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;font-family:'Space Mono',monospace;font-size:8.5px;font-weight:700;line-height:1;padding:3px 4px;border-radius:5px;border:1px solid currentColor;letter-spacing:0;}
+#tab-cheatsheet .approach-flag.a{color:#1E7A55;background:rgba(63,182,138,.10);}
+#tab-cheatsheet .approach-flag.p{color:#3156A3;background:rgba(107,138,235,.10);}
+#tab-cheatsheet .approach-flag.h{color:#8A5A12;background:rgba(232,163,61,.11);}
+#tab-cheatsheet .approach-legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:9px 10px;margin:8px 0 11px;background:#F5F7FB;border:1px solid #D9DFEE;border-radius:9px;color:#30384E;font-size:11px;line-height:1.45;}
+#tab-cheatsheet .approach-legend > span{display:inline-flex;align-items:center;gap:4px;}
+#tab-cheatsheet .approach-legend-note{flex:1 1 100%;color:#59637B;font-size:10.5px;}
+#tab-cheatsheet .approach-io-table col:nth-child(1){width:13% !important;}
+#tab-cheatsheet .approach-io-table col:nth-child(2){width:35% !important;}
+#tab-cheatsheet .approach-io-table col:nth-child(3){width:52% !important;}
+#tab-cheatsheet .approach-io-table td:nth-child(1){font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.03em;}
+#tab-cheatsheet .approach-io-table td:nth-child(2){font-size:11.1px;}
+#tab-cheatsheet .approach-io-table td:nth-child(3){font-size:10.8px;}
+#tab-cheatsheet .approach-section-label{font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;color:#516080;letter-spacing:.08em;text-transform:uppercase;margin:13px 0 6px;}
+@media(max-width:520px){
+  #tab-cheatsheet .approach-flag{font-size:7.8px;padding:3px 3px;}
+  #tab-cheatsheet .approach-legend{gap:6px;padding:8px;font-size:10px;}
+  #tab-cheatsheet .approach-io-table col:nth-child(1){width:15% !important;}
+  #tab-cheatsheet .approach-io-table col:nth-child(2){width:38% !important;}
+  #tab-cheatsheet .approach-io-table col:nth-child(3){width:47% !important;}
+  #tab-cheatsheet .approach-io-table td:nth-child(2){font-size:10.3px !important;}
+  #tab-cheatsheet .approach-io-table td:nth-child(3){font-size:9.8px !important;}
+}
+
+/* 3-column per-domain T&T tables: tool compact, situation gets most space. */
+#tab-cheatsheet table[style*="min-width:820px"] col:nth-child(1){width:20% !important;}
+#tab-cheatsheet table[style*="min-width:820px"] col:nth-child(2){width:55% !important;}
+#tab-cheatsheet table[style*="min-width:820px"] col:nth-child(3){width:25% !important;}
+#tab-cheatsheet table[style*="min-width:820px"] td:first-child{
+  font-size:11.2px !important;
+  vertical-align:top !important;
+}
+#tab-cheatsheet table[style*="min-width:820px"] td:nth-child(2){
+  font-size:11.8px !important;
+}
+#tab-cheatsheet table[style*="min-width:820px"] td:nth-child(3){
+  font-size:11px !important;
+}
+/* Selector overview has a short Domain column and a text-heavy last column. */
+#tab-cheatsheet #p8-tt-selector table col:nth-child(1){width:14% !important;}
+#tab-cheatsheet #p8-tt-selector table col:nth-child(2){width:28% !important;}
+#tab-cheatsheet #p8-tt-selector table col:nth-child(3){width:58% !important;}
+/* Artifact table: the function column usually carries the longest prose. */
+#tab-cheatsheet .cs-artifact-table col:nth-child(1){width:16% !important;}
+#tab-cheatsheet .cs-artifact-table col:nth-child(2){width:39% !important;}
+#tab-cheatsheet .cs-artifact-table col:nth-child(3){width:45% !important;}
+/* Formula table: keep term compact and give interpretation the most room. */
+#tab-cheatsheet .cs-formula-table col:nth-child(1){width:15% !important;}
+#tab-cheatsheet .cs-formula-table col:nth-child(2){width:29% !important;}
+#tab-cheatsheet .cs-formula-table col:nth-child(3){width:56% !important;}
+/* Large matrices must also fit the cheatsheet width instead of forcing a slider. */
+#tab-cheatsheet .cs-focus-matrix,
+#tab-cheatsheet .cs-capm-matrix{
+  min-width:0 !important;
+  width:100% !important;
+  max-width:100% !important;
+  table-layout:fixed !important;
+}
+#tab-cheatsheet .cs-focus-matrix col:nth-child(1){width:13% !important;}
+#tab-cheatsheet .cs-focus-matrix col:nth-child(2){width:10% !important;}
+#tab-cheatsheet .cs-focus-matrix col:nth-child(3){width:23% !important;}
+#tab-cheatsheet .cs-focus-matrix col:nth-child(4){width:20% !important;}
+#tab-cheatsheet .cs-focus-matrix col:nth-child(5){width:24% !important;}
+#tab-cheatsheet .cs-focus-matrix col:nth-child(6){width:10% !important;}
+#tab-cheatsheet .cs-capm-matrix col:nth-child(1){width:13% !important;}
+#tab-cheatsheet .cs-capm-matrix col:nth-child(2){width:12% !important;}
+#tab-cheatsheet .cs-capm-matrix col:nth-child(3){width:29% !important;}
+#tab-cheatsheet .cs-capm-matrix col:nth-child(4){width:22% !important;}
+#tab-cheatsheet .cs-capm-matrix col:nth-child(5){width:24% !important;}
+/* Two legacy wrappers around wide matrices/formulas: keep them fit-to-width too. */
+#tab-cheatsheet div[style*="overflow-x:auto"]{
+  overflow-x:hidden !important;
+  max-width:100% !important;
+}
+
+@media(max-width:700px){
+  #tab-cheatsheet table.cs-polished thead th,
+  #tab-cheatsheet table.cs-polished tr:first-child th{
+    padding:6px 5px !important;
+    font-size:9.6px !important;
+    line-height:1.22 !important;
+  }
+  #tab-cheatsheet table.cs-polished td{
+    padding:6px 5px !important;
+    font-size:10.4px !important;
+    line-height:1.34 !important;
+  }
+  #tab-cheatsheet table[style*="min-width:820px"] col:nth-child(1){width:24% !important;}
+  #tab-cheatsheet table[style*="min-width:820px"] col:nth-child(2){width:52% !important;}
+  #tab-cheatsheet table[style*="min-width:820px"] col:nth-child(3){width:24% !important;}
+  #tab-cheatsheet table[style*="min-width:820px"] td:first-child{font-size:9.9px !important;}
+  #tab-cheatsheet table[style*="min-width:820px"] td:nth-child(2){font-size:10.4px !important;}
+  #tab-cheatsheet table[style*="min-width:820px"] td:nth-child(3){font-size:9.8px !important;}
+  #tab-cheatsheet #p8-tt-selector table col:nth-child(1){width:15% !important;}
+  #tab-cheatsheet #p8-tt-selector table col:nth-child(2){width:27% !important;}
+  #tab-cheatsheet #p8-tt-selector table col:nth-child(3){width:58% !important;}
+  #tab-cheatsheet .cs-focus-matrix td,
+  #tab-cheatsheet .cs-capm-matrix td{
+    font-size:8.8px !important;
+    padding:5px 4px !important;
+    line-height:1.28 !important;
+  }
+  #tab-cheatsheet .cs-focus-matrix th,
+  #tab-cheatsheet .cs-capm-matrix th{
+    font-size:8.5px !important;
+    padding:5px 3px !important;
+  }
+  #tab-cheatsheet .cs-domain-badge{
+    min-width:0 !important;
+    width:auto !important;
+    padding:5px 7px !important;
+    font-size:9.5px !important;
+  }
+}
+
+@media(max-width:480px){
+  #tab-cheatsheet table.cs-polished thead th,
+  #tab-cheatsheet table.cs-polished tr:first-child th{
+    padding:5px 4px !important;
+    font-size:9px !important;
+  }
+  #tab-cheatsheet table.cs-polished td{
+    padding:5px 4px !important;
+    font-size:9.9px !important;
+  }
+  #tab-cheatsheet table[style*="min-width:820px"] col:nth-child(1){width:24% !important;}
+  #tab-cheatsheet table[style*="min-width:820px"] col:nth-child(2){width:52% !important;}
+  #tab-cheatsheet table[style*="min-width:820px"] col:nth-child(3){width:24% !important;}
+  #tab-cheatsheet .cs-focus-matrix td,
+  #tab-cheatsheet .cs-capm-matrix td{font-size:8.2px !important;}
+  #tab-cheatsheet .cs-focus-matrix th,
+  #tab-cheatsheet .cs-capm-matrix th{font-size:8px !important;}
+}
+
 </style>
 <link rel="stylesheet" href="data/askme/askme-v3.css?v=3.6.0">
 <!-- Firebase (cloud progress sync) -->
@@ -1697,6 +1886,7 @@
 <button class="cs-group-btn" data-cs-group="focus" onclick="switchCSNavGroup('focus',this)">🔁 Focus Areas</button>
 <button class="cs-group-btn" data-cs-group="tools" onclick="switchCSNavGroup('tools',this)">🧰 Tools</button>
 <button class="cs-group-btn" data-cs-group="exam" onclick="switchCSNavGroup('exam',this)">🔥 Exam 2026</button>
+<button class="cs-group-btn" data-cs-group="ethics" onclick="switchCSNavGroup('ethics',this)">⚖️ Ethics</button>
 </div>
 <div class="cs-subnav active" id="cs-subnav-mindset">
 <button class="cs-mini-btn" onclick="jumpAndOpen('01')">🎯 Mindset</button>
@@ -1731,12 +1921,17 @@
 <button class="cs-mini-btn" onclick="jumpAndOpen('p8-focus')">🔁 5 Focus Areas</button>
 </div>
 <div class="cs-subnav" id="cs-subnav-tools">
+<button class="cs-mini-btn" onclick="jumpAndOpen('p8-tt-selector')">🧰 T&amp;T Selector</button>
+<button class="cs-mini-btn" onclick="jumpAndOpen('p8-approach-flags')">🔖 [A][P] Flags</button>
 <button class="cs-mini-btn" onclick="jumpAndOpen('p8-artifacts')">🗂️ Artifacts</button>
 <button class="cs-mini-btn" onclick="jumpAndOpen('p8-formulas')">📐 Formulas</button>
 </div>
 <div class="cs-subnav" id="cs-subnav-exam">
 <button class="cs-mini-btn" onclick="jumpAndOpen('p8-eco')">🎯 ECO</button>
 <button class="cs-mini-btn" onclick="jumpAndOpen('p8-ai')">🤖 AI &amp; Value</button>
+</div>
+<div class="cs-subnav" id="cs-subnav-ethics">
+<button class="cs-mini-btn" onclick="jumpAndOpen('p8-ethics')">⚖️ RRFH &amp; Conduct</button>
 </div>
 </div>
 <div style="margin-bottom:18px;">
@@ -2098,6 +2293,12 @@
 <tr><td>Apa ketidakpastian, ancaman, peluang, dan responsnya?</td><td><span class="cs-domain-badge">Risk</span></td></tr>
 </table></div>
 <div class="cs-trap">🧭 <b>Catatan:</b> Cheatsheet PMP ini tidak lagi memakai 10 Knowledge Areas sebagai struktur utama. Konsep yang masih relevan sudah dipindahkan ke tujuh Performance Domains dan topik lintas-domain di bawah.</div>
+
+<div class="ant-exam-tip">
+<div class="ant-exam-tip-title">📘 ANT Exam Tip — Processes</div>
+<div class="ant-exam-tip-item"><b>Pahami proses dan logikanya; jangan menghafal secara mekanis.</b> Kenali tujuan proses, kapan digunakan, input/informasi yang diperiksa, serta output atau keputusan yang dihasilkan.</div>
+<div class="ant-source-note">Ringkasan dari ANT-PMP Exam Preparation v8, halaman 247.</div>
+</div>
 </div>
 </div>
 <div class="p8-cluster-header" style="margin:24px 0 11px;padding:14px 16px;background:var(--navy-2);border:1px solid var(--line);border-left:4px solid var(--periwinkle);border-radius:12px;">
@@ -2167,6 +2368,66 @@
 <tr><td>Proyek/phase selesai</td><td>Pastikan acceptance, transisi, kontrak/administrasi, lessons learned, arsip, release resources, dan closure formal.</td></tr>
 </table></div>
 <div class="cs-trap">🪤 <b>Jebakan:</b> PMBOK 8 tidak menjadikan kualitas dan procurement sebagai domain berdiri sendiri. Kualitas di-embed lintas proses/deliverable; sourcing dan procurement dikelola lintas Governance, Finance, Resources, dan Risk.</div>
+
+
+<div class="cs-response-box" style="margin-top:12px;margin-bottom:10px;">
+<div class="cs-rb-title">🧰 TOOLS &amp; TECHNIQUES — KAPAN DIPAKAI</div>
+<div class="cs-rb-item">Gunakan tabel ini untuk memilih T&amp;T Governance berdasarkan trigger skenario—bukan menghafal ITTO.</div>
+</div>
+<div class="cs-table-scroll"><table class="cs-table cs-balanced-table cs-polished" style="min-width:820px;"><colgroup><col style="width:24%"/><col style="width:49%"/><col style="width:27%"/></colgroup>
+<tr><th>Tool / Technique</th><th>Pakai kalau / situasi</th><th>Jangan tertukar / exam cue</th></tr>
+<tr><td><b>Expert judgment</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau keputusan governance/change/quality/sourcing membutuhkan pengetahuan khusus yang tidak cukup dijawab dari data proyek—misalnya regulasi, kontrak, arsitektur, atau kebijakan organisasi.</td><td>Cue: informasi tidak cukup dari data proyek saja → libatkan SME/ahli, tetapi akuntabilitas PM tetap ada.</td></tr>
+<tr><td><b>Alternatives analysis</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau ada beberapa opsi tindakan/corrective action yang sama-sama feasible dan PM perlu membandingkan konsekuensi masing-masing sebelum memilih.</td><td>Cue: “which option/best alternative” — jangan langsung memilih solusi pertama.</td></tr>
+<tr><td><b>Cost-benefit analysis</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau keputusan harus ditimbang dari sisi biaya vs manfaat/value—misalnya biaya percepatan dibanding manfaat launch lebih awal.</td><td>Cue: trade-off cost vs benefit/value.</td></tr>
+<tr><td><b>Root cause analysis (RCA)</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau masalah, defect, atau variance sudah terjadi/berulang dan PM perlu menemukan penyebab mendasar sebelum menentukan corrective action.</td><td>Cue: “why did this happen / most likely cause”.</td></tr>
+<tr><td><b>Trend analysis</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau tersedia data beberapa periode dan PM ingin tahu arah performance membaik, memburuk, atau stabil—bukan hanya melihat satu snapshot.</td><td>Cue: banyak periode/sprint/status point, bukan satu titik data.</td></tr>
+<tr><td><b>Variance analysis / EVA</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau ada baseline/plan dan actual/WPD lalu PM perlu mengetahui besar serta penyebab deviasi cost, schedule, scope, atau performance.</td><td>Cue: baseline + actual/WPD → cari variance.</td></tr>
+<tr><td><b>Quality audit</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau ingin memeriksa apakah proses proyek mengikuti policy/procedure/standard dan apakah approved change/process improvement benar-benar diterapkan.</td><td>QA/process oriented; bukan inspeksi produk akhir.</td></tr>
+<tr><td><b>Knowledge management</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau pengetahuan penting bersifat tacit/berbasis pengalaman dan perlu ditransfer antarorang melalui diskusi, workshop, mentoring, networking, atau storytelling.</td><td>Cue: pengalaman/know-how sulit didokumentasikan.</td></tr>
+<tr><td><b>Information management</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau pengetahuan sudah dapat didokumentasikan dan perlu dibuat, disimpan, diorganisasi, dicari, atau dibagikan melalui repository/library/wiki/document system.</td><td>Cue: repository, website, library, documents.</td></tr>
+<tr><td><b>After-Action Review (AAR)</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai segera setelah milestone, event, incident, sprint, atau aktivitas penting selesai untuk membandingkan expected vs actual dan menangkap lesson learned sebelum terlupakan.</td><td>Empat pertanyaan: what should happen, what happened, why, what learned.</td></tr>
+<tr><td><b>In-progress postmortem</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau proyek masih berjalan tetapi performance/kejadian penting perlu dibedah sekarang agar perbaikan dapat diterapkan sebelum proyek selesai.</td><td>Berbeda dari post-project review karena dilakukan during project.</td></tr>
+<tr><td><b>Storytelling</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau ingin mentransfer pengalaman/tacit knowledge yang sulit dijelaskan hanya dengan prosedur atau dokumen; gunakan contoh nyata/narasi agar konteks mudah dipahami.</td><td>Cue: knowledge transfer berbasis pengalaman.</td></tr>
+<tr><td><b>Project dashboard</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau sponsor/management membutuhkan ringkasan high-level lintas cost, schedule, risk, scope, dan health untuk pengambilan keputusan cepat.</td><td>Dashboard = ringkasan manajerial.</td></tr>
+<tr><td><b>Visual controls / information radiators</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau tim membutuhkan status kerja yang selalu terlihat dan real-time untuk koordinasi harian—terutama Agile/Kanban, misalnya task board, burndown, atau radiator.</td><td>Kanban/burndown/task board; radiator harus highly visible.</td></tr>
+<tr><td><b>Change control tools / integrated change control</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Pakai pada predictive/hybrid governance kalau perubahan dapat memengaruhi approved baseline atau controlled artifact dan harus dinilai, diputuskan, didokumentasikan, lalu dikomunikasikan secara formal.</td><td>Assess impact dulu; approved CR baru boleh mengubah baseline.</td></tr>
+<tr><td><b>Backlog management</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Pakai pada Agile/adaptive kalau requirement/feature/change baru muncul dan perlu ditambahkan, di-refine, serta diprioritaskan ulang oleh Product Owner berdasarkan value.</td><td>Agile change → backlog/reprioritize, bukan CCB formal.</td></tr>
+<tr><td><b>Make-or-buy analysis</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau organisasi harus memilih apakah pekerjaan/produk dibuat internal atau diperoleh dari seller/vendor dengan membandingkan cost, capability, speed, control, dan risk.</td><td>Bandingkan cost, speed, expertise, control, dan risk.</td></tr>
+</table></div>
+
+<div class="cs-response-box" style="margin-top:14px;margin-bottom:10px;">
+<div class="cs-rb-title">📑 PROCUREMENT &amp; CONTRACT TYPES — KAPAN DIPAKAI</div>
+<div class="cs-rb-item"><b>Exam mindset:</b> baca procurement dari perspektif <b>buyer</b>. Pilih jenis kontrak terutama dari tingkat kejelasan scope, uncertainty, insentif, dan siapa yang menanggung cost risk.</div>
+<div class="cs-rb-item"><b>Risk continuum:</b> cost-reimbursable → buyer menanggung lebih banyak cost risk; fixed-price → seller menanggung lebih banyak cost risk; <b>T&amp;M</b> berada di tengah.</div>
+</div>
+<div class="cs-table-scroll"><table class="cs-table cs-balanced-table cs-polished procurement-contract-table"><colgroup><col style="width:27%"/><col style="width:50%"/><col style="width:23%"/></colgroup>
+<tr><th>Contract / kepanjangan</th><th>Pakai kalau / situasi</th><th>Exam cue</th></tr>
+<tr><td><b>FFP — Firm Fixed Price</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Scope, requirement, dan acceptance criteria sudah <b>sangat jelas/stabil</b> sehingga buyer ingin harga yang dapat diprediksi. Cost overrun pada pekerjaan yang sama terutama menjadi risiko seller.</td><td><b>Stable scope + price certainty</b>. Buyer cost risk rendah; seller cost risk tinggi.</td></tr>
+<tr><td><b>FPIF — Fixed Price Incentive Fee</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span><br/><span class="ant-source-note">ANT menulis “fixed price plus incentive fee”.</span></td><td>Dasar pekerjaan cukup jelas untuk fixed price, tetapi buyer ingin mendorong seller mencapai target cost, schedule, atau performance melalui <b>incentive</b>.</td><td>Fixed-price + <b>reward for target performance</b>; seller tetap menanggung lebih banyak cost risk.</td></tr>
+<tr><td><b>FPAF — Fixed Price Award Fee</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Harga dasar fixed tetapi buyer ingin memberi award berdasarkan penilaian kinerja. Kriteria/prosedur award harus ditetapkan <b>sebelum</b> evaluasi agar tidak subjektif.</td><td><b>Award</b> ≠ incentive formula. ANT menekankan prosedur award harus predefined.</td></tr>
+<tr><td><b>FPEPA — Fixed Price with Economic Price Adjustment</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Scope relatif stabil tetapi kontrak berjalan cukup lama sehingga harga dapat terdampak faktor ekonomi seperti inflasi, indeks harga, kurs, atau komoditas; penyesuaian mengikuti mekanisme yang disepakati.</td><td><b>Long duration + economic uncertainty</b>, bukan scope uncertainty.</td></tr>
+<tr><td><b>CPFF — Cost Plus Fixed Fee</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Scope/effort belum cukup pasti sehingga seller dibayar actual allowable cost + <b>fee tetap</b>. Cocok saat pekerjaan sulit diestimasi secara akurat di awal.</td><td>Buyer menanggung cost overrun; <b>fee seller tetap</b>.</td></tr>
+<tr><td><b>CPIF — Cost Plus Incentive Fee</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Uncertainty masih tinggi tetapi buyer ingin mengurangi risiko cost-reimbursable dengan memberi incentive untuk mencapai target cost/performance dan membagi saving/overrun sesuai formula.</td><td><b>Actual cost + incentive</b>; ada target dan sharing formula.</td></tr>
+<tr><td><b>CPAF — Cost Plus Award Fee</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Actual allowable cost dibayar dan tambahan award diberikan berdasarkan evaluasi performance buyer terhadap kriteria yang sudah ditetapkan.</td><td><b>Award bersifat evaluatif</b>; jangan tertukar dengan CPIF yang memakai incentive formula.</td></tr>
+<tr><td><b>CPPC — Cost Plus Percentage of Costs</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Fee seller dihitung sebagai persentase dari cost. Dalam risk chart ANT, tipe ini berada di sisi <b>buyer risk paling tinggi</b> karena biaya dan fee sama-sama meningkat saat cost meningkat.</td><td>Cue risk allocation: <b>buyer sangat exposed</b> terhadap cost growth.</td></tr>
+<tr><td><b>T&amp;M — Time and Materials</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Scope/durasi belum sepenuhnya diketahui tetapi pekerjaan harus segera dimulai—misalnya specialist, support, staff augmentation, atau pekerjaan dengan volume yang sulit dipastikan.</td><td><b>Rate × time/material</b>. Lebih fleksibel dari fixed price; buyer perlu mengontrol batas waktu/cost.</td></tr>
+<tr><td><b>Target Cost Contract</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Ada planned/target cost dan buyer–seller ingin <b>berbagi saving atau overrun</b>. Cocok ketika kedua pihak ingin alignment terhadap efisiensi biaya.</td><td>Cue: <b>shared savings / shared overruns</b>.</td></tr>
+<tr><td><b>Agile Contracting</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Requirement berkembang, delivery dilakukan iteratif/incremental, dan feedback customer sering; kontrak perlu cukup fleksibel untuk feature, milestone, atau scope reprioritization.</td><td>Cue: <b>evolving scope + iterative delivery + frequent feedback</b>.</td></tr>
+</table></div>
+<div class="cs-trap">🧠 <b>Quick contract selector:</b> scope sangat jelas → <b>Fixed Price</b>. Scope belum jelas / R&amp;D / uncertainty tinggi → <b>Cost-Reimbursable</b>. Durasi/volume belum pasti tetapi perlu mulai sekarang → <b>T&amp;M</b>. Fixed scope tetapi risiko ekonomi jangka panjang → <b>FPEPA</b>. Perlu reward berbasis target → <b>FPIF/CPIF</b>. Perlu award berbasis evaluasi kinerja → <b>FPAF/CPAF</b>.</div>
+<div class="ant-source-note" style="margin-top:7px;">Basis ANT PMP 2026 v8: Understanding Contracts &amp; Types of Contracts (PDF pp.315–317). Slide ANT menampilkan FFP, FPIF, CPFF, CPAF, CPIF, T&amp;M serta risk continuum yang juga memuat CPPC dan FPEPA; p.316 menjelaskan cost-reimbursable, target-cost, award, dan buyer perspective. Kepanjangan singkatan ditulis dengan nomenklatur standar PMI; istilah FPIF pada slide ANT tertulis “fixed price plus incentive fee”.</div>
+
+<div class="ant-source-note" style="margin-top:7px;">Basis: ANT PMP 2026 v8 — Governance: quality assurance, knowledge management, monitor/control performance, change control, backlog management, sourcing.</div>
+<div class="ant-exam-tip">
+<div class="ant-exam-tip-title">📘 ANT Exam Tips — Change, Contract, Quality &amp; Knowledge</div>
+<div class="ant-exam-tip-item"><b>Predictive:</b> setelah plan/baseline disetujui, hanya approved change request yang boleh mengubahnya. Jangan approve atau reject perubahan sebelum impact assessment.</div>
+<div class="ant-exam-tip-item"><b>Agile:</b> perubahan umumnya masuk product backlog lalu diprioritaskan ulang oleh Product Owner; kewenangan utama bukan pada CCB.</div>
+<div class="ant-exam-tip-item"><b>Contract questions:</b> baca dari perspektif buyer—organisasi mempekerjakan seller/vendor dan mengelola hubungan tersebut melalui kontrak.</div>
+<div class="ant-exam-tip-item"><b>Contract shorthand:</b> FFP = Firm Fixed Price; FPIF = Fixed Price Incentive Fee; FPEPA = Fixed Price with Economic Price Adjustment; CPFF = Cost Plus Fixed Fee; CPIF = Cost Plus Incentive Fee; CPAF = Cost Plus Award Fee; T&amp;M = Time and Materials.</div>
+<div class="ant-exam-tip-item"><b>Quality:</b> quality = memenuhi requirements; QA berfokus pada proses pengembangan, sedangkan QC berfokus pada inspeksi deliverable/produk aktual.</div>
+<div class="ant-exam-tip-item"><b>Knowledge:</b> tacit = berbasis pengalaman dan sulit diartikulasikan; explicit = terdokumentasi. Storytelling mentransfer tacit knowledge melalui contoh dan narasi nyata.</div>
+<div class="ant-source-note">Ringkasan dari halaman 307, 315, 330, 336, 339, dan 367.</div>
+</div>
 </div>
 </div>
 <div class="uc-block" id="p8-scope">
@@ -2186,6 +2447,43 @@
 <tr><td>Scope creep</td><td>Bandingkan dengan approved scope, cari sumber perubahan, dan pulihkan kontrol tanpa mengabaikan kebutuhan bisnis yang valid.</td></tr>
 </table></div>
 <div class="cs-trap">🪤 <b>Jebakan:</b> Scope structure/WBS mendekomposisi deliverable, bukan sekadar daftar aktivitas. Verified deliverable belum otomatis accepted deliverable.</div>
+
+
+<div class="cs-response-box" style="margin-top:12px;margin-bottom:10px;">
+<div class="cs-rb-title">🧰 TOOLS &amp; TECHNIQUES — KAPAN DIPAKAI</div>
+<div class="cs-rb-item">Pilih teknik Scope berdasarkan apakah kebutuhan perlu digali, dianalisis, diprioritaskan, didekomposisi, diuji, atau diterima.</div>
+</div>
+<div class="cs-table-scroll"><table class="cs-table cs-balanced-table cs-polished" style="min-width:820px;"><colgroup><col style="width:24%"/><col style="width:49%"/><col style="width:27%"/></colgroup>
+<tr><th>Tool / Technique</th><th>Pakai kalau / situasi</th><th>Jangan tertukar / exam cue</th></tr>
+<tr><td><b>Brainstorming</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau kebutuhan/solusi belum lengkap dan kelompok perlu menghasilkan banyak ide atau requirement dengan cepat sebelum evaluasi/prioritisasi.</td><td>Diverge dulu; bukan teknik prioritisasi akhir.</td></tr>
+<tr><td><b>Interviews</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau perlu informasi requirement yang mendalam, spesifik, sensitif, atau hanya dimiliki stakeholder/SME tertentu melalui percakapan satu-satu.</td><td>Cocok bila butuh depth/honesty dari specific stakeholder.</td></tr>
+<tr><td><b>Focus groups</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau ingin menggali persepsi, expectation, atau feedback dari kelompok kecil user/SME terpilih dan interaksi antar peserta justru membantu memunculkan insight.</td><td>Kelompok kecil terpilih, bukan mass survey.</td></tr>
+<tr><td><b>Questionnaires & surveys</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau stakeholder sangat banyak/tersebar dan PM perlu mengumpulkan input yang konsisten serta cepat dari banyak orang; cocok untuk breadth, bukan eksplorasi mendalam.</td><td>Breadth > depth.</td></tr>
+<tr><td><b>Benchmarking</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau perlu menentukan target/requirement dengan membandingkan produk, proses, metric, atau praktik proyek terhadap internal/external reference atau best practice.</td><td>Cue: external/internal comparison.</td></tr>
+<tr><td><b>Document analysis</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau requirement mungkin sudah tersirat/tersebar dalam kontrak, regulation, policy, proposal, business case, process document, atau artefak yang ada.</td><td>Gunakan saat requirement sudah tersebar di dokumen.</td></tr>
+<tr><td><b>Mind mapping</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau banyak ide/requirement perlu divisualkan untuk melihat hubungan, dependency, tema, atau area yang belum terpikirkan.</td><td>Visual network of ideas.</td></tr>
+<tr><td><b>Affinity diagram</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai setelah banyak ide/requirement terkumpul dan perlu dikelompokkan menjadi kategori/tema yang serupa agar lebih mudah dianalisis.</td><td>Cue: cluster/group many ideas.</td></tr>
+<tr><td><b>Nominal group technique</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau kelompok sudah menghasilkan banyak ide tetapi perlu menilai dan merankingnya secara terstruktur melalui diskusi singkat lalu voting.</td><td>Generate → discuss → vote/rank.</td></tr>
+<tr><td><b>Delphi technique</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau butuh konsensus/judgment dari para ahli tetapi ingin mengurangi dominasi senior, groupthink, atau bias interpersonal melalui putaran input anonim.</td><td>Anonymous expert consensus.</td></tr>
+<tr><td><b>Observation / job shadowing</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau user sulit menjelaskan kebutuhan/prosesnya secara verbal dan PM perlu melihat langsung bagaimana pekerjaan dilakukan di dunia nyata.</td><td>Terbaik bila user sulit menjelaskan proses tacit.</td></tr>
+<tr><td><b>Facilitated workshop</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau banyak stakeholder memiliki requirement yang berbeda/bertentangan dan perlu mencapai pemahaman bersama serta konsensus dalam sesi terfasilitasi.</td><td>Cue: many stakeholders + conflicting requirements.</td></tr>
+<tr><td><b>User stories</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Pakai pada Agile/adaptive kalau requirement perlu ditulis singkat dari perspektif user dan value, lalu dapat diperinci melalui conversation dan acceptance criteria.</td><td>Format: As a… I want… so that…</td></tr>
+<tr><td><b>Design thinking</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau problem, user need, atau solusi masih sangat tidak pasti dan tim perlu memahami user, bereksperimen, membuat prototype, dan belajar sebelum mengunci solusi.</td><td>Empathize/ideate/prototype; cocok high uncertainty.</td></tr>
+<tr><td><b>Prioritization / ranking</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau requirement lebih banyak daripada capacity/time/budget dan perlu menentukan urutan berdasarkan value, urgency, risk, dependency, atau constraint.</td><td>Cue: limited capacity, competing requirements.</td></tr>
+<tr><td><b>Decomposition</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau deliverable masih terlalu besar untuk diestimasi/ditugaskan/dikontrol dan perlu dipecah menjadi work package dalam scope structure/WBS.</td><td>WBS = deliverable decomposition, bukan urutan aktivitas.</td></tr>
+<tr><td><b>Test & inspection planning</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai saat merencanakan bagaimana requirement dan acceptance criteria akan dibuktikan melalui test, review, inspection, UAT, regression, atau metode verifikasi lain.</td><td>Contoh: unit, regression, UAT.</td></tr>
+<tr><td><b>Inspection</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau deliverable sudah dibuat dan perlu diperiksa secara objektif terhadap documented requirement/acceptance criteria untuk memastikan sesuai.</td><td>Inspection = examine product; formal acceptance terjadi di Validate Scope.</td></tr>
+<tr><td><b>Customer talks and tests</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau perlu feedback customer secara berulang selama pengembangan melalui diskusi dan hands-on testing, bukan menunggu acceptance di akhir.</td><td>Continuous interaction, bukan satu review meeting.</td></tr>
+<tr><td><b>Review meeting</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau completed work perlu ditinjau bersama stakeholder dalam forum formal/terjadwal untuk membahas hasil, issue, feedback, dan kesiapan acceptance.</td><td>Meeting = forum review; inspection = teknik memeriksa deliverable.</td></tr>
+</table></div>
+<div class="ant-source-note" style="margin-top:7px;">Basis: ANT PMP 2026 v8 — Scope: data gathering/analysis/representation, interpersonal techniques, decomposition, test & inspection planning, Validate Scope.</div>
+<div class="ant-exam-tip">
+<div class="ant-exam-tip-title">📘 ANT Exam Tips — Scope &amp; Acceptance</div>
+<div class="ant-exam-tip-item"><b>Tempat scope disimpan:</b> predictive/traditional → project scope statement; agile → product backlog.</div>
+<div class="ant-exam-tip-item"><b>Scope baseline =</b> project scope statement + WBS + WBS dictionary. Setelah disetujui, perubahan memerlukan change request yang diotorisasi.</div>
+<div class="ant-exam-tip-item"><b>Bedakan istilah review:</b> inspection = memeriksa deliverable terhadap requirement/acceptance criteria; customer talks and tests = interaksi dan feedback berkelanjutan; review meeting = sesi formal tempat review berlangsung.</div>
+<div class="ant-source-note">Ringkasan dari halaman 438, 453, dan 472.</div>
+</div>
 </div>
 </div>
 <div class="uc-block" id="p8-schedule">
@@ -2207,6 +2505,44 @@
 <div class="cs-rb-title">URUTAN ANALISIS KETERLAMBATAN</div>
 <div class="cs-rb-item">Assess penyebab dan dampak → cek critical path/dependency/capacity → evaluasi opsi recovery → sepakati perubahan → update forecast dan komunikasikan.</div>
 </div>
+
+
+<div class="cs-response-box" style="margin-top:12px;margin-bottom:10px;">
+<div class="cs-rb-title">🧰 TOOLS &amp; TECHNIQUES — KAPAN DIPAKAI</div>
+<div class="cs-rb-item">Pilih teknik Schedule berdasarkan apakah masalahnya sequencing, estimating, compression, resource constraint, atau adaptive forecasting.</div>
+</div>
+<div class="cs-table-scroll"><table class="cs-table cs-balanced-table cs-polished" style="min-width:820px;"><colgroup><col style="width:24%"/><col style="width:49%"/><col style="width:27%"/></colgroup>
+<tr><th>Tool / Technique</th><th>Pakai kalau / situasi</th><th>Jangan tertukar / exam cue</th></tr>
+<tr><td><b>Decomposition</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau work package sudah ada tetapi belum cukup rinci untuk dijadwalkan; pecah menjadi activity yang dapat diurutkan, diestimasi durasinya, dan diberi resource.</td><td>Scope decomposition → work package; schedule decomposition → activities.</td></tr>
+<tr><td><b>Rolling wave planning</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau pekerjaan dekat sudah cukup jelas untuk dirinci tetapi pekerjaan jauh masih uncertain; detailkan near-term sekarang dan elaborasi future work nanti.</td><td>Cue: detail dekat, high-level jauh.</td></tr>
+<tr><td><b>PDM / network diagram</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau PM perlu menentukan urutan aktivitas dan logical relationship predecessor–successor untuk membangun schedule network.</td><td>Cue: dependency/order of activities.</td></tr>
+<tr><td><b>Dependency determination</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau hubungan antaraktivitas sudah diketahui tetapi perlu diklasifikasikan apakah mandatory/discretionary dan internal/external untuk memahami fleksibilitas serta ownership.</td><td>Hard logic vs soft logic; outside vs inside control.</td></tr>
+<tr><td><b>Analogous estimating</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau butuh estimasi durasi cepat dengan data terbatas dan ada aktivitas/proyek sebelumnya yang benar-benar cukup mirip.</td><td>Cepat, detail rendah; similarity harus cukup.</td></tr>
+<tr><td><b>Parametric estimating</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau tersedia hubungan statistik/rate yang reliabel dan durasi dapat dihitung dari unit × quantity, misalnya jam per unit × jumlah unit.</td><td>Cue: unit rate × volume.</td></tr>
+<tr><td><b>Three-point / PERT estimating</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau durasi uncertain dan tersedia optimistic, most likely, serta pessimistic estimate sehingga PM perlu expected duration/range yang lebih realistis.</td><td>Beta PERT = (O+4M+P)/6.</td></tr>
+<tr><td><b>Bottom-up estimating</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau butuh estimasi paling rinci/akurat dan aktivitas dapat dipecah serta diestimasi satu per satu sebelum diagregasikan.</td><td>Paling detail; butuh waktu/data lebih banyak.</td></tr>
+<tr><td><b>Reserve analysis</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau ada identified schedule uncertainty/risk dan PM perlu menentukan contingency time berdasarkan exposure, bukan menambah padding sembarang.</td><td>Gunakan risk information; bukan padding sembarang.</td></tr>
+<tr><td><b>Monte Carlo simulation estimating</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau banyak aktivitas memiliki uncertainty dan PM ingin tahu distribusi kemungkinan tanggal selesai atau probabilitas mencapai deadline tertentu melalui banyak iterasi simulasi.</td><td>Thousands of iterations → confidence/probability date.</td></tr>
+<tr><td><b>Critical path method (CPM)</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau PM perlu mengetahui aktivitas/jalur mana yang benar-benar mengendalikan tanggal selesai proyek serta berapa float pada jalur nonkritis.</td><td>Critical path biasanya total float 0.</td></tr>
+<tr><td><b>Critical chain method</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau keterbatasan resource lintas aktivitas menjadi isu utama dan schedule perlu dilindungi dengan project/feeding buffers setelah mempertimbangkan resource constraints.</td><td>Cue: project/feeding buffer + resource constraints.</td></tr>
+<tr><td><b>Crashing</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau deadline harus dipercepat dan organisasi bersedia menambah cost/resource pada aktivitas critical yang dapat dipercepat dengan cost increment paling efektif.</td><td>Compression + extra cost; tidak selalu bisa.</td></tr>
+<tr><td><b>Fast tracking</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau deadline harus dipercepat dan aktivitas yang semula sequential dapat dioverlap/paralel, sambil menerima peningkatan risk dan potensi rework.</td><td>Compression + risiko/rework meningkat.</td></tr>
+<tr><td><b>Resource leveling</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau resource overallocated/tidak tersedia dan jadwal boleh bergeser; aktivitas dipindah hingga kebutuhan sesuai availability meski critical path/end date dapat berubah.</td><td>Resource constraint lebih penting; deadline bisa bergeser.</td></tr>
+<tr><td><b>Resource smoothing</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau resource overallocated tetapi deadline tidak boleh berubah; geser aktivitas hanya dalam available float sehingga critical path/end date tetap.</td><td>Fixed deadline + available float.</td></tr>
+<tr><td><b>What-if scenario analysis</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau PM ingin menguji beberapa skenario “jika X terjadi” seperti resource hilang, delay supplier, atau perubahan sequence untuk melihat dampaknya pada schedule.</td><td>Cue: “what if X happens?”</td></tr>
+<tr><td><b>Agile release / iteration planning</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Pakai pada Agile kalau backlog perlu dipetakan ke sprint/iteration dan release berdasarkan priority, capacity, dependency, dan feedback cadence.</td><td>Release = beberapa iterations; iteration = satu timebox.</td></tr>
+<tr><td><b>Velocity / throughput</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Pakai kalau ingin forecast delivery Agile/Kanban berdasarkan rate aktual historis tim, misalnya story points per sprint atau items per week.</td><td>Gunakan historical actual, bukan target arbitrer.</td></tr>
+<tr><td><b>Burnup / burndown / CFD</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Pakai kalau perlu visual monitoring Agile: burnup untuk completed work/scope, burndown untuk remaining work, CFD untuk flow/WIP per workflow state.</td><td>Visual Agile monitoring.</td></tr>
+<tr><td><b>Lead time / cycle time</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Pakai pada flow/Kanban kalau ingin mengukur kecepatan layanan: lead time dari request sampai delivery; cycle time dari work started sampai completed.</td><td>Lead mencakup waiting sebelum mulai; cycle tidak.</td></tr>
+<tr><td><b>Daily coordination / stand-up</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Pakai kalau tim Agile membutuhkan sinkronisasi singkat harian mengenai progress, plan, dependency, dan blocker; bukan untuk status reporting panjang ke manajemen.</td><td>Short daily sync; bukan status meeting panjang.</td></tr>
+</table></div>
+<div class="ant-source-note" style="margin-top:7px;">Basis: ANT PMP 2026 v8 — Schedule: PDM/dependencies, estimates, critical path/chain, compression, resource optimization, agile release planning, velocity/burn charts.</div>
+<div class="ant-exam-tip">
+<div class="ant-exam-tip-title">📘 ANT Exam Tips — Dependencies &amp; Burn Charts</div>
+<div class="ant-exam-tip-item"><b>Dependencies:</b> pahami dan identifikasi mandatory/hard logic, discretionary/soft logic, external, dan internal dependencies dalam skenario.</div>
+<div class="ant-exam-tip-item"><b>Burnup dan burndown</b> sering diuji untuk melacak overall progress—berapa banyak pekerjaan yang sudah selesai atau masih tersisa.</div>
+<div class="ant-source-note">Ringkasan dari halaman 533 dan 554.</div>
+</div>
 </div>
 </div>
 <div class="uc-block" id="p8-finance">
@@ -2226,6 +2562,38 @@
 <tr><td>Forecast memburuk</td><td>Analisis akar penyebab dan tren CPI/SPI, perbarui estimate/forecast, lalu tentukan corrective action bersama pihak berwenang.</td></tr>
 </table></div>
 <div class="cs-trap">💡 Semua formula EVM dan PERT tetap relevan; ditempatkan pada blok <b>Formula &amp; Interpretasi</b>, bukan sebagai Knowledge Area terpisah.</div>
+
+
+<div class="cs-response-box" style="margin-top:12px;margin-bottom:10px;">
+<div class="cs-rb-title">🧰 TOOLS &amp; TECHNIQUES — KAPAN DIPAKAI</div>
+<div class="cs-rb-item">Pilih teknik Finance berdasarkan apakah kebutuhan soal adalah estimating, budgeting/reserve, performance measurement, atau forecasting.</div>
+</div>
+<div class="cs-table-scroll"><table class="cs-table cs-balanced-table cs-polished" style="min-width:820px;"><colgroup><col style="width:24%"/><col style="width:49%"/><col style="width:27%"/></colgroup>
+<tr><th>Tool / Technique</th><th>Pakai kalau / situasi</th><th>Jangan tertukar / exam cue</th></tr>
+<tr><td><b>Analogous estimating</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau perlu estimasi cost cepat dengan informasi terbatas dan ada proyek/aktivitas historis yang cukup serupa untuk dijadikan pembanding.</td><td>Cepat tetapi bergantung similarity.</td></tr>
+<tr><td><b>Parametric estimating</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau tersedia rate/statistical relationship yang reliabel sehingga cost dapat dihitung dari unit cost × quantity.</td><td>Cue: biaya per unit × jumlah unit.</td></tr>
+<tr><td><b>Bottom-up estimating</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau butuh estimasi cost detail/akurat dan pekerjaan dapat diestimasi dari activity/work package lalu dijumlahkan ke total project.</td><td>Detail/accuracy tinggi; effort lebih besar.</td></tr>
+<tr><td><b>Multipoint / PERT estimating</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau cost memiliki uncertainty signifikan dan tersedia optimistic, most likely, serta pessimistic estimate untuk menghitung expected cost/range.</td><td>PERT berlaku juga untuk cost.</td></tr>
+<tr><td><b>Alternatives analysis</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau ada beberapa cara teknis/sourcing/delivery yang feasible dan perlu dibandingkan dari cost, value, schedule, resource, atau constraint sebelum memilih.</td><td>Cue: make choices among feasible options.</td></tr>
+<tr><td><b>Reserve analysis</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau perlu menentukan/mengevaluasi contingency untuk identified risks dan kebutuhan management reserve untuk unknown-unknowns sesuai governance.</td><td>Contingency masuk cost baseline; management reserve di luar baseline.</td></tr>
+<tr><td><b>Cost of Quality (CoQ)</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau perlu menilai trade-off biaya prevention/appraisal terhadap biaya failure/rework agar total cost of quality paling efektif.</td><td>Jangan hanya melihat biaya inspeksi.</td></tr>
+<tr><td><b>Cost aggregation</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Pakai setelah cost estimate level bawah tersedia dan perlu digulung dari activity → work package → deliverable/control account → total budget/cost baseline.</td><td>Dipakai membentuk budget/cost baseline.</td></tr>
+<tr><td><b>Historical information review</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau historical project data tersedia dan perlu diuji relevansinya sebagai dasar analogous/parametric estimate atau validation estimate.</td><td>Exam cue: historical rate / similar project.</td></tr>
+<tr><td><b>Funding limit reconciliation</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau planned expenditure melebihi batas/ketersediaan dana pada periode tertentu sehingga timing pekerjaan harus diselaraskan dengan funding constraints.</td><td>Dapat menyebabkan rescheduling karena funding cap.</td></tr>
+<tr><td><b>Financing</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau proyek membutuhkan sumber pendanaan eksternal atau skema pembiayaan—misalnya investor, government, public, loan, atau mekanisme lain.</td><td>Cue: public/government/investor/external funding.</td></tr>
+<tr><td><b>Earned Value Analysis (EVA/EVM)</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau proyek memiliki baseline dan PM ingin mengintegrasikan scope, schedule, serta cost actual untuk mengukur variance dan performance secara kuantitatif.</td><td>PV/EV/AC → CV, CPI, SV, SPI.</td></tr>
+<tr><td><b>Trend analysis</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau CPI/SPI/cost performance tersedia beberapa periode dan PM ingin melihat arah kecenderungan serta mendukung forecast.</td><td>Serangkaian periode, bukan snapshot.</td></tr>
+<tr><td><b>TCPI</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau manajemen bertanya seberapa efisien sisa pekerjaan harus dilakukan agar target BAC atau EAC masih dapat dicapai.</td><td>“How efficiently must remaining work perform?”</td></tr>
+<tr><td><b>Forecasting (EAC/ETC/VAC)</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau pertanyaan meminta perkiraan total cost saat selesai, biaya sisa, atau selisih akhir terhadap budget berdasarkan performance/asumsi saat ini.</td><td>Cue: “expected final cost / remaining cost”.</td></tr>
+</table></div>
+<div class="ant-source-note" style="margin-top:7px;">Basis: ANT PMP 2026 v8 — Finance: estimating methods, reserve/CoQ analysis, cost aggregation, funding, EVA/EVM, trend dan forecast.</div>
+<div class="ant-exam-tip">
+<div class="ant-exam-tip-title">📘 ANT Exam Tips — Estimation &amp; Reserves</div>
+<div class="ant-exam-tip-item"><b>Parametric estimate memiliki batas.</b> Gunakan hanya bila historical relationship/rate relevan dan proyek cukup sebanding; jangan menganggap rate lama otomatis berlaku.</div>
+<div class="ant-exam-tip-item"><b>Cost baseline</b> adalah approved project cost untuk mengukur performance; biasanya mencakup contingency reserve tetapi tidak management reserve.</div>
+<div class="ant-exam-tip-item"><b>Project budget = cost baseline + management reserve.</b></div>
+<div class="ant-source-note">Ringkasan dari halaman 607 dan 610.</div>
+</div>
 </div>
 </div>
 <div class="uc-block" id="p8-stakeholders">
@@ -2250,6 +2618,32 @@
 <tr><td>Push</td><td>Informasi dikirim ke penerima tertentu: email, memo, report.</td></tr>
 <tr><td>Pull</td><td>Informasi volume besar diakses sesuai kebutuhan: portal, wiki, dashboard, repository.</td></tr>
 </table></div>
+
+<div class="cs-response-box" style="margin-top:12px;margin-bottom:10px;">
+<div class="cs-rb-title">🧰 TOOLS &amp; TECHNIQUES — KAPAN DIPAKAI</div>
+<div class="cs-rb-item">Pilih teknik Stakeholders berdasarkan apakah tujuan soal adalah identify/classify, plan engagement, communicate, atau resolve resistance/conflict.</div>
+</div>
+<div class="cs-table-scroll"><table class="cs-table cs-balanced-table cs-polished" style="min-width:820px;"><colgroup><col style="width:24%"/><col style="width:49%"/><col style="width:27%"/></colgroup>
+<tr><th>Tool / Technique</th><th>Pakai kalau / situasi</th><th>Jangan tertukar / exam cue</th></tr>
+<tr><td><b>Stakeholder analysis</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai saat stakeholder baru/berubah atau di awal proyek untuk mengidentifikasi siapa yang dapat memengaruhi/terdampak proyek dan menilai interest, influence, attitude, role, serta impact sebelum menyusun engagement strategy.</td><td>Langkah dasar sebelum menentukan engagement strategy.</td></tr>
+<tr><td><b>Power/interest grid</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau butuh pemetaan awal yang sederhana untuk banyak stakeholder berdasarkan dua dimensi—power/authority dan interest/concern—agar cepat menentukan siapa manage closely, keep satisfied, keep informed, atau monitor.</td><td>Power + interest = 2D grid.</td></tr>
+<tr><td><b>Power/influence & impact/influence grids</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau “interest” bukan pembeda utama: gunakan power/influence saat yang penting adalah authority vs ability to influence; gunakan impact/influence saat yang penting adalah seberapa terdampak vs seberapa mampu memengaruhi.</td><td>Pilih sumbu sesuai kata kunci soal.</td></tr>
+<tr><td><b>Stakeholder cube</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau stakeholder cukup banyak/kompleks dan grid 2D tidak cukup membedakan mereka; perlu pemetaan 3 dimensi sekaligus—interest, power, dan influence—untuk segmentasi yang lebih granular.</td><td>Cue: multi-dimensional / 3 dimensions.</td></tr>
+<tr><td><b>Salience model</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai terutama pada proyek besar/kompleks dengan banyak stakeholder dan tuntutan yang bersaing ketika PM harus menentukan siapa yang paling perlu diprioritaskan berdasarkan kombinasi power, urgency, dan legitimacy.</td><td>Power + urgency + legitimacy; strongest prioritization cue.</td></tr>
+<tr><td><b>Direction of Influence</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau pertanyaan meminta mengklasifikasikan stakeholder berdasarkan posisi/arah pengaruh terhadap proyek: upward (sponsor/senior), downward (team), outward (external), atau sideward (peer/internal lateral).</td><td>Cue: sponsor vs team vs external vs peer.</td></tr>
+<tr><td><b>Stakeholder engagement matrix</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau PM perlu membandingkan posisi engagement saat ini vs yang dibutuhkan—unaware, resistant, neutral, supportive, leading—untuk menentukan gap dan tindakan engagement.</td><td>Dipakai untuk planning/monitoring engagement gap.</td></tr>
+<tr><td><b>Data gathering</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau informasi tentang kebutuhan, expectation, attitude, influence, atau concern stakeholder belum cukup; pilih interview, survey, focus group, atau teknik lain sesuai jumlah dan kedalaman informasi.</td><td>Gunakan bila informasi kebutuhan/attitude belum lengkap.</td></tr>
+<tr><td><b>Data analysis</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau data stakeholder sudah terkumpul dan PM perlu menilai pola/perubahan interest, influence, attitude, engagement, atau menentukan prioritas engagement.</td><td>Stakeholder map bukan sekali di awal; reassess.</td></tr>
+<tr><td><b>Interactive communication</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau pesan kompleks/sensitif, ada konflik/negosiasi, atau keputusan membutuhkan feedback dan mutual understanding real-time—misalnya meeting, call, workshop.</td><td>Paling kaya feedback.</td></tr>
+<tr><td><b>Push communication</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau informasi harus dikirim langsung ke penerima tertentu dan tidak memerlukan dialog langsung saat itu—misalnya report, email, memo, notification.</td><td>Memastikan delivery, tidak menjamin understanding.</td></tr>
+<tr><td><b>Pull communication</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau volume informasi besar atau audiens luas perlu mengakses informasi sesuai kebutuhan sendiri—misalnya portal, wiki, dashboard, knowledge repository.</td><td>Self-service information.</td></tr>
+<tr><td><b>Communication technology</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau PM harus memilih media/tool komunikasi dengan mempertimbangkan urgency, lokasi virtual, security, accessibility, reliability, ease of use, dan stakeholder preference.</td><td>Cue: distributed/virtual stakeholders.</td></tr>
+<tr><td><b>Active listening / empathy</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau stakeholder resistant, tidak puas, emosional, atau concern belum jelas; pahami posisi dan kebutuhan dulu sebelum memberi solusi atau eskalasi.</td><td>Understand first, jangan langsung defend/escalate.</td></tr>
+<tr><td><b>Facilitation / conflict management</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau beberapa stakeholder mempunyai kepentingan/priority yang bertentangan dan perlu dialogue, trade-off, consensus, atau problem solving tanpa memaksakan keputusan sepihak.</td><td>Collaborate/problem solve lebih kuat daripada force.</td></tr>
+<tr><td><b>Meetings / feedback loop</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau perlu memastikan pesan benar-benar dipahami, keputusan dikonfirmasi, concern ditutup, atau engagement diperbarui melalui komunikasi dua arah dan feedback.</td><td>Communication complete bila understood + feedback.</td></tr>
+</table></div>
+<div class="cs-trap">🧭 <b>Stakeholder mapping shortcut:</b> <b>Power/Interest</b> = mapping awal sederhana 2D; <b>Stakeholder Cube</b> = stakeholder banyak/kompleks dan perlu 3 dimensi interest–power–influence; <b>Salience</b> = proyek besar/kompleks + competing demands dan perlu menentukan prioritas perhatian berdasarkan power–urgency–legitimacy; <b>Direction of Influence</b> = yang ditanya arah/posisi pengaruh (up/down/out/side).</div>
+<div class="ant-source-note" style="margin-top:7px;">Basis: ANT PMP 2026 v8 — Stakeholders: stakeholder analysis, data representation (grids/cube/salience/direction), engagement matrix, communications.</div>
 </div>
 </div>
 <div class="uc-block" id="p8-resources">
@@ -2269,6 +2663,42 @@
 <tr><td>Kapasitas tim overload</td><td>Prioritaskan work, batasi WIP, negosiasikan scope/schedule, dan gunakan capacity data—jangan memaksa lembur permanen.</td></tr>
 </table></div>
 <div class="cs-trap">🪤 <b>Jebakan:</b> Memindahkan orang, menghukum, atau eskalasi biasanya bukan langkah pertama. Assess dan fasilitasi lebih dulu, kecuali ada pelanggaran hukum, keselamatan, etika, atau keamanan.</div>
+
+
+<div class="cs-response-box" style="margin-top:12px;margin-bottom:10px;">
+<div class="cs-rb-title">🧰 TOOLS &amp; TECHNIQUES — KAPAN DIPAKAI</div>
+<div class="cs-rb-item">Pilih teknik Resources berdasarkan apakah masalahnya role clarity, acquisition, skill/team development, conflict, leadership, atau distributed team.</div>
+</div>
+<div class="cs-table-scroll"><table class="cs-table cs-balanced-table cs-polished" style="min-width:820px;"><colgroup><col style="width:24%"/><col style="width:49%"/><col style="width:27%"/></colgroup>
+<tr><th>Tool / Technique</th><th>Pakai kalau / situasi</th><th>Jangan tertukar / exam cue</th></tr>
+<tr><td><b>Expert judgment</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau planning/acquisition/resource issue membutuhkan knowledge khusus mengenai skill, staffing, logistics, labor rule, acquisition lead time, seller, atau personnel development.</td><td>Cue: specialized resource knowledge.</td></tr>
+<tr><td><b>Hierarchical charts (WBS/OBS/RBS)</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau perlu melihat hubungan hierarkis antara work, organizational unit, atau resource categories untuk memahami struktur sebelum menetapkan responsibility/resource.</td><td>Hierarchical representation.</td></tr>
+<tr><td><b>Responsibility Assignment Matrix / RACI</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau banyak work package/activity dan role terlibat sehingga ownership membingungkan; gunakan RACI untuk memperjelas siapa Responsible, Accountable, Consulted, dan Informed.</td><td>Pastikan satu accountable owner yang jelas.</td></tr>
+<tr><td><b>Organizational theory</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau team design/performance dipengaruhi struktur, culture, motivation, authority, atau behavior organisasi dan PM perlu menyesuaikan cara mengelola resource.</td><td>Cue: organizational structure/culture affects team.</td></tr>
+<tr><td><b>Multicriteria decision analysis</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau ada beberapa kandidat people/physical resource dan harus dipilih secara objektif dengan beberapa kriteria berbobot seperti skill, cost, availability, experience, location, atau reliability.</td><td>Cue: several candidate resources + weighted factors.</td></tr>
+<tr><td><b>Pre-assignment</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau resource sudah ditetapkan sebelum proyek mulai melalui charter, contract, proposal, atau commitment sehingga PM tinggal mengonfirmasi/merencanakan penggunaannya.</td><td>Tidak perlu “acquire” ulang resource yang sudah assigned.</td></tr>
+<tr><td><b>Negotiation</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau resource belum tersedia dan PM perlu mendapatkannya dari functional manager, unit lain, seller, atau project lain melalui negosiasi priority, timing, dan availability.</td><td>Buktikan kebutuhan dengan schedule/network/resource data.</td></tr>
+<tr><td><b>Virtual team tools / virtual colocation</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau anggota tim tersebar geografis/time zone dan perlu collaboration technology yang meniru kedekatan face-to-face untuk koordinasi dan tacit communication.</td><td>Tujuan: mereplikasi manfaat face-to-face/tacit communication.</td></tr>
+<tr><td><b>Team building</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau trust, cohesiveness, ownership, atau kolaborasi tim perlu dibentuk/diperkuat—sejak awal, setelah perubahan anggota, atau ketika teamwork melemah.</td><td>WBS/planning bersama juga dapat menjadi team-building.</td></tr>
+<tr><td><b>Training / coaching / mentoring</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau gap performance berasal dari kurangnya skill/knowledge/capability dan masih dapat dikembangkan; perbaiki kemampuan sebelum memilih replace/escalate.</td><td>Develop capability sebelum mengganti orang.</td></tr>
+<tr><td><b>Individual & team assessments</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau PM perlu memahami style, strength, weakness, interaction pattern, decision style, atau perkembangan team effectiveness sebagai dasar intervensi.</td><td>Assessment berlanjut sepanjang proyek.</td></tr>
+<tr><td><b>Conflict management</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau ada disagreement antaranggota/stakeholder; pilih collaborate/problem solve untuk solusi win-win bila waktu memungkinkan, compromise untuk solusi cepat, dan style lain sesuai konteks.</td><td>Default exam: collaborate/problem solve; ethics/legal → escalate.</td></tr>
+<tr><td><b>Emotional intelligence</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau masalah melibatkan emosi, trust, motivation, tension, self-awareness, atau relationship dan PM perlu membaca serta mengelola reaksi diri/orang lain.</td><td>Cue: tension, motivation, trust, emotional behavior.</td></tr>
+<tr><td><b>Leadership style selection</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau kebutuhan tim berbeda berdasarkan maturity, capability, urgency, dan context; pilih directing/coaching/supporting/facilitating/delegating/servant leadership yang sesuai.</td><td>Jangan gunakan satu style untuk semua situasi.</td></tr>
+<tr><td><b>Burndown / burnup</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Pakai pada adaptive team kalau perlu memonitor remaining vs completed work dan melihat apakah progress/capacity tim sesuai iteration/release plan.</td><td>Useful untuk team performance in adaptive delivery.</td></tr>
+</table></div>
+<div class="ant-source-note" style="margin-top:7px;">Basis: ANT PMP 2026 v8 — Resources: role representation, multicriteria selection, negotiation, virtual teams, team building, assessment, conflict/leadership.</div>
+<div class="ant-exam-tip">
+<div class="ant-exam-tip-title">📘 ANT Exam Tip — Agile Meetings</div>
+<div class="cs-table-scroll"><table class="cs-table cs-balanced-table cs-polished"><colgroup><col style="width:28%"/><col style="width:72%"/></colgroup>
+<tr><th>Meeting</th><th>Pembeda utama</th></tr>
+<tr><td>Daily stand-up</td><td>Check-in harian singkat; time-boxed sekitar 15 menit.</td></tr>
+<tr><td>Sprint planning</td><td>Tim merencanakan pekerjaan untuk sprint berikutnya.</td></tr>
+<tr><td>Sprint review</td><td>Tim dan customer/stakeholder meninjau increment dan memberi feedback.</td></tr>
+<tr><td>Sprint retrospective</td><td>Tim mengevaluasi cara kerja sprint sebelumnya dan menentukan improvement.</td></tr>
+</table></div>
+<div class="ant-source-note">Ringkasan dari ANT Exam Tips, halaman 753.</div>
+</div>
 </div>
 </div>
 <div class="uc-block" id="p8-risk">
@@ -2290,6 +2720,41 @@
 <div class="cs-response-box" style="margin-top:10px;">
 <div class="cs-rb-title">SAAT RISIKO TERJADI</div>
 <div class="cs-rb-item">Gunakan respons yang telah disetujui → assign owner/action → update risk/issue information → monitor residual/secondary risk → komunikasikan dampak.</div>
+</div>
+
+
+<div class="cs-response-box" style="margin-top:12px;margin-bottom:10px;">
+<div class="cs-rb-title">🧰 TOOLS &amp; TECHNIQUES — KAPAN DIPAKAI</div>
+<div class="cs-rb-item">Pilih teknik Risk berdasarkan fase: identify → qualitative prioritize → quantitative model → response → monitor.</div>
+</div>
+<div class="cs-table-scroll"><table class="cs-table cs-balanced-table cs-polished" style="min-width:820px;"><colgroup><col style="width:24%"/><col style="width:49%"/><col style="width:27%"/></colgroup>
+<tr><th>Tool / Technique</th><th>Pakai kalau / situasi</th><th>Jangan tertukar / exam cue</th></tr>
+<tr><td><b>Prompt list / RBS</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai saat Identify Risks kalau tim takut ada area risiko yang terlewat; gunakan kategori terstruktur/RBS sebagai pemicu diskusi agar identifikasi lebih lengkap.</td><td>Cue: risk identification categories/checklist.</td></tr>
+<tr><td><b>Interviews / expert judgment</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai saat risiko bersifat specialized, historical data terbatas, atau pengalaman ahli tertentu dibutuhkan untuk menemukan/menilai uncertainty yang tidak terlihat oleh tim umum.</td><td>Gunakan saat data historis tidak cukup atau risk specialized.</td></tr>
+<tr><td><b>Facilitation</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau risk identification/analysis membutuhkan banyak perspektif dan tim/SME perlu workshop terstruktur untuk menyatukan informasi, asumsi, serta prioritas.</td><td>Group risk identification/analysis.</td></tr>
+<tr><td><b>Probability–Impact Matrix</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau tujuan hanya memprioritaskan individual risks secara kualitatif berdasarkan probability × impact dengan skala relatif; cocok saat belum perlu angka distribusi/forecast numerik.</td><td>Ranking/prioritization, bukan numeric distribution.</td></tr>
+<tr><td><b>Other risk parameters</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau dua risiko memiliki P×I mirip tetapi prioritasnya masih perlu dibedakan dengan urgency, proximity, dormancy, manageability, controllability, detectability, connectivity, atau parameter lain.</td><td>Dipakai untuk memperhalus prioritas selain P×I.</td></tr>
+<tr><td><b>Representations of uncertainty</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai sebelum/di quantitative analysis kalau input tidak berupa satu angka pasti dan perlu dimodelkan sebagai range atau probability distribution untuk cost, duration, atau variable lain.</td><td>Cue: distributions/ranges as model inputs.</td></tr>
+<tr><td><b>Monte Carlo simulation</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau banyak uncertainty/risk variable berinteraksi dan PM ingin mengetahui rentang outcome serta probabilitas mencapai target cost/date; model dijalankan ribuan iterasi.</td><td>“Thousands of iterations”, S-curve, probability finish by date/cost.</td></tr>
+<tr><td><b>Sensitivity analysis</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau PM sudah memiliki beberapa uncertain variables dan ingin tahu variabel/risk mana yang paling besar pengaruhnya terhadap outcome dengan mengubah satu faktor sementara lainnya ditahan; sering divisualkan sebagai tornado diagram.</td><td>Output sering tornado diagram.</td></tr>
+<tr><td><b>Decision tree analysis</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau harus memilih di antara beberapa alternatif keputusan yang memiliki cabang outcome probabilistik dan perlu dibandingkan konsekuensi cost/benefit/EMV setiap jalur.</td><td>Tree branches + EMV at decision/chance nodes.</td></tr>
+<tr><td><b>Expected Monetary Value (EMV)</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau risiko atau alternatif memiliki probability dan monetary impact sehingga perlu dihitung expected financial exposure/value; sering menjadi angka pada cabang decision tree.</td><td>Gunakan untuk expected value dan decision tree.</td></tr>
+<tr><td><b>Influence diagrams</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau hubungan antara decision, uncertainty, variable, objective, dan outcome kompleks tetapi ingin divisualkan lebih ringkas daripada decision tree untuk memahami apa yang memengaruhi keputusan.</td><td>Graphical decision aid under uncertainty; lebih compact dari decision tree.</td></tr>
+<tr><td><b>Reserve analysis</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau identified risk/exposure sudah dianalisis dan PM perlu menentukan atau mengecek kecukupan contingency reserve untuk menutup known-unknowns.</td><td>Known-unknowns → contingency.</td></tr>
+<tr><td><b>Risk audit</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau pertanyaannya bukan “risiko apa yang terjadi” melainkan apakah proses risk management dan response plan efektif, dipatuhi, dan benar-benar diimplementasikan.</td><td>Audit response/process, bukan sekadar status risk.</td></tr>
+<tr><td><b>Technical performance analysis</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai kalau proyek memiliki technical performance measures/threshold dan PM ingin mendeteksi emerging risk dari penyimpangan metric aktual terhadap target teknis.</td><td>Cue: technical metric trending away from target.</td></tr>
+<tr><td><b>Risk reassessment / meetings</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai secara berkala sepanjang proyek atau setelah perubahan besar untuk menemukan new risk, menutup obsolete risk, memperbarui probability/impact, owner, dan response.</td><td>Risk identification bersifat iterative sepanjang proyek.</td></tr>
+<tr><td><b>Threat response selection</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai setelah threat dianalisis dan perlu memilih strategi: avoid bila hilangkan ancaman, mitigate bila turunkan P/I, transfer bila pindahkan ownership/financial impact, accept bila tidak ekonomis ditangani, escalate bila di luar authority.</td><td>Pilih sesuai ownership dan effect yang diinginkan.</td></tr>
+<tr><td><b>Opportunity response selection</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Pakai setelah opportunity dianalisis dan perlu memilih strategi: exploit untuk memastikan terjadi, enhance untuk menaikkan P/I, share bila pihak lain lebih mampu menangkapnya, accept bila hanya mengambil manfaat jika muncul, escalate bila di luar authority.</td><td>Opportunity ≠ threat response.</td></tr>
+</table></div>
+<div class="cs-trap">🎲 <b>Quantitative risk shortcut:</b> <b>Monte Carlo</b> = “berapa peluang selesai ≤ tanggal/biaya X?”; <b>Sensitivity/Tornado</b> = “variabel mana paling memengaruhi outcome?”; <b>EMV</b> = “berapa expected monetary exposure/value?”; <b>Decision Tree</b> = “alternatif keputusan bercabang mana yang paling baik?”; <b>Influence Diagram</b> = “apa hubungan decision–uncertainty–outcome?”</div>
+<div class="ant-source-note" style="margin-top:7px;">Basis: ANT PMP 2026 v8 — Risk: prompt/RBS, qualitative P×I, quantitative simulation/sensitivity/decision tree/EMV/influence diagrams, monitoring and responses.</div>
+<div class="ant-exam-tip">
+<div class="ant-exam-tip-title">📘 ANT Exam Tips — Risk Documents</div>
+<div class="ant-exam-tip-item"><b>Risk management plan</b> menjelaskan bagaimana proses risk management dijalankan; dokumen ini tidak berisi daftar risiko.</div>
+<div class="ant-exam-tip-item"><b>Risk register</b> mencatat risiko individual secara rinci dan merupakan project document, bukan bagian dari project management plan.</div>
+<div class="ant-exam-tip-item"><b>Risk report</b> merangkum overall project risk, sedangkan risk register menjelaskan individual project risks.</div>
+<div class="ant-source-note">Ringkasan dari halaman 916 dan 926.</div>
 </div>
 </div>
 </div>
@@ -2359,13 +2824,103 @@
 </table>
 </div>
 <div class="cs-trap">🧠 <b>Jangan hafal sebagai urutan linear.</b> Focus Areas dapat berulang dan saling overlap. Gunakan untuk memahami tujuan pekerjaan pada saat tertentu, lalu tailor sesuai delivery approach dan kondisi proyek.</div>
+
+<div class="ant-exam-tip">
+<div class="ant-exam-tip-title">📘 ANT Exam Tips — Planning &amp; PMP</div>
+<div class="ant-exam-tip-item"><b>Management plan adalah “how-to guide”.</b> Scope management plan menjelaskan cara mengelola scope; schedule management plan menjelaskan cara mengelola schedule, dan seterusnya.</div>
+<div class="ant-exam-tip-item"><b>Pola nama cepat:</b> proses <i>Plan X Management</i> umumnya menghasilkan <i>X Management Plan</i>.</div>
+<div class="ant-exam-tip-item"><b>Project Management Plan</b> menjadi acuan untuk Executing, Monitoring &amp; Controlling, dan Closing karena menjelaskan bagaimana pekerjaan pada focus area tersebut dijalankan.</div>
+<div class="ant-source-note">Ringkasan dari halaman 308 dan 421.</div>
+</div>
 </div>
 </div>
 <div class="p8-cluster-header" style="margin:24px 0 11px;padding:14px 16px;background:var(--navy-2);border:1px solid var(--line);border-left:4px solid var(--muted);border-radius:12px;">
 <div style="font-family:Space Mono,monospace;font-size:10px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;">REFERENCE TOOLS</div>
 <div style="font-family:'Source Serif 4',serif;font-size:21px;color:var(--paper);font-weight:600;margin-top:3px;">Supporting Tools</div>
 <div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5;">Artifact dan formula penting yang mendukung beberapa domain sekaligus.</div>
-</div><div class="uc-block" id="p8-artifacts">
+</div><div class="uc-block" id="p8-tt-selector">
+<div class="uc-header" onclick="toggleUC('p8-tt-selector')">
+<div class="uc-header-title"><span>🧰</span><span>T&amp;T Selector — Tool Apa Dipakai Kapan?</span></div>
+<span class="uc-icon" id="uc-icon-p8-tt-selector">▼</span>
+</div>
+<div class="uc-body" id="uc-body-p8-tt-selector">
+<div class="cs-response-box" style="margin-bottom:10px;">
+<div class="cs-rb-title">CARA PAKAI</div>
+<div class="cs-rb-item">1) Kenali performance domain dari trigger soal → 2) tentukan tujuan analisis → 3) pilih tool yang menghasilkan informasi/keputusan yang diminta. Detail lengkap ada di setiap domain di atas.</div>
+</div>
+<div class="cs-table-scroll"><table class="cs-table cs-balanced-table cs-polished" style="min-width:820px;"><colgroup><col style="width:18%"/><col style="width:35%"/><col style="width:47%"/></colgroup>
+<tr><th>Domain</th><th>Trigger utama</th><th>T&amp;T yang paling sering dipakai</th></tr>
+
+<tr><td><b>Governance</b></td><td>change, quality process, knowledge, sourcing, performance control</td><td>RCA, variance/trend, quality audit, dashboard/radiator, change control, backlog, make-or-buy</td></tr>
+<tr><td><b>Scope</b></td><td>requirements, WBS, validation/acceptance</td><td>interview/focus group/survey, Delphi, workshop, affinity, decomposition, inspection</td></tr>
+<tr><td><b>Schedule</b></td><td>sequence, duration, delay, compression, resource conflict</td><td>PDM, PERT, Monte Carlo, CPM/critical chain, crash/fast track, leveling/smoothing, velocity</td></tr>
+<tr><td><b>Finance</b></td><td>estimate, budget, reserve, performance, forecast</td><td>analogous/parametric/bottom-up, reserve analysis, aggregation, EVM, TCPI, EAC/ETC/VAC</td></tr>
+<tr><td><b>Stakeholders</b></td><td>identify, prioritize, engage, communicate</td><td>power-interest, cube, salience, direction of influence, engagement matrix, interactive/push/pull</td></tr>
+<tr><td><b>Resources</b></td><td>roles, acquire, develop/manage team, conflict</td><td>RACI, multicriteria, negotiation, virtual team tools, training, assessment, EI, conflict styles</td></tr>
+<tr><td><b>Risk</b></td><td>identify, prioritize, quantify, respond, monitor</td><td>RBS/prompt list, P×I, Monte Carlo, sensitivity/tornado, EMV/decision tree, influence diagram, audit</td></tr>
+</table></div>
+<div class="cs-trap">🧠 <b>Shortcut exam:</b> nama tool bukan tujuan. Tanyakan: “informasi/keputusan apa yang ingin dihasilkan?” Contoh: faktor paling berpengaruh → <b>Sensitivity</b>; range/probability outcome → <b>Monte Carlo</b>; memilih cabang keputusan finansial → <b>Decision Tree + EMV</b>; prioritas stakeholder kompleks → <b>Salience Model</b>.</div>
+</div>
+</div>
+
+<div class="uc-block" id="p8-approach-flags">
+<div class="uc-header" onclick="toggleUC('p8-approach-flags')">
+<div class="uc-header-title"><span>🔖</span><span>[A] [P] — Input, T&amp;T &amp; Output by Approach</span></div>
+<span class="uc-icon" id="uc-icon-p8-approach-flags">▼</span>
+</div>
+<div class="uc-body" id="uc-body-p8-approach-flags">
+<div class="approach-legend">
+<span><span class="approach-flags"><span class="approach-flag a">[A]</span></span> Agile / Adaptive</span>
+<span><span class="approach-flags"><span class="approach-flag p">[P]</span></span> Predictive / Traditional</span>
+
+<div class="approach-legend-note"><b>Cara baca:</b> <b>[A]</b> = Agile/Adaptive, <b>[P]</b> = Predictive/Traditional, dan <b>[A][P]</b> = dapat dipakai pada keduanya. <b>Hybrid tidak diberi flag terpisah</b> karena secara praktik menggunakan kombinasi Agile dan Predictive; untuk soal Hybrid, baca flag sesuai sisi pendekatan yang sedang digunakan. Flag menunjukkan <i>asosiasi utama untuk soal PMP</i>, bukan larangan absolut—tetap tailor sesuai konteks.</div>
+</div>
+<div class="cs-trap">📌 <b>Catatan penting:</b> planning tetap ada pada Agile. Bedanya, ANT menjelaskan bahwa pada agile/hybrid beberapa subsidiary plan dapat tidak berdiri sebagai dokumen terpisah dan isinya bisa terintegrasi ke product backlog, release roadmap, iteration/release plan.</div>
+<div class="approach-section-label">Common Inputs & Outputs</div>
+<div class="cs-table-scroll"><table class="cs-table cs-balanced-table cs-polished approach-io-table"><colgroup><col/><col/><col/></colgroup>
+<tr><th>I / O</th><th>Artifact / information</th><th>Approach cue</th></tr>
+<tr><td>INPUT</td><td><b>EEF</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Kondisi internal/eksternal organisasi memengaruhi semua delivery approach.</td></tr><tr><td>INPUT</td><td><b>OPA</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Policy, template, repository, historical information dapat dipakai pada semua approach.</td></tr><tr><td>INPUT</td><td><b>Project documents</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Dokumen proyek tetap ada pada semua approach; tingkat formalitasnya ditailor.</td></tr><tr><td>INPUT</td><td><b>Project Management Plan (PMP)</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Paling khas predictive; pada hybrid tetap penting. Agile planning tetap ada tetapi sering lebih ringan dan terintegrasi ke backlog/roadmap.</td></tr><tr><td>OUTPUT</td><td><b>Change request</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Khas formal change control predictive; hybrid memakainya untuk bagian/baseline yang dikendalikan secara predictive.</td></tr><tr><td>OUTPUT</td><td><b>Work Performance Data (WPD)</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Actual/raw performance data dapat berasal dari predictive, agile, maupun hybrid.</td></tr><tr><td>OUTPUT</td><td><b>Work Performance Information (WPI)</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Data yang sudah dianalisis terhadap plan/target—approach agnostic.</td></tr><tr><td>OUTPUT</td><td><b>Work Performance Report (WPR)</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Reporting dapat dipakai pada semua approach; format/detail ditailor.</td></tr><tr><td>OUTPUT</td><td><b>Project document / EEF / OPA updates</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Update pengetahuan dan dokumen berlaku lintas approach.</td></tr><tr><td>OUTPUT</td><td><b>Backlog / release-roadmap updates</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Agile-native; pada hybrid dipakai untuk bagian yang dikelola adaptively.</td></tr>
+</table></div>
+<div class="approach-section-label">Governance — Key Inputs & Outputs</div>
+<div class="cs-table-scroll"><table class="cs-table cs-balanced-table cs-polished approach-io-table"><colgroup><col/><col/><col/></colgroup>
+<tr><th>I / O</th><th>Artifact / information</th><th>Approach cue</th></tr>
+<tr><td>INPUT</td><td><b>Business case</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Value/viability tetap relevan pada semua approach.</td></tr><tr><td>INPUT</td><td><b>Project charter</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Otorisasi dan high-level intent dapat digunakan lintas approach.</td></tr><tr><td>INPUT</td><td><b>Approved change requests</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Masuk ke execution setelah formal approval pada predictive/hybrid.</td></tr><tr><td>INPUT</td><td><b>Product backlog</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Sumber kebutuhan/perubahan prioritas pada agile dan bagian adaptive hybrid.</td></tr><tr><td>INPUT</td><td><b>Lessons learned / knowledge</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Dipakai terus sepanjang proyek terlepas dari approach.</td></tr><tr><td>OUTPUT</td><td><b>Deliverables</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Semua approach menghasilkan deliverable; cadence berbeda.</td></tr><tr><td>OUTPUT</td><td><b>Change decisions / approved changes</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Formal approval/CCB terutama predictive dan sisi predictive hybrid.</td></tr><tr><td>OUTPUT</td><td><b>Backlog reprioritization</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Respons perubahan agile; Product Owner memprioritaskan ulang.</td></tr><tr><td>OUTPUT</td><td><b>Lessons learned register / knowledge updates</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Continuous learning berlaku lintas approach.</td></tr><tr><td>OUTPUT</td><td><b>Final transition / closure records</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Closing, handoff, dan acceptance tetap diperlukan pada semua approach.</td></tr>
+</table></div>
+<div class="approach-section-label">Scope — Key Inputs & Outputs</div>
+<div class="cs-table-scroll"><table class="cs-table cs-balanced-table cs-polished approach-io-table"><colgroup><col/><col/><col/></colgroup>
+<tr><th>I / O</th><th>Artifact / information</th><th>Approach cue</th></tr>
+<tr><td>INPUT</td><td><b>Scope management plan</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Biasanya formal pada predictive; hybrid menggunakannya untuk bagian yang dibaseline.</td></tr><tr><td>INPUT</td><td><b>Requirements documentation</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Dokumen kebutuhan formal lebih khas predictive/hybrid.</td></tr><tr><td>INPUT</td><td><b>Product backlog</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Tempat scope/requirements hidup pada agile dan bagian adaptive hybrid.</td></tr><tr><td>INPUT</td><td><b>Product vision / roadmap</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Arah produk dan sequencing value pada agile/hybrid.</td></tr><tr><td>OUTPUT</td><td><b>Requirements documentation / RTM</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Traceability formal paling khas predictive/hybrid.</td></tr><tr><td>OUTPUT</td><td><b>User stories / backlog items</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Representasi kebutuhan agile dan adaptive-hybrid.</td></tr><tr><td>OUTPUT</td><td><b>Project scope statement</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Scope formal yang dibaseline—predictive/hybrid.</td></tr><tr><td>OUTPUT</td><td><b>Scope baseline / WBS / WBS dictionary</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Baseline scope formal; agile biasanya memakai product backlog sebagai padanan struktur scope.</td></tr><tr><td>OUTPUT</td><td><b>Definition of Done</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Kriteria kelengkapan yang sangat khas agile/hybrid.</td></tr><tr><td>OUTPUT</td><td><b>Accepted deliverables</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Formal/explicit acceptance tetap berlaku lintas approach.</td></tr>
+</table></div>
+<div class="approach-section-label">Schedule — Key Inputs & Outputs</div>
+<div class="cs-table-scroll"><table class="cs-table cs-balanced-table cs-polished approach-io-table"><colgroup><col/><col/><col/></colgroup>
+<tr><th>I / O</th><th>Artifact / information</th><th>Approach cue</th></tr>
+<tr><td>INPUT</td><td><b>Schedule management plan</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Lebih formal pada predictive/hybrid.</td></tr><tr><td>INPUT</td><td><b>Activity list / attributes</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Activity-level planning formal lebih khas predictive/hybrid.</td></tr><tr><td>INPUT</td><td><b>Network diagram</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>PDM/CPM scheduling terutama predictive dan sisi predictive hybrid.</td></tr><tr><td>INPUT</td><td><b>Milestone list / calendars</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Milestone dan calendar dapat dipakai semua approach.</td></tr><tr><td>INPUT</td><td><b>Product backlog / release roadmap</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Sumber planned work dan sequencing value pada agile/hybrid.</td></tr><tr><td>INPUT</td><td><b>Velocity / throughput history</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Forecast berbasis empirical team capacity.</td></tr><tr><td>OUTPUT</td><td><b>Duration estimates</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Estimasi durasi/effort tetap ada; tekniknya berbeda per approach.</td></tr><tr><td>OUTPUT</td><td><b>Schedule baseline</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Baseline formal predictive; hybrid untuk bagian yang fixed/contractual.</td></tr><tr><td>OUTPUT</td><td><b>Project schedule / network data</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Model jadwal formal predictive/hybrid.</td></tr><tr><td>OUTPUT</td><td><b>Iteration / sprint plan</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Plan kerja satu iteration pada agile/hybrid.</td></tr><tr><td>OUTPUT</td><td><b>Release plan</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Sekumpulan iteration untuk delivery/feedback.</td></tr><tr><td>OUTPUT</td><td><b>Burn charts / CFD / velocity forecast</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Visual monitoring dan empirical forecast agile/hybrid.</td></tr><tr><td>OUTPUT</td><td><b>Change request</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Jika perubahan menyentuh schedule baseline formal.</td></tr><tr><td>OUTPUT</td><td><b>Backlog reprioritization</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Jika perubahan ditangani adaptively tanpa formal CR.</td></tr>
+</table></div>
+<div class="approach-section-label">Finance — Key Inputs & Outputs</div>
+<div class="cs-table-scroll"><table class="cs-table cs-balanced-table cs-polished approach-io-table"><colgroup><col/><col/><col/></colgroup>
+<tr><th>I / O</th><th>Artifact / information</th><th>Approach cue</th></tr>
+<tr><td>INPUT</td><td><b>Financial management plan</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Formal planning/budget governance terutama predictive/hybrid.</td></tr><tr><td>INPUT</td><td><b>Cost estimates / basis of estimates</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Estimasi biaya diperlukan lintas approach.</td></tr><tr><td>INPUT</td><td><b>Project schedule / release plan</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Time-phasing cost dapat memakai schedule predictive atau release plan adaptive.</td></tr><tr><td>INPUT</td><td><b>Risk register / reserve information</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Exposure memengaruhi contingency pada semua approach.</td></tr><tr><td>OUTPUT</td><td><b>Cost estimates</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Semua approach perlu memahami cost/financial impact.</td></tr><tr><td>OUTPUT</td><td><b>Cost baseline / BAC</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Baseline dan BAC paling khas predictive/hybrid.</td></tr><tr><td>OUTPUT</td><td><b>Project funding requirements</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Funding time-phasing formal lebih khas predictive/hybrid.</td></tr><tr><td>OUTPUT</td><td><b>EAC / ETC / VAC forecasts</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>EVM-based cost forecast terutama predictive/hybrid.</td></tr><tr><td>OUTPUT</td><td><b>Reserve information</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Contingency/management decisions dapat muncul lintas approach.</td></tr><tr><td>OUTPUT</td><td><b>Change request</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Untuk perubahan yang memengaruhi approved cost baseline/budget.</td></tr>
+</table></div>
+<div class="approach-section-label">Stakeholders — Key Inputs & Outputs</div>
+<div class="cs-table-scroll"><table class="cs-table cs-balanced-table cs-polished approach-io-table"><colgroup><col/><col/><col/></colgroup>
+<tr><th>I / O</th><th>Artifact / information</th><th>Approach cue</th></tr>
+<tr><td>INPUT</td><td><b>Stakeholder register</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Stakeholder identification selalu relevan.</td></tr><tr><td>INPUT</td><td><b>Communications / engagement plans</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Dokumen formal lebih khas predictive/hybrid; agile sering memakai working agreements dan feedback loops yang lebih ringan.</td></tr><tr><td>INPUT</td><td><b>Product vision / backlog / release info</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Digunakan untuk menyelaraskan stakeholder dengan value dan prioritas agile.</td></tr><tr><td>INPUT</td><td><b>Issue log / WPI / WPR</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Status, isu, dan performance menjadi input engagement di semua approach.</td></tr><tr><td>OUTPUT</td><td><b>Stakeholder register updates</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Power, interest, urgency, attitude dapat berubah pada semua approach.</td></tr><tr><td>OUTPUT</td><td><b>Stakeholder engagement plan</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Formal planned engagement lebih khas predictive/hybrid.</td></tr><tr><td>OUTPUT</td><td><b>Project communications / feedback records</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Komunikasi dan evidence of understanding berlaku lintas approach.</td></tr><tr><td>OUTPUT</td><td><b>Change request</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Bila kebutuhan stakeholder mengubah baseline formal.</td></tr><tr><td>OUTPUT</td><td><b>Backlog feedback / new backlog item</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Bila feedback diakomodasi melalui backlog agile/hybrid.</td></tr>
+</table></div>
+<div class="approach-section-label">Resources — Key Inputs & Outputs</div>
+<div class="cs-table-scroll"><table class="cs-table cs-balanced-table cs-polished approach-io-table"><colgroup><col/><col/><col/></colgroup>
+<tr><th>I / O</th><th>Artifact / information</th><th>Approach cue</th></tr>
+<tr><td>INPUT</td><td><b>Resource management plan</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Formal roles/resource approach lebih khas predictive/hybrid.</td></tr><tr><td>INPUT</td><td><b>Resource requirements / calendars</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Availability/capacity tetap penting pada semua approach.</td></tr><tr><td>INPUT</td><td><b>Team charter / working agreements</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Norma kerja tim relevan lintas approach; sangat penting pada self-organizing teams.</td></tr><tr><td>INPUT</td><td><b>Backlog / sprint plan</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Capacity planning agile/hybrid berangkat dari prioritized work.</td></tr><tr><td>OUTPUT</td><td><b>Resource breakdown structure / formal assignments</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Struktur dan assignment formal lebih khas predictive/hybrid.</td></tr><tr><td>OUTPUT</td><td><b>Team assignments / resource calendars</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Siapa/apa yang tersedia tetap perlu dikelola lintas approach.</td></tr><tr><td>OUTPUT</td><td><b>Team performance assessments</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Assessment, coaching, dan development berlaku lintas approach.</td></tr><tr><td>OUTPUT</td><td><b>Issue / lessons learned updates</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Masalah tim dan pembelajaran harus ditangkap di semua approach.</td></tr><tr><td>OUTPUT</td><td><b>Change request</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Jika solusi resource memerlukan perubahan baseline/formal plan.</td></tr><tr><td>OUTPUT</td><td><b>Impediment / team-board updates</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Agile/hybrid memakai visible impediment/work management lebih langsung.</td></tr>
+</table></div>
+<div class="approach-section-label">Risk — Key Inputs & Outputs</div>
+<div class="cs-table-scroll"><table class="cs-table cs-balanced-table cs-polished approach-io-table"><colgroup><col/><col/><col/></colgroup>
+<tr><th>I / O</th><th>Artifact / information</th><th>Approach cue</th></tr>
+<tr><td>INPUT</td><td><b>Risk management plan</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Cara mengelola uncertainty harus ada pada semua approach meski bentuknya bisa ringan/terintegrasi.</td></tr><tr><td>INPUT</td><td><b>Risk register / risk report</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Individual dan overall risk berlaku lintas approach.</td></tr><tr><td>INPUT</td><td><b>Baselines / detailed schedule-cost data</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Model risiko berbasis baseline formal paling khas predictive/hybrid.</td></tr><tr><td>INPUT</td><td><b>Product backlog / release roadmap</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Adaptive risk dapat tertanam dalam backlog/release planning.</td></tr><tr><td>INPUT</td><td><b>Performance data / project documents / EEF / OPA</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Sumber risk identification/reassessment lintas approach.</td></tr><tr><td>OUTPUT</td><td><b>Risk register / risk report updates</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Risk information diperbarui di semua approach.</td></tr><tr><td>OUTPUT</td><td><b>Prioritized risks / analysis results</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Qualitative/quantitative analysis tidak eksklusif pada satu approach.</td></tr><tr><td>OUTPUT</td><td><b>Risk responses / contingency / fallback</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Response planning berlaku lintas approach.</td></tr><tr><td>OUTPUT</td><td><b>Change request</b><span class="approach-flags"><span class="approach-flag p">[P]</span></span></td><td>Jika response memerlukan perubahan formal pada baseline/plan.</td></tr><tr><td>OUTPUT</td><td><b>Backlog reprioritization / risk backlog item</b><span class="approach-flags"><span class="approach-flag a">[A]</span></span></td><td>Jika response ditangani melalui adaptive backlog.</td></tr><tr><td>OUTPUT</td><td><b>Issue log update when risk occurs</b><span class="approach-flags"><span class="approach-flag a">[A]</span><span class="approach-flag p">[P]</span></span></td><td>Saat risk materializes menjadi issue pada semua approach.</td></tr>
+</table></div>
+<div class="cs-trap">🧠 <b>Exam shortcut:</b> formal baseline / CCB / approved CR / EVM / CPM → biasanya <b>[P]</b>. Product backlog / user story / sprint-release plan / velocity / burndown / stand-up → biasanya <b>[A]</b>. Expert judgment, stakeholder analysis, risk analysis, communication, facilitation, RCA, lessons learned → umumnya <b>[A][P]</b>. Pada <b>Hybrid</b>, pilih cue [A] atau [P] sesuai bagian proyek yang sedang dibahas.</div>
+</div>
+</div>
+
+<div class="uc-block" id="p8-artifacts">
 <div class="uc-header" onclick="toggleUC('p8-artifacts')">
 <div class="uc-header-title"><span>🗂️</span><span>Project Documents &amp; Artifacts — Dipetakan ke Domain</span></div>
 <span class="uc-icon" id="uc-icon-p8-artifacts">▼</span>
@@ -2383,6 +2938,14 @@
 <tr><td><b>Lintas domain—Quality</b></td><td>Quality metrics, quality control measurements, test and evaluation documents, Definition of Done/acceptance evidence</td><td>Membuktikan bahwa proses dan deliverable memenuhi standar.</td></tr>
 </table></div>
 <div class="cs-trap">📌 <b>Exam cue:</b> Pahami fungsi dan hubungan antarartifact. Soal lebih sering menguji “dokumen mana yang diperiksa/diupdate berikutnya” daripada meminta hafalan daftar.</div>
+
+<div class="ant-exam-tip">
+<div class="ant-exam-tip-title">📘 ANT Exam Tip — WPD → WPI → WPR</div>
+<div class="ant-exam-tip-item"><b>Work Performance Data (WPD)</b> = data mentah aktual dari pekerjaan.</div>
+<div class="ant-exam-tip-item"><b>WPD dibandingkan dengan plan/baseline</b> dan dianalisis menjadi <b>Work Performance Information (WPI)</b>.</div>
+<div class="ant-exam-tip-item"><b>WPI dikompilasi dan disajikan</b> menjadi <b>Work Performance Report (WPR)</b>.</div>
+<div class="ant-source-note">Mantra: analyzed data becomes information; compiled information becomes reports. Ringkasan halaman 269.</div>
+</div>
 </div>
 </div>
 <div class="uc-block" id="p8-formulas">
@@ -2453,6 +3016,37 @@
 </table></div>
 </div>
 </div>
+
+<div class="uc-block" id="p8-ethics">
+<div class="uc-header" onclick="toggleUC('p8-ethics')">
+<div class="uc-header-title"><span>⚖️</span><span>Ethics &amp; Professional Conduct — RRFH</span></div>
+<span class="uc-icon" id="uc-icon-p8-ethics">▼</span>
+</div>
+<div class="uc-body" id="uc-body-p8-ethics">
+<div class="uc-mantra"><b>RRFH:</b> Responsibility → Respect → Fairness → Honesty. Pada soal etika, lakukan hal yang benar walaupun tidak nyaman atau berisiko bagi posisi pribadi.</div>
+<div class="cs-table-scroll"><table class="cs-table cs-balanced-table cs-polished"><colgroup><col style="width:24%"/><col style="width:76%"/></colgroup>
+<tr><th>Prinsip / situasi</th><th>Exam rule</th></tr>
+<tr><td>Responsibility</td><td>Ambil ownership atas keputusan dan hasil; akui kesalahan, jangan menyalahkan tim.</td></tr>
+<tr><td>Respect</td><td>Hargai orang, sumber daya, lingkungan, dan perbedaan; jaga lingkungan kerja yang aman dan kolaboratif.</td></tr>
+<tr><td>Fairness</td><td>Bersikap objektif, transparan, dan bebas bias/favoritisme dalam keputusan.</td></tr>
+<tr><td>Honesty</td><td>Sampaikan status, risiko, dan fakta apa adanya; jangan menyesatkan atau menyembunyikan informasi material.</td></tr>
+<tr><td>Local law</td><td>Ikuti hukum negara/lokasi tempat proyek dilakukan; kebiasaan organisasi tidak mengalahkan hukum.</td></tr>
+<tr><td>Gift / donation</td><td>Jangan menerima hadiah yang memengaruhi atau tampak memengaruhi objektivitas; ikuti hukum dan kebijakan setempat.</td></tr>
+<tr><td>Conflict of interest</td><td>Ungkapkan konflik secara terbuka kepada pihak berwenang sebelum mengambil keputusan.</td></tr>
+<tr><td>Copyright / IP</td><td>Dapatkan izin atau lisensi sebelum memakai karya, software, materi, atau data milik pihak lain.</td></tr>
+<tr><td>Public safety &amp; environment</td><td>Utamakan kepentingan masyarakat, keselamatan publik, dan lingkungan; jangan menyetujui tindakan koruptif atau membahayakan.</td></tr>
+<tr><td>Ground-rule violation</td><td>Assess dan upayakan remediation lebih dulu; pelanggaran serius dapat memerlukan removal/replacement sesuai aturan dan bukti.</td></tr>
+</table></div>
+<div class="ant-exam-tip">
+<div class="ant-exam-tip-title">📘 ANT Ethics Exam Tips</div>
+<div class="ant-exam-tip-item">Be honest, follow local laws, do the right thing, do not accept improper gifts, obtain permission for others’ work, and report the actual project status.</div>
+<div class="ant-exam-tip-item">Jangan memilih “shortcut” yang melompati proses, lisensi, hukum, atau kewajiban profesional hanya demi waktu, biaya, atau tekanan atasan.</div>
+<div class="ant-source-note">Ringkasan Module 15, halaman 1057–1072.</div>
+</div>
+<div class="cs-trap">🪤 <b>Jebakan:</b> “Atasan meminta”, “anggaran masih ada”, “semua orang biasa melakukannya”, atau “demi menyelamatkan proyek” bukan pembenaran untuk melanggar hukum, kebijakan, transparansi, IP, atau keselamatan publik.</div>
+</div>
+</div>
+
 <div class="uc-block" id="p8-tips">
 <div class="uc-header" onclick="toggleUC('p8-tips')">
 <div class="uc-header-title"><span>🎓</span><span>Tips &amp; Trik Belajar dan Hari Ujian</span></div>
@@ -2460,10 +3054,14 @@
 </div>
 <div class="uc-body" id="uc-body-p8-tips">
 <div class="cs-response-box" style="margin-bottom:10px;">
-<div class="cs-rb-title">SEBELUM UJIAN</div>
-<div class="cs-rb-item">Rencanakan sekitar <b>60–100 jam</b> belajar dan jadwal rutin; jangan mengandalkan maraton belajar terakhir.</div>
-<div class="cs-rb-item">Targetkan <b>≥80%</b> pada latihan per topik dan mock, tetapi fokus pada alasan benar/salah—bukan menghafal jawaban.</div>
-<div class="cs-rb-item">Buat flashcard untuk definisi/formula yang benar-benar perlu recall; latihan utama tetap skenario dan professional judgment.</div>
+<div class="cs-rb-title">SEBELUM UJIAN — RINGKASAN EXAM TIPS ANT</div>
+<div class="cs-rb-item">Selesaikan <b>35 jam pendidikan PM</b>, lalu siapkan dan kirim aplikasi PMP dengan deskripsi pengalaman proyek yang jelas.</div>
+<div class="cs-rb-item">Setelah aplikasi disetujui, tetapkan tanggal ujian sebagai deadline belajar. Materi ANT menyarankan sekitar <b>2–3 minggu</b>; sesuaikan dengan kesiapan pribadi.</div>
+<div class="cs-rb-item">Alokasikan total sekitar <b>60–100 jam</b>, idealnya konsisten <b>6–20 jam per minggu</b>; hindari jeda belajar panjang.</div>
+<div class="cs-rb-item">Targetkan <b>≥80%</b> pada latihan per topik dan mock; pahami mengapa jawaban benar dan distractor salah—jangan menghafal kunci.</div>
+<div class="cs-rb-item">Jangan menghafal ITTO secara lepas. Pahami tujuan proses dan bagaimana input, tools, serta output digunakan dalam situasi proyek.</div>
+<div class="cs-rb-item">Baca ulang materi inti, buat flashcard sendiri untuk definisi/formula, dan gunakan practice questions untuk professional judgment.</div>
+<div class="cs-rb-item">Sisihkan satu hari penuh untuk ujian dan administrasinya. Materi ANT menyarankan slot pagi sekitar <b>08.00–10.00</b>; pilih waktu ketika fokusmu paling baik.</div>
 <div class="cs-rb-item">Sehari sebelum ujian: review formula/peta konsep secukupnya, siapkan ID, test perangkat/internet untuk online exam, dan tidur 6–8 jam.</div>
 </div>
 <div class="cs-table-scroll"><table class="cs-table cs-balanced-table cs-polished"><colgroup><col style="width:25%"/><col style="width:75%"/></colgroup>
@@ -2479,7 +3077,7 @@
 </div>
 </div>
 <div style="font-size:11px;color:var(--muted);line-height:1.55;margin:14px 2px 4px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:rgba(255,255,255,.03);">
-<b style="color:var(--paper);">Basis pembaruan:</b> struktur resmi PMBOK® Guide—Eighth Edition (6 principles, 7 performance domains, evolved process guidance), tabel Performance Domains × Focus Areas dan exam tips dari ringkasan PMBOK 8 yang diberikan, serta PMP Exam Content Outline 2026. Diperbarui Agustus 2026.
+<b style="color:var(--paper);">Basis pembaruan:</b> struktur PMBOK® Guide—Eighth Edition (6 principles, 7 performance domains, evolved process guidance), PMP Exam Content Outline 2026, serta Exam Tips dari ANT-PMP Exam Preparation v8 (2026). Diperbarui Agustus 2026.
 </div>
 </div>
 <div class="subtab-content" id="cs-capm">
