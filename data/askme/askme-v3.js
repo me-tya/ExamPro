@@ -1,13 +1,14 @@
-/* AskME v3.6 Audited Stable - Smart Plus encrypted search with reliable page viewer and local page analysis */
+/* AskME v3.7 - Smart Plus encrypted search + free AI Chat mode (via Cloudflare Worker + Groq) with reliable page viewer and local page analysis */
 (() => {
   'use strict';
 
   const BASE = 'data/askme/';
+  const AI_WORKER_URL = 'https://pmp-askme-proxy.ristya-onlineshop.workers.dev';
   const HISTORY_KEY = 'pmp_askme_history_v3';
   const MODE_KEY = 'pmp_askme_mode_v3';
   const SESSION_KEY = 'pmp_askme_session_key_v3';
   const STABLE_MIGRATION_KEY = 'pmp_askme_stable_v36';
-  const BUILD = 'v3.6';
+  const BUILD = 'v3.7';
   const AAD = new TextEncoder().encode('askme-v3');
   const STOP = new Set(('yang dan atau dengan dari untuk pada di ke dalam adalah itu ini apa apakah bagaimana mengapa kenapa siapa kapan dimana mana berapa sebuah suatu antara hasil keluaran output masukan input the a an and or of to in on for is are was were be been being what which how why when where does do did project proyek management manajemen tentang jelaskan tolong materi').split(/\s+/));
   const ACRONYM = {
@@ -279,15 +280,20 @@
   function closePage(){state.els.pageModal?.classList.remove('show');}
 
   async function setMode(mode){
-    state.mode='smart';localStorage.setItem(MODE_KEY,'smart');updateModeUI();
-    if(mode==='ai')alert('AI Lokal telah dinonaktifkan. AskME menggunakan Smart Plus yang gratis, privat, dan langsung siap.');
+    state.mode=mode==='ai'?'ai':'smart';localStorage.setItem(MODE_KEY,state.mode);updateModeUI();
   }
   function updateModeUI(){
-    state.mode='smart';localStorage.setItem(MODE_KEY,'smart');
-    state.els.modeSmart?.classList.add('active');
+    const isAI=state.mode==='ai';
+    state.els.modeSmart?.classList.toggle('active',!isAI);
+    state.els.modeAI?.classList.toggle('active',isAI);
     if(state.els.modeSmart)state.els.modeSmart.textContent='⚡ Smart Plus';
-    if(state.els.modeAI)state.els.modeAI.style.display='none';
-    if(state.els.modeInfo)state.els.modeInfo.textContent='Jawaban berbasis materi ANT, tanpa unduhan model dan tanpa API berbayar.';
+    if(state.els.modeAI){state.els.modeAI.style.display='';state.els.modeAI.textContent='🤖 AI Chat';}
+    if(state.els.modeInfo)state.els.modeInfo.textContent=isAI
+      ?'Jawaban dari AI (Llama 3.3 via Groq) — gratis, tapi bisa menjawab di luar materi ANT dan butuh koneksi internet.'
+      :'Jawaban berbasis materi ANT, tanpa unduhan model dan tanpa API berbayar.';
+    if(state.els.input)state.els.input.placeholder=isAI
+      ?'Tanyakan apa saja seputar PMP/CAPM ke AI…'
+      :'Tanyakan konsep, proses, rumus, output, tabel, atau diagram dalam materi ANT…';
   }
 
   function pageAnalysisText(doc,question){
@@ -344,6 +350,30 @@
     finally{state.els.send.disabled=false;state.els.chat.scrollTop=state.els.chat.scrollHeight;}
   }
 
+  async function askAI(q){
+    q=String(q||'').trim();if(!q)return;
+    addMessage('user',escapeHtml(q));state.plainHistory.push({role:'user',content:q});
+    state.els.input.value='';resizeInput();state.els.send.disabled=true;
+    const typing=addMessage('bot','<div class="askme-typing" aria-label="AI sedang menjawab"><span></span><span></span><span></span></div>',false);
+    try{
+      const history=state.plainHistory.slice(-7,-1).map(m=>({role:m.role==='user'?'user':'assistant',content:m.content}));
+      const res=await fetch(AI_WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,history})});
+      if(!res.ok){let msg='Layanan AI sedang sibuk (kode '+res.status+'). Coba lagi sebentar lagi.';try{const j=await res.json();if(j?.error)msg=j.error;}catch(_){}throw new Error(msg);}
+      const data=await res.json();
+      if(data?.error)throw new Error(data.error);
+      const answer=String(data?.answer||'Maaf, AI tidak memberikan jawaban.').trim();
+      const html='<div class="askme-answer-title">AskME AI Chat</div><div class="askme-answer-main">'+renderSimpleMarkdown(answer)+'</div><div class="askme-answer-note">Jawaban dari AI (di luar materi ANT), butuh koneksi internet. Selalu verifikasi konsep penting dengan sumber resmi PMI.</div>';
+      typing.querySelector('.askme-bubble').innerHTML=html;
+      state.plainHistory.push({role:'assistant',content:answer.slice(0,1800)});
+      saveHistory();
+    }catch(err){
+      typing.querySelector('.askme-bubble').innerHTML='<div class="askme-answer-title">Tidak dapat terhubung ke AI</div><div class="askme-answer-main">'+escapeHtml(String(err?.message||err))+'</div><div class="askme-answer-note">Periksa koneksi internet, atau alihkan ke mode Smart Plus yang bekerja tanpa internet.</div>';
+    }finally{
+      state.els.send.disabled=false;state.els.chat.scrollTop=state.els.chat.scrollHeight;
+    }
+  }
+  function ask(q){return state.mode==='ai'?askAI(q):askText(q);}
+
   async function tryFirestoreKey(user){
     if(!user)return false;try{setStatus('Mengambil kunci dari Firestore…','loading');const db=firebase.firestore();const snap=await db.collection('appConfig').doc('askme').get();const b64=snap.exists?snap.data()?.knowledgeKeyB64:null;if(!b64)return false;await unlockWithKey(b64,'firestore');return state.ready;}catch(err){console.warn('AskME key fetch failed',err);return false;}
   }
@@ -363,8 +393,8 @@
       chat:document.getElementById('askme-chat'),compose:document.getElementById('askme-compose'),tools:document.getElementById('askme-tools'),modebar:document.getElementById('askme-modebar'),input:document.getElementById('askme-input'),send:document.getElementById('askme-send'),clear:document.getElementById('askme-clear'),modeSmart:document.getElementById('askme-mode-smart'),modeAI:document.getElementById('askme-mode-ai'),modeInfo:document.getElementById('askme-mode-info'),
       pageModal:document.getElementById('askme-page-modal'),pageImage:document.getElementById('askme-page-image'),pageTitle:document.getElementById('askme-page-title'),pageClose:document.getElementById('askme-page-close')
     };
-    if(!state.els.chat)return false;localStorage.setItem(MODE_KEY,'smart');state.mode='smart';loadHistory();updateModeUI();if(state.els.modeAI)state.els.modeAI.style.display='none';
-    state.els.send.addEventListener('click',()=>askText(state.els.input.value));state.els.input.addEventListener('input',resizeInput);state.els.input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();askText(state.els.input.value);}});state.els.clear.addEventListener('click',clear);
+    if(!state.els.chat)return false;localStorage.setItem(MODE_KEY,'smart');state.mode='smart';loadHistory();updateModeUI();
+    state.els.send.addEventListener('click',()=>ask(state.els.input.value));state.els.input.addEventListener('input',resizeInput);state.els.input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ask(state.els.input.value);}});state.els.clear.addEventListener('click',clear);
     state.els.unlockBtn.addEventListener('click',()=>unlockWithKey(state.els.unlockInput.value,'manual'));state.els.unlockInput.addEventListener('keydown',e=>{if(e.key==='Enter')unlockWithKey(state.els.unlockInput.value,'manual');});
     state.els.modeSmart?.addEventListener('click',()=>setMode('smart'));state.els.modeAI?.addEventListener('click',()=>setMode('ai'));state.els.pageClose?.addEventListener('click',closePage);state.els.pageModal?.addEventListener('click',e=>{if(e.target===state.els.pageModal)closePage();});document.addEventListener('keydown',e=>{if(e.key==='Escape')closePage();});
     state.els.chat.addEventListener('click',e=>{
@@ -375,12 +405,12 @@
       const thumb=e.target.closest('[data-page-thumb]');
       if(thumb){e.preventDefault();openPage(Number(thumb.dataset.pageThumb));}
     });
-    document.querySelectorAll('[data-askme-question]').forEach(btn=>btn.addEventListener('click',()=>askText(btn.getAttribute('data-askme-question'))));
+    document.querySelectorAll('[data-askme-question]').forEach(btn=>btn.addEventListener('click',()=>ask(btn.getAttribute('data-askme-question'))));
     return true;
   }
   function init(){try{if(localStorage.getItem(STABLE_MIGRATION_KEY)!=='1'){localStorage.removeItem(HISTORY_KEY);localStorage.setItem(STABLE_MIGRATION_KEY,'1');}}catch(_){}if(!bindUI())return;showLock('Menyiapkan AskME','Memeriksa login dan kunci materi…');startAuth();}
 
   async function resetLocalAI(){localStorage.setItem(MODE_KEY,'smart');state.mode='smart';updateModeUI();setProgress(0);setStatus(state.ready?`${state.docs.length} halaman siap · ${BUILD}`:'Materi siap');}
-  window.AskME={init,search,askText,clear,openPage,unlock:unlockWithKey,setMode,resetLocalAI};
+  window.AskME={init,search,askText,askAI,ask,clear,openPage,unlock:unlockWithKey,setMode,resetLocalAI};
   document.addEventListener('DOMContentLoaded',init);
 })();
