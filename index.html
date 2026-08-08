@@ -1479,6 +1479,96 @@
   .deck-inline-note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:6px;}
   .file-list-preview{margin-top:7px;font-size:10.5px;color:var(--muted);line-height:1.5;word-break:break-word;}
 
+
+
+/* ===== Cheatsheet nav density polish — 2026-08-08 =====
+   Compact category chips + low-profile horizontal scrollbars. */
+#tab-cheatsheet{
+  --cs-toolbar-height:40px;
+  --cs-nav-height:76px;
+}
+#tab-cheatsheet .cs-top-toolbar{
+  gap:10px;
+  padding:4px 0 !important;
+}
+#tab-cheatsheet .cs-cheatsheet-switcher{
+  gap:6px;
+}
+#tab-cheatsheet .cs-cheatsheet-switcher .subtab-btn{
+  padding:6px 11px;
+  border-radius:14px;
+  font-size:10.5px;
+  line-height:1.05;
+}
+#tab-cheatsheet .cs-search-input-wrap{
+  height:30px;
+  min-height:30px;
+}
+#tab-cheatsheet #cs-compact-nav{
+  max-height:102px;
+  padding:4px 10px 6px !important;
+  margin-bottom:8px !important;
+}
+#tab-cheatsheet .cs-nav-primary,
+#tab-cheatsheet .cs-subnav{
+  gap:5px;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(148,160,194,.58) transparent;
+}
+#tab-cheatsheet .cs-nav-primary{
+  padding-bottom:4px;
+}
+#tab-cheatsheet .cs-subnav{
+  padding-top:0;
+  padding-bottom:2px;
+}
+#tab-cheatsheet .cs-group-btn,
+#tab-cheatsheet .cs-mini-btn{
+  width:max-content;
+  min-width:0;
+  min-height:0;
+  height:auto;
+  border-radius:8px;
+  line-height:1.05;
+}
+#tab-cheatsheet .cs-group-btn{
+  padding:6px 9px;
+  font-size:10px;
+}
+#tab-cheatsheet .cs-mini-btn{
+  padding:5px 8px;
+  font-size:9.5px;
+}
+#tab-cheatsheet .cs-nav-primary::-webkit-scrollbar,
+#tab-cheatsheet .cs-subnav::-webkit-scrollbar,
+#tab-cheatsheet .cs-cheatsheet-switcher::-webkit-scrollbar{
+  height:3px !important;
+}
+#tab-cheatsheet .cs-nav-primary::-webkit-scrollbar-track,
+#tab-cheatsheet .cs-subnav::-webkit-scrollbar-track,
+#tab-cheatsheet .cs-cheatsheet-switcher::-webkit-scrollbar-track{
+  background:transparent !important;
+}
+#tab-cheatsheet .cs-nav-primary::-webkit-scrollbar-thumb,
+#tab-cheatsheet .cs-subnav::-webkit-scrollbar-thumb,
+#tab-cheatsheet .cs-cheatsheet-switcher::-webkit-scrollbar-thumb{
+  background:rgba(148,160,194,.58) !important;
+  border-radius:999px !important;
+  border:0 !important;
+}
+#tab-cheatsheet .cs-nav-primary::-webkit-scrollbar-button,
+#tab-cheatsheet .cs-subnav::-webkit-scrollbar-button,
+#tab-cheatsheet .cs-cheatsheet-switcher::-webkit-scrollbar-button{
+  display:none !important;
+  width:0 !important;
+  height:0 !important;
+}
+@media(max-width:700px){
+  #tab-cheatsheet{--cs-toolbar-height:76px;--cs-nav-height:72px;}
+  #tab-cheatsheet #cs-compact-nav{max-height:96px;padding:4px 8px 5px !important;}
+  #tab-cheatsheet .cs-group-btn{padding:5px 8px;font-size:9.6px;}
+  #tab-cheatsheet .cs-mini-btn{padding:4px 7px;font-size:9.2px;}
+}
 </style>
 <link rel="stylesheet" href="data/askme/askme-v3.css?v=3.6.0">
 <!-- Firebase (cloud progress sync) -->
