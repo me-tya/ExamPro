@@ -6,6 +6,7 @@
   Original author: Atitya Pritasari — https://github.com/me-tya/pmp-prep
   AskME local knowledge search added from ANT-PMP-ExamPrepv2026-v8
   AskME AI Chat mode added from Prakom2026 pattern (AI worker + local chat history)
+  AskME AI history upgraded to session-based local + Firestore history with search/open/delete.
 -->
 <html lang="id">
 <head>
@@ -1260,11 +1261,37 @@
   .exampro-ai-status{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(107,138,235,.35);background:rgba(107,138,235,.10);color:#C8D4FF;border-radius:999px;padding:5px 9px;font:600 9.5px/1.2 'Space Mono',monospace;white-space:nowrap;}
   .exampro-ai-status.busy{color:#FFD38F;border-color:rgba(232,163,61,.38);background:rgba(232,163,61,.09);}
   .exampro-ai-status.err{color:#FF9E91;border-color:rgba(226,96,79,.38);background:rgba(226,96,79,.09);}
+  .exampro-ai-history-btn,.exampro-ai-new{border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--ink);border-radius:999px;padding:7px 10px;font:700 10.5px/1.2 'Inter',sans-serif;cursor:pointer;white-space:nowrap;transition:.15s;}
+  .exampro-ai-history-btn:hover,.exampro-ai-new:hover{border-color:rgba(107,138,235,.55);background:rgba(107,138,235,.10);color:#C8D4FF;}
+  .exampro-ai-history-btn.active{border-color:var(--periwinkle);background:rgba(107,138,235,.14);color:#C8D4FF;}
+  .exampro-ai-history{display:none;margin:0 0 10px;border:1px solid var(--line);border-radius:13px;background:rgba(8,16,38,.42);overflow:hidden;}
+  .exampro-ai-history.show{display:block;}
+  .exampro-ai-history-head{display:flex;align-items:center;gap:8px;padding:10px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+  .exampro-ai-history-search{flex:1 1 240px;min-width:160px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--paper);border-radius:9px;padding:8px 10px;font:12px/1.3 'Inter',sans-serif;outline:none;}
+  .exampro-ai-history-search:focus{border-color:rgba(107,138,235,.7);box-shadow:0 0 0 3px rgba(107,138,235,.08);}
+  .exampro-ai-history-search::placeholder{color:var(--muted);}
+  .exampro-ai-history-deleteall{border:1px solid rgba(226,96,79,.32);background:rgba(226,96,79,.08);color:#FFAA9D;border-radius:9px;padding:8px 10px;font:700 10px/1.2 'Inter',sans-serif;cursor:pointer;white-space:nowrap;}
+  .exampro-ai-history-deleteall:hover{background:rgba(226,96,79,.15);border-color:rgba(226,96,79,.55);}
+  .exampro-ai-history-list{max-height:245px;overflow-y:auto;padding:7px;display:flex;flex-direction:column;gap:6px;}
+  .exampro-ai-history-empty{padding:20px 12px;text-align:center;color:var(--muted);font-size:11.5px;line-height:1.55;}
+  .exampro-ai-history-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;border:1px solid transparent;border-radius:10px;padding:9px 10px;background:rgba(255,255,255,.035);cursor:pointer;transition:.15s;}
+  .exampro-ai-history-item:hover{background:rgba(255,255,255,.065);border-color:rgba(107,138,235,.30);}
+  .exampro-ai-history-item.active{background:rgba(107,138,235,.10);border-color:rgba(107,138,235,.44);}
+  .exampro-ai-history-copy{min-width:0;}
+  .exampro-ai-history-title{font-size:11.5px;font-weight:800;color:var(--paper);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .exampro-ai-history-meta{font-size:9.5px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .exampro-ai-history-del{width:28px;height:28px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;font-size:13px;}
+  .exampro-ai-history-del:hover{color:#FF9E91;border-color:rgba(226,96,79,.38);background:rgba(226,96,79,.09);}
+  .exampro-ai-sessionbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 5px;padding:0 2px;min-height:22px;}
+  .exampro-ai-session-title{min-width:0;font:700 10.5px/1.25 'Inter',sans-serif;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .exampro-ai-session-title b{color:#C8D4FF;}
+  .exampro-ai-cloud-note{font-size:9.5px;color:var(--muted);white-space:nowrap;}
   @media(max-width:620px){
     .exampro-ai-panel{padding:10px 10px 12px;}
     .exampro-ai-chat{height:calc(100dvh - 430px);min-height:230px;max-height:430px;}
     .exampro-ai-msg{max-width:96%;}
-    .exampro-ai-clear{display:none;}
+    .exampro-ai-history-list{max-height:210px;}
+    .exampro-ai-cloud-note{display:none;}
   }
 
 
@@ -2084,8 +2111,20 @@
         </div>
         <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
           <span class="exampro-ai-status" id="exampro-ai-status">● AI siap</span>
-          <button class="exampro-ai-clear" id="exampro-ai-clear" type="button">Hapus chat AI</button>
+          <button class="exampro-ai-history-btn" id="exampro-ai-history-btn" type="button">📚 History</button>
+          <button class="exampro-ai-new" id="exampro-ai-new" type="button">＋ Chat Baru</button>
         </div>
+      </div>
+      <div class="exampro-ai-history" id="exampro-ai-history">
+        <div class="exampro-ai-history-head">
+          <input class="exampro-ai-history-search" id="exampro-ai-history-search" type="search" autocomplete="off" placeholder="Cari judul atau isi percakapan…" aria-label="Cari history AskME AI">
+          <button class="exampro-ai-history-deleteall" id="exampro-ai-history-deleteall" type="button">Hapus semua history</button>
+        </div>
+        <div class="exampro-ai-history-list" id="exampro-ai-history-list"></div>
+      </div>
+      <div class="exampro-ai-sessionbar">
+        <div class="exampro-ai-session-title" id="exampro-ai-session-title"><b>Chat baru</b></div>
+        <div class="exampro-ai-cloud-note" id="exampro-ai-cloud-note">History lokal · login Google untuk sync cloud</div>
       </div>
       <div class="exampro-ai-chat" id="exampro-ai-chat" role="log" aria-live="polite" aria-label="Percakapan AskME AI"></div>
       <div class="exampro-ai-compose">
@@ -2093,7 +2132,7 @@
           <textarea class="exampro-ai-input" id="exampro-ai-input" rows="1" placeholder="Tanyakan konsep PMP/CAPM, alasan jawaban, perbandingan, contoh, atau mnemonic…" aria-label="Pertanyaan untuk AskME AI"></textarea>
           <button class="exampro-ai-send" id="exampro-ai-send" type="button" aria-label="Kirim ke AI" title="Kirim">➤</button>
         </div>
-        <div class="exampro-ai-foot">Enter untuk mengirim · Shift+Enter untuk baris baru · Riwayat AI disimpan lokal di browser ini.</div>
+        <div class="exampro-ai-foot">Enter untuk mengirim · Shift+Enter untuk baris baru · Chat Baru tidak menghapus history · saat login Google, history disinkronkan per akun.</div>
       </div>
     </div>
 
@@ -19953,6 +19992,10 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeQuestionEditor
       if(reviewTab && reviewTab.classList.contains('active') && typeof refreshReview === 'function'){
         refreshReview();
       }
+      // Keep AskME AI's local/session view aligned after account/progress refreshes.
+      if(typeof window.ExamProAIChatCloudRefresh === 'function'){
+        window.ExamProAIChatCloudRefresh();
+      }
     }catch(e){ console.warn('UI refresh after sync failed:', e); }
   }
 
@@ -20475,6 +20518,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeQuestionEditor
         }
         rawSet(LAST_UID_KEY, user.uid);
         currentUid = user.uid;
+        try{window.dispatchEvent(new CustomEvent('exampro-cloud-auth-changed',{detail:{uid:user.uid}}));}catch(_){}
         updateAccountUI(user);
         startRealtimeSync(user.uid);
         startCustomDeckSync(user.uid);
@@ -20484,12 +20528,92 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeQuestionEditor
         stopRealtimeSync();
         stopCustomDeckSync();
         currentUid = null;
+        try{window.dispatchEvent(new CustomEvent('exampro-cloud-auth-changed',{detail:{uid:null}}));}catch(_){}
         updateAccountUI(null);
         setBadge('Local', 'var(--muted)');
         if(wasSignedIn) resetLocalDeckStateOnSignOut();
       }
     });
   }
+
+  // ── AskME AI history sync (subcollection: progress/{uid}/aiChats/{sessionId}) ──
+  // Kept separate from the merged progress document so long chat histories do not
+  // approach Firestore's per-document size limit. Local history remains the fallback.
+  window.ExamProAICloud = {
+    isSignedIn: function(){ return !!(currentUid && db); },
+    getUid: function(){ return currentUid || null; },
+    watchSessions: function(onData, onError){
+      if(!currentUid || !db){ if(typeof onData==='function') onData([]); return function(){}; }
+      return db.collection('progress').doc(currentUid).collection('aiChats')
+        .orderBy('updatedAtMs','desc').limit(100)
+        .onSnapshot({includeMetadataChanges:true}, function(snap){
+          const rows=[];
+          snap.forEach(function(doc){
+            const d=doc.data()||{};
+            let messages=[];
+            try{ messages=JSON.parse(d.messagesJson||'[]'); }catch(_){ messages=[]; }
+            rows.push({
+              id:doc.id,
+              title:String(d.title||'Chat tanpa judul'),
+              createdAt:Number(d.createdAtMs)||Date.now(),
+              updatedAt:Number(d.updatedAtMs)||Number(d.createdAtMs)||Date.now(),
+              messages:Array.isArray(messages)?messages:[]
+            });
+          });
+          if(typeof onData==='function') onData(rows);
+        }, function(err){
+          console.error('AI history realtime sync failed:',err);
+          if(typeof onError==='function') onError(err);
+        });
+    },
+    saveSession: function(session){
+      if(!currentUid || !db || !session || !session.id) return Promise.resolve(false);
+      const clean=(Array.isArray(session.messages)?session.messages:[]).filter(function(m){return m&&!m.pending&&m.text;}).slice(-80);
+      return db.collection('progress').doc(currentUid).collection('aiChats').doc(String(session.id)).set({
+        title:String(session.title||'Chat tanpa judul').slice(0,180),
+        createdAtMs:Number(session.createdAt)||Date.now(),
+        updatedAtMs:Number(session.updatedAt)||Date.now(),
+        messagesJson:JSON.stringify(clean),
+        _updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+        _lastClientId:clientId
+      },{merge:true}).then(function(){return true;}).catch(function(err){
+        console.error('AI history save failed:',err); throw err;
+      });
+    },
+    deleteSession: function(id){
+      if(!currentUid || !db || !id) return Promise.resolve(false);
+      return db.collection('progress').doc(currentUid).collection('aiChats').doc(String(id)).delete().then(function(){return true;});
+    },
+    deleteAllSessions: function(){
+      if(!currentUid || !db) return Promise.resolve(false);
+      const ref=db.collection('progress').doc(currentUid).collection('aiChats');
+      return ref.get().then(function(snap){
+        if(snap.empty) return true;
+        const docs=[];snap.forEach(function(doc){docs.push(doc.ref)});
+        let chain=Promise.resolve();
+        for(let i=0;i<docs.length;i+=400){
+          const part=docs.slice(i,i+400);
+          chain=chain.then(function(){const b=db.batch();part.forEach(function(r){b.delete(r)});return b.commit();});
+        }
+        return chain.then(function(){return true;});
+      });
+    },
+    readLegacyFlatChat: function(){
+      if(!currentUid || !db) return Promise.resolve(null);
+      return db.collection('progress').doc(currentUid).get().then(function(doc){
+        if(!doc.exists) return null;
+        const d=doc.data()||{};
+        return typeof d.exampro_askme_ai_chat_v1==='string' ? d.exampro_askme_ai_chat_v1 : null;
+      });
+    },
+    clearLegacyFlatChat: function(){
+      if(!currentUid || !db) return Promise.resolve(false);
+      return db.collection('progress').doc(currentUid).set({
+        exampro_askme_ai_chat_v1:firebase.firestore.FieldValue.delete(),
+        _updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      },{merge:true}).then(function(){return true;});
+    }
+  };
 
   try{
     app = firebase.initializeApp(firebaseConfig);
@@ -20592,97 +20716,99 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 <script src="data/askme/askme-v3.js?v=3.6.0"></script>
 <script>
-/* AskME AI Chat — isolated add-on; does not replace Smart Plus. */
+/* AskME AI Chat — session-based history, local fallback + Firestore per-session sync. */
 (function(){
   'use strict';
   const AI_WORKER_URL='https://pmp-askme-proxy.ristya-onlineshop.workers.dev';
   const PMP_SUBJECT='PMI Project Management Professional (PMP) dan Certified Associate in Project Management (CAPM), termasuk PMBOK Guide, PMI Exam Content Outline, predictive/waterfall, agile/adaptive, hybrid, people, process, business environment, project performance domains, tailoring, models-methods-artifacts, risk, schedule, cost, quality, resource, stakeholder, communication, procurement, governance, change management, earned value, dan soal situasional ujian PMP/CAPM';
-  const CHAT_KEY='exampro_askme_ai_chat_v1';
+  const LEGACY_CHAT_KEY='exampro_askme_ai_chat_v1';
+  const SESSIONS_KEY='exampro_askme_ai_sessions_v2';
+  const ACTIVE_KEY='exampro_askme_ai_active_session_v2';
+  const MIGRATION_KEY='exampro_askme_ai_migration_v2';
   const MODE_KEY='exampro_askme_mode_v1';
-  let messages=[], history=[], busy=false;
+  const MAX_LOCAL_SESSIONS=100;
+  const MAX_MESSAGES_PER_SESSION=80;
+  let sessions=[],activeId=null,messages=[],history=[],busy=false,cloudUnsub=null,historyOpen=false,cloudApplying=false,lastCloudIds=null;
+  const pendingDeletes=new Set();
 
   const $=id=>document.getElementById(id);
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const nl=s=>esc(s).replace(/\n/g,'<br>');
-
-  function setStatus(text,state){
-    const el=$('exampro-ai-status'); if(!el)return;
-    el.textContent=text; el.classList.remove('busy','err'); if(state)el.classList.add(state);
+  const now=()=>Date.now();
+  const makeId=()=> 'chat_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,9);
+  function cleanMessages(arr){return (Array.isArray(arr)?arr:[]).filter(m=>m&&!m.pending&&m.text&&(m.role==='user'||m.role==='bot')).slice(-MAX_MESSAGES_PER_SESSION).map(m=>({role:m.role,text:String(m.text)}));}
+  function titleFromMessages(arr){const u=cleanMessages(arr).find(m=>m.role==='user');if(!u)return 'Chat baru';const t=String(u.text).replace(/\s+/g,' ').trim();return (t.length>62?t.slice(0,59)+'…':t)||'Chat baru';}
+  function normalizeSession(x){
+    const ms=cleanMessages(x&&x.messages);
+    return {id:String((x&&x.id)||makeId()),title:String((x&&x.title)||titleFromMessages(ms)||'Chat baru'),createdAt:Number(x&&x.createdAt)||now(),updatedAt:Number(x&&x.updatedAt)||Number(x&&x.createdAt)||now(),messages:ms};
   }
-  function load(){
-    try{const x=JSON.parse(localStorage.getItem(CHAT_KEY)||'[]');messages=Array.isArray(x)?x.slice(-40):[]}catch(_){messages=[]}
+  function sortSessions(){sessions=sessions.map(normalizeSession).sort((a,b)=>b.updatedAt-a.updatedAt).slice(0,MAX_LOCAL_SESSIONS);}
+  function setStatus(text,state){const el=$('exampro-ai-status');if(!el)return;el.textContent=text;el.classList.remove('busy','err');if(state)el.classList.add(state);}
+  function setCloudNote(text){const el=$('exampro-ai-cloud-note');if(el)el.textContent=text;}
+  function isCloud(){return !!(window.ExamProAICloud&&window.ExamProAICloud.isSignedIn&&window.ExamProAICloud.isSignedIn());}
+  function rebuildHistory(){history=[];cleanMessages(messages).forEach(m=>history.push({role:m.role==='user'?'user':'assistant',content:String(m.text).slice(0,1800)}));history=history.slice(-12);}
+  function readLocal(){try{const x=JSON.parse(localStorage.getItem(SESSIONS_KEY)||'[]');sessions=Array.isArray(x)?x.map(normalizeSession):[]}catch(_){sessions=[]}sortSessions();try{activeId=localStorage.getItem(ACTIVE_KEY)||null}catch(_){activeId=null}}
+  function writeLocal(){if(cloudApplying)return;sortSessions();try{localStorage.setItem(SESSIONS_KEY,JSON.stringify(sessions));if(activeId)localStorage.setItem(ACTIVE_KEY,activeId);else localStorage.removeItem(ACTIVE_KEY)}catch(_){}}
+  function sessionById(id){return sessions.find(s=>s.id===id)||null;}
+  function upsertLocal(session){const n=normalizeSession(session);const i=sessions.findIndex(s=>s.id===n.id);if(i>=0)sessions[i]=n;else sessions.push(n);sortSessions();writeLocal();return n;}
+  function ensureActive(create=false){let s=activeId?sessionById(activeId):null;if(!s&&create){s=normalizeSession({id:makeId(),title:'Chat baru',createdAt:now(),updatedAt:now(),messages:[]});activeId=s.id;sessions.push(s);writeLocal()}messages=s?cleanMessages(s.messages):[];rebuildHistory();return s;}
+  function persistActive(syncCloud=true){if(!activeId)return;let s=sessionById(activeId);if(!s)return;s.messages=cleanMessages(messages);s.title=titleFromMessages(s.messages);s.updatedAt=now();s=upsertLocal(s);if(syncCloud&&isCloud()&&window.ExamProAICloud.saveSession){setCloudNote('Menyimpan history ke cloud…');window.ExamProAICloud.saveSession(s).then(()=>setCloudNote('History tersinkron ke Firestore')).catch(()=>setCloudNote('History lokal · sync cloud gagal'));}renderHistory();updateSessionBar();}
+  function formatWhen(ts){try{return new Date(ts).toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}catch(_){return ''}}
+  function renderHistory(){
+    const list=$('exampro-ai-history-list');if(!list)return;const q=String(($('exampro-ai-history-search')||{}).value||'').trim().toLowerCase();
+    const rows=sessions.filter(s=>{if(!q)return true;const hay=(s.title+' '+s.messages.map(m=>m.text).join(' ')).toLowerCase();return hay.includes(q)});
+    if(!rows.length){list.innerHTML='<div class="exampro-ai-history-empty">'+(q?'Tidak ada history yang cocok.':'Belum ada history AI. Mulai bertanya, lalu percakapan akan muncul di sini.')+'</div>';return;}
+    list.innerHTML=rows.map(s=>{const last=s.messages.length?s.messages[s.messages.length-1].text:'';return '<div class="exampro-ai-history-item '+(s.id===activeId?'active':'')+'" data-ai-session="'+esc(s.id)+'"><div class="exampro-ai-history-copy"><div class="exampro-ai-history-title">'+esc(s.title)+'</div><div class="exampro-ai-history-meta">'+esc(formatWhen(s.updatedAt))+(last?' · '+esc(String(last).replace(/\s+/g,' ').slice(0,80)):'')+'</div></div><button class="exampro-ai-history-del" type="button" data-ai-delete="'+esc(s.id)+'" title="Hapus percakapan" aria-label="Hapus percakapan">🗑</button></div>'}).join('');
+    list.querySelectorAll('[data-ai-session]').forEach(el=>el.addEventListener('click',e=>{if(e.target.closest('[data-ai-delete]'))return;openSession(el.dataset.aiSession)}));
+    list.querySelectorAll('[data-ai-delete]').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();deleteSession(btn.dataset.aiDelete)}));
   }
-  function save(){try{localStorage.setItem(CHAT_KEY,JSON.stringify(messages.slice(-40)))}catch(_){}}
+  function updateSessionBar(){const el=$('exampro-ai-session-title');const s=activeId?sessionById(activeId):null;if(el)el.innerHTML=s?'<b>'+esc(s.title)+'</b> · '+s.messages.length+' pesan':'<b>Chat baru</b>';}
   function render(){
-    const box=$('exampro-ai-chat'); if(!box)return;
-    if(!messages.length){
-      box.innerHTML='<div class="exampro-ai-msg bot"><div class="exampro-ai-avatar">🤖</div><div class="exampro-ai-bubble"><div class="exampro-ai-answer-title">AskME AI</div>Tanyakan apa saja seputar PMP/CAPM. Saya bisa menjelaskan konsep, membandingkan pilihan, membuat contoh situasional, mnemonic, atau membantu memahami mengapa suatu opsi lebih tepat.<div class="exampro-ai-note">AI bersifat generatif. Gunakan Smart Plus bila kamu ingin jawaban yang ditambatkan langsung ke materi ANT dan halaman sumber.</div></div></div>';
-    } else {
-      box.innerHTML=messages.map(m=>{
-        if(m.pending)return '<div class="exampro-ai-msg bot"><div class="exampro-ai-avatar">🤖</div><div class="exampro-ai-bubble"><span class="exampro-ai-thinking"><span></span><span></span><span></span></span></div></div>';
-        const user=m.role==='user';
-        return '<div class="exampro-ai-msg '+(user?'user':'bot')+'"><div class="exampro-ai-avatar">'+(user?'👤':'🤖')+'</div><div class="exampro-ai-bubble">'+(user?nl(m.text):'<div class="exampro-ai-answer-title">Jawaban AI</div>'+nl(m.text)+'<div class="exampro-ai-note">Jawaban AI generatif (Llama 3.3 via Groq). Bisa melampaui materi ANT; cek kembali ke sumber resmi PMI bila ada perbedaan.</div>')+'</div></div>';
-      }).join('');
-    }
-    box.scrollTop=box.scrollHeight;
+    const box=$('exampro-ai-chat');if(!box)return;
+    if(!messages.length){box.innerHTML='<div class="exampro-ai-msg bot"><div class="exampro-ai-avatar">🤖</div><div class="exampro-ai-bubble"><div class="exampro-ai-answer-title">AskME AI</div>Tanyakan apa saja seputar PMP/CAPM. Saya bisa menjelaskan konsep, membandingkan pilihan, membuat contoh situasional, mnemonic, atau membantu memahami mengapa suatu opsi lebih tepat.<div class="exampro-ai-note">Klik <b>📚 History</b> untuk mencari dan membuka percakapan lama. <b>＋ Chat Baru</b> hanya memulai sesi baru dan tidak menghapus history.</div></div></div>';}else{box.innerHTML=messages.map(m=>{if(m.pending)return '<div class="exampro-ai-msg bot"><div class="exampro-ai-avatar">🤖</div><div class="exampro-ai-bubble"><span class="exampro-ai-thinking"><span></span><span></span><span></span></span></div></div>';const user=m.role==='user';return '<div class="exampro-ai-msg '+(user?'user':'bot')+'"><div class="exampro-ai-avatar">'+(user?'👤':'🤖')+'</div><div class="exampro-ai-bubble">'+(user?nl(m.text):'<div class="exampro-ai-answer-title">Jawaban AI</div>'+nl(m.text)+'<div class="exampro-ai-note">Jawaban AI generatif (Llama 3.3 via Groq). Bisa melampaui materi ANT; cek kembali ke sumber resmi PMI bila ada perbedaan.</div>')+'</div></div>'}).join('');}
+    box.scrollTop=box.scrollHeight;updateSessionBar();
   }
-  function clearChat(){
-    if(!confirm('Hapus semua riwayat AskME AI di perangkat ini?'))return;
-    messages=[];history=[];try{localStorage.removeItem(CHAT_KEY)}catch(_){};render();
-  }
-  async function askAI(q){
-    if(busy)return; busy=true; setStatus('● AI menjawab…','busy');
-    messages.push({role:'bot',pending:true}); save(); render();
-    const pendingIndex=messages.length-1;
+  function newChat(){if(busy)return;activeId=null;messages=[];history=[];try{localStorage.removeItem(ACTIVE_KEY)}catch(_){};render();renderHistory();setStatus('● AI siap','');const input=$('exampro-ai-input');if(input)input.focus();}
+  function openSession(id){if(busy)return;const s=sessionById(id);if(!s)return;activeId=s.id;messages=cleanMessages(s.messages);rebuildHistory();writeLocal();render();renderHistory();setHistoryOpen(false);setStatus('● AI siap','');}
+  function deleteSession(id){const s=sessionById(id);if(!s)return;if(!confirm('Hapus percakapan “'+s.title+'”? Tindakan ini menghapus session dari history'+(isCloud()?' dan Firestore':'')+'.'))return;pendingDeletes.add(id);sessions=sessions.filter(x=>x.id!==id);if(activeId===id){activeId=null;messages=[];history=[]}writeLocal();render();renderHistory();if(isCloud()&&window.ExamProAICloud.deleteSession){window.ExamProAICloud.deleteSession(id).then(()=>{pendingDeletes.delete(id)}).catch(()=>{pendingDeletes.delete(id);setCloudNote('History lokal · hapus cloud gagal')})}else pendingDeletes.delete(id);}
+  function deleteAll(){if(!sessions.length)return;if(!confirm('Hapus SEMUA history AskME AI?\n\nChat Baru tidak perlu menghapus history. Gunakan ini hanya jika memang ingin menghapus seluruh percakapan secara permanen'+(isCloud()?' dari browser dan Firestore':'')+'.'))return;const ids=sessions.map(s=>s.id);ids.forEach(id=>pendingDeletes.add(id));sessions=[];activeId=null;messages=[];history=[];writeLocal();try{localStorage.removeItem(SESSIONS_KEY);localStorage.removeItem(ACTIVE_KEY)}catch(_){};render();renderHistory();if(isCloud()&&window.ExamProAICloud.deleteAllSessions){setCloudNote('Menghapus history cloud…');window.ExamProAICloud.deleteAllSessions().then(()=>{ids.forEach(id=>pendingDeletes.delete(id));lastCloudIds=new Set();setCloudNote('History cloud dihapus')}).catch(()=>{ids.forEach(id=>pendingDeletes.delete(id));setCloudNote('History lokal dihapus · cloud gagal')})}else ids.forEach(id=>pendingDeletes.delete(id));}
+  function setHistoryOpen(v){historyOpen=!!v;const p=$('exampro-ai-history'),b=$('exampro-ai-history-btn');if(p)p.classList.toggle('show',historyOpen);if(b)b.classList.toggle('active',historyOpen);if(historyOpen){renderHistory();const q=$('exampro-ai-history-search');if(q)setTimeout(()=>q.focus(),0)}}
+  async function askAI(q){if(busy)return;busy=true;setStatus('● AI menjawab…','busy');messages.push({role:'bot',pending:true});render();const pendingIndex=messages.length-1;try{const res=await fetch(AI_WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,history:history.slice(-6),subject:PMP_SUBJECT})});if(!res.ok){let msg='Layanan AI sedang sibuk (kode '+res.status+').';try{const j=await res.json();if(j&&j.error)msg=j.error}catch(_){}throw new Error(msg)}const data=await res.json();if(data&&data.error)throw new Error(data.error);const answer=String((data&&data.answer)||'Maaf, AI tidak memberikan jawaban.').trim();messages[pendingIndex]={role:'bot',text:answer};history.push({role:'user',content:q});history.push({role:'assistant',content:answer.slice(0,1800)});setStatus('● AI siap','');}catch(err){messages[pendingIndex]={role:'bot',text:'Tidak dapat terhubung ke AI. '+String((err&&err.message)||err)+' Coba lagi atau gunakan Smart Plus yang bekerja dari basis materi lokal.'};setStatus('● AI tidak terhubung','err');}finally{busy=false;persistActive(true);render();}}
+  function submit(){const input=$('exampro-ai-input');if(!input||busy)return;const q=String(input.value||'').trim();if(!q)return;input.value='';input.style.height='auto';if(!activeId)ensureActive(true);messages.push({role:'user',text:q});persistActive(true);render();askAI(q);}
+  function setMode(mode,persist=true){const shell=document.querySelector('#tab-askme .askme-shell');const smart=$('askme-mode-smart'),ai=$('askme-mode-ai'),info=$('askme-mode-info');const isAI=mode==='ai';if(shell)shell.classList.toggle('exampro-ai-mode',isAI);if(smart)smart.classList.toggle('active',!isAI);if(ai)ai.classList.toggle('active',isAI);if(info)info.textContent=isAI?'AI generatif untuk menjelaskan, membandingkan, memberi contoh, dan menjawab pertanyaan lanjutan seputar PMP/CAPM.':'Jawaban berbasis materi ANT, tanpa unduhan model dan tanpa API berbayar.';if(persist){try{localStorage.setItem(MODE_KEY,isAI?'ai':'smart')}catch(_){}}if(isAI){render();renderHistory();setTimeout(()=>{const x=$('exampro-ai-input');if(x)x.focus()},0)}}
+  function mergeCloudSessions(rows){
+    if(!Array.isArray(rows))return;
+    const api=window.ExamProAICloud;
+    const cloudRows=rows.map(normalizeSession).filter(c=>!pendingDeletes.has(c.id));
+    const cloudIds=new Set(cloudRows.map(c=>c.id));
+    const localBefore=sessions.map(normalizeSession);
+    cloudApplying=true;
     try{
-      const res=await fetch(AI_WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,history:history.slice(-6),subject:PMP_SUBJECT})});
-      if(!res.ok){
-        let msg='Layanan AI sedang sibuk (kode '+res.status+').';
-        try{const j=await res.json();if(j&&j.error)msg=j.error}catch(_){}
-        throw new Error(msg);
-      }
-      const data=await res.json(); if(data&&data.error)throw new Error(data.error);
-      const answer=String((data&&data.answer)||'Maaf, AI tidak memberikan jawaban.').trim();
-      messages[pendingIndex]={role:'bot',text:answer};
-      history.push({role:'user',content:q}); history.push({role:'assistant',content:answer.slice(0,1800)});
-      setStatus('● AI siap','');
-    }catch(err){
-      messages[pendingIndex]={role:'bot',text:'Tidak dapat terhubung ke AI. '+String((err&&err.message)||err)+' Coba lagi atau gunakan Smart Plus yang bekerja dari basis materi lokal.'};
-      setStatus('● AI tidak terhubung','err');
-    }finally{busy=false;save();render();}
+      let base=localBefore;
+      // After the first successful snapshot, an ID that previously existed in
+      // Firestore but is now missing is treated as a remote deletion.
+      if(lastCloudIds){base=base.filter(s=>!(lastCloudIds.has(s.id)&&!cloudIds.has(s.id)&&!pendingDeletes.has(s.id)));}
+      const map=new Map(base.map(s=>[s.id,s]));
+      cloudRows.forEach(c=>{const l=map.get(c.id);if(!l||c.updatedAt>=l.updatedAt)map.set(c.id,c)});
+      sessions=Array.from(map.values());sortSessions();
+      try{localStorage.setItem(SESSIONS_KEY,JSON.stringify(sessions))}catch(_){}
+      if(activeId){const a=sessionById(activeId);if(a){messages=cleanMessages(a.messages);rebuildHistory()}else{activeId=null;messages=[];history=[];try{localStorage.removeItem(ACTIVE_KEY)}catch(_){}}}
+    }finally{cloudApplying=false}
+    // Local-only sessions (for example chats created while logged out/offline)
+    // are uploaded once an account becomes available.
+    if(api&&api.saveSession&&isCloud()){
+      sessions.filter(s=>!cloudIds.has(s.id)&&!pendingDeletes.has(s.id)).forEach(s=>api.saveSession(s).catch(()=>{}));
+    }
+    lastCloudIds=cloudIds;
+    render();renderHistory();setCloudNote('History tersinkron ke Firestore');
   }
-  function submit(){
-    const input=$('exampro-ai-input'); if(!input||busy)return;
-    const q=String(input.value||'').trim(); if(!q)return;
-    input.value=''; input.style.height='auto';
-    messages.push({role:'user',text:q}); save(); render(); askAI(q);
-  }
-  function setMode(mode,persist=true){
-    const shell=document.querySelector('#tab-askme .askme-shell');
-    const smart=$('askme-mode-smart'), ai=$('askme-mode-ai'), info=$('askme-mode-info');
-    const isAI=mode==='ai';
-    if(shell)shell.classList.toggle('exampro-ai-mode',isAI);
-    if(smart)smart.classList.toggle('active',!isAI);
-    if(ai)ai.classList.toggle('active',isAI);
-    if(info)info.textContent=isAI
-      ?'AI generatif untuk menjelaskan, membandingkan, memberi contoh, dan menjawab pertanyaan lanjutan seputar PMP/CAPM.'
-      :'Jawaban berbasis materi ANT, tanpa unduhan model dan tanpa API berbayar.';
-    if(persist){try{localStorage.setItem(MODE_KEY,isAI?'ai':'smart')}catch(_){}}
-    if(isAI){render();setTimeout(()=>{const x=$('exampro-ai-input');if(x)x.focus()},0)}
-  }
-  function init(){
-    if(!$('askme-mode-ai')||!$('exampro-ai-panel'))return;
-    load();render();
-    $('askme-mode-ai').addEventListener('click',()=>setMode('ai'));
-    $('askme-mode-smart').addEventListener('click',()=>setMode('smart'));
-    $('exampro-ai-send').addEventListener('click',submit);
-    $('exampro-ai-clear').addEventListener('click',clearChat);
-    $('exampro-ai-input').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();submit()}});
-    $('exampro-ai-input').addEventListener('input',e=>{e.target.style.height='auto';e.target.style.height=Math.min(e.target.scrollHeight,120)+'px'});
-    document.querySelectorAll('[data-ai-question]').forEach(b=>b.addEventListener('click',()=>{const i=$('exampro-ai-input');if(i){i.value=b.dataset.aiQuestion||b.textContent;submit()}}));
-    let preferred='ai'; try{preferred=localStorage.getItem(MODE_KEY)||'ai'}catch(_){}
-    setMode(preferred==='smart'?'smart':'ai',false);
-  }
+  function connectCloud(){if(cloudUnsub){try{cloudUnsub()}catch(_){}cloudUnsub=null}lastCloudIds=null;if(!isCloud()){setCloudNote('History lokal · login Google untuk sync cloud');renderHistory();return;}setCloudNote('Memuat history Firestore…');const api=window.ExamProAICloud;migrateLegacyCloudIfNeeded();if(api&&api.watchSessions){cloudUnsub=api.watchSessions(rows=>{mergeCloudSessions(rows);migrateLegacyCloudIfNeeded();},()=>setCloudNote('History lokal · sync cloud gagal'));}}
+  function migrateLegacyLocal(){try{if(localStorage.getItem(MIGRATION_KEY))return;const raw=localStorage.getItem(LEGACY_CHAT_KEY);if(raw){let arr=[];try{arr=JSON.parse(raw)}catch(_){};arr=cleanMessages(arr);if(arr.length){const t=now();const s=normalizeSession({id:'legacy_local_'+t.toString(36),title:titleFromMessages(arr),createdAt:t,updatedAt:t,messages:arr});sessions.push(s);activeId=activeId||s.id;sortSessions();localStorage.setItem(SESSIONS_KEY,JSON.stringify(sessions));localStorage.removeItem(LEGACY_CHAT_KEY)}}localStorage.setItem(MIGRATION_KEY,'1')}catch(_){}}
+  let cloudLegacyChecked=false;
+  function migrateLegacyCloudIfNeeded(){if(cloudLegacyChecked||!isCloud()||!window.ExamProAICloud.readLegacyFlatChat)return;cloudLegacyChecked=true;window.ExamProAICloud.readLegacyFlatChat().then(raw=>{if(!raw)return;let arr=[];try{arr=JSON.parse(raw)}catch(_){};arr=cleanMessages(arr);if(!arr.length)return;const duplicate=sessions.some(s=>s.id.indexOf('legacy_cloud_')===0||JSON.stringify(s.messages)===JSON.stringify(arr));if(duplicate){return window.ExamProAICloud.clearLegacyFlatChat&&window.ExamProAICloud.clearLegacyFlatChat()}const t=now();const s=normalizeSession({id:'legacy_cloud_'+t.toString(36),title:titleFromMessages(arr),createdAt:t,updatedAt:t,messages:arr});upsertLocal(s);return window.ExamProAICloud.saveSession(s).then(()=>window.ExamProAICloud.clearLegacyFlatChat&&window.ExamProAICloud.clearLegacyFlatChat())}).catch(()=>{});}
+  // Backward-compatible hook called by the old merged-progress sync layer.
+  window.ExamProAIChatCloudRefresh=function(){readLocal();ensureActive(false);render();renderHistory();connectCloud();};
+  function init(){if(!$('askme-mode-ai')||!$('exampro-ai-panel'))return;readLocal();migrateLegacyLocal();readLocal();ensureActive(false);render();renderHistory();$('askme-mode-ai').addEventListener('click',()=>setMode('ai'));$('askme-mode-smart').addEventListener('click',()=>setMode('smart'));$('exampro-ai-send').addEventListener('click',submit);$('exampro-ai-new').addEventListener('click',newChat);$('exampro-ai-history-btn').addEventListener('click',()=>setHistoryOpen(!historyOpen));$('exampro-ai-history-search').addEventListener('input',renderHistory);$('exampro-ai-history-deleteall').addEventListener('click',deleteAll);$('exampro-ai-input').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();submit()}});$('exampro-ai-input').addEventListener('input',e=>{e.target.style.height='auto';e.target.style.height=Math.min(e.target.scrollHeight,120)+'px'});document.querySelectorAll('[data-ai-question]').forEach(b=>b.addEventListener('click',()=>{const i=$('exampro-ai-input');if(i){i.value=b.dataset.aiQuestion||b.textContent;submit()}}));window.addEventListener('exampro-cloud-auth-changed',()=>{cloudLegacyChecked=false;connectCloud()});let preferred='ai';try{preferred=localStorage.getItem(MODE_KEY)||'ai'}catch(_){}setMode(preferred==='smart'?'smart':'ai',false);setTimeout(connectCloud,250);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
