@@ -20184,6 +20184,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeQuestionEditor
     const localTimes = readLocalTimes();
     let changedLocally = false;
     let localIsNewer = false;
+    let builtinOverridesChanged = false;
 
     applyingRemote = true;
     try{
@@ -20198,6 +20199,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeQuestionEditor
             rawSet(key, cloudRaw);
             localTimes[key] = cloudTs || Date.now();
             changedLocally = true;
+            if(key === BUILTIN_DECK_OVERRIDES_KEY && cloudRaw !== localRaw) builtinOverridesChanged = true;
           } else if(localRaw !== cloudRaw && localTs > cloudTs){
             localIsNewer = true;
           }
@@ -20207,6 +20209,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeQuestionEditor
             rawRemove(key);
             localTimes[key] = cloudTs;
             changedLocally = true;
+            if(key === BUILTIN_DECK_OVERRIDES_KEY) builtinOverridesChanged = true;
           } else if(localRaw !== null && localTs > cloudTs){
             localIsNewer = true;
           } else if(localRaw === null){
@@ -20223,7 +20226,16 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeQuestionEditor
       applyingRemote = false;
     }
 
-    if(changedLocally) refreshVisibleUI();
+    // BUILTIN_DECK_OVERRIDES_KEY drives which built-in decks are spliced out of
+    // SET_CONFIG at page load (see applyBuiltInDeckOverrides). refreshVisibleUI()
+    // re-renders from the in-memory SET_CONFIG, which was only built once at
+    // bootstrap — it won't pick up a hide/restore/edit that just arrived from
+    // another device. Reload so the deck catalog is rebuilt from the fresh value.
+    if(builtinOverridesChanged){
+      scheduleDeckReload();
+    } else if(changedLocally){
+      refreshVisibleUI();
+    }
     syncReady = true;
     setBadge('Synced', 'var(--teal)');
 
