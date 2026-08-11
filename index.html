@@ -5,6 +5,7 @@
   © 2026 Atitya Pritasari. All rights reserved.
   Original author: Atitya Pritasari — https://github.com/me-tya/pmp-prep
   AskME local knowledge search added from ANT-PMP-ExamPrepv2026-v8
+  AskME AI Chat mode added from Prakom2026 pattern (AI worker + local chat history)
 -->
 <html lang="id">
 <head>
@@ -1215,6 +1216,58 @@
 
 
 
+  /* ─── ASKME — GENERATIVE AI CHAT MODE (ported from Prakom2026 pattern) ─── */
+  .exampro-ai-panel{display:none;padding:13px 16px 16px;}
+  .askme-shell.exampro-ai-mode #askme-status,
+  .askme-shell.exampro-ai-mode #askme-progress,
+  .askme-shell.exampro-ai-mode #askme-smart-notice,
+  .askme-shell.exampro-ai-mode #askme-tools,
+  .askme-shell.exampro-ai-mode #askme-lock,
+  .askme-shell.exampro-ai-mode #askme-chat,
+  .askme-shell.exampro-ai-mode #askme-compose{display:none!important;}
+  .askme-shell.exampro-ai-mode .exampro-ai-panel{display:block;}
+  .exampro-ai-notice{margin:0 0 11px;padding:10px 12px;border:1px solid rgba(107,138,235,.32);background:rgba(107,138,235,.10);border-radius:10px;color:#D9E0F5;font-size:11.5px;line-height:1.55;}
+  .exampro-ai-notice strong{color:#AFC0FF;}
+  .exampro-ai-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+  .exampro-ai-suggestions{display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin;flex:1 1 650px;padding-bottom:3px;}
+  .exampro-ai-chip{flex:0 0 auto;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);border-radius:999px;padding:7px 10px;font:600 10.5px/1.2 'Inter',sans-serif;cursor:pointer;white-space:nowrap;transition:.15s;}
+  .exampro-ai-chip:hover{border-color:var(--periwinkle);background:rgba(107,138,235,.12);color:#C8D4FF;}
+  .exampro-ai-clear{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:7px 10px;font:600 10.5px/1.2 'Inter',sans-serif;cursor:pointer;white-space:nowrap;}
+  .exampro-ai-clear:hover{color:var(--coral);border-color:rgba(226,96,79,.45);}
+  .exampro-ai-chat{height:min(55vh,540px);min-height:350px;overflow-y:auto;padding:10px 2px 15px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth;}
+  .exampro-ai-msg{display:flex;gap:9px;align-items:flex-start;max-width:88%;}
+  .exampro-ai-msg.user{align-self:flex-end;flex-direction:row-reverse;}
+  .exampro-ai-avatar{width:29px;height:29px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:14px;border:1px solid var(--line);background:var(--navy-3);}
+  .exampro-ai-msg.bot .exampro-ai-avatar{background:rgba(107,138,235,.15);border-color:rgba(107,138,235,.38);}
+  .exampro-ai-bubble{border:1px solid var(--line);border-radius:15px;padding:11px 13px;font-size:13px;line-height:1.6;word-break:break-word;white-space:normal;}
+  .exampro-ai-msg.bot .exampro-ai-bubble{background:rgba(255,255,255,.055);border-top-left-radius:5px;color:var(--ink);}
+  .exampro-ai-msg.user .exampro-ai-bubble{background:var(--paper);color:#20243A;border-color:var(--paper-dim);border-top-right-radius:5px;}
+  .exampro-ai-answer-title{font:800 11px/1.2 'Space Mono',monospace;color:#AFC0FF;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;}
+  .exampro-ai-note{font-size:10.5px;color:var(--muted);margin-top:8px;line-height:1.45;border-top:1px dashed var(--line);padding-top:7px;}
+  .exampro-ai-thinking{display:inline-flex;gap:4px;align-items:center;min-width:42px;}
+  .exampro-ai-thinking span{width:6px;height:6px;border-radius:50%;background:#AFC0FF;animation:examproAiPulse 1s infinite ease-in-out;}
+  .exampro-ai-thinking span:nth-child(2){animation-delay:.14s}.exampro-ai-thinking span:nth-child(3){animation-delay:.28s}
+  @keyframes examproAiPulse{0%,70%,100%{opacity:.25;transform:translateY(0)}35%{opacity:1;transform:translateY(-3px)}}
+  .exampro-ai-compose{border-top:1px solid var(--line);padding-top:11px;}
+  .exampro-ai-inputbox{display:flex;align-items:flex-end;gap:8px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.055);padding:8px 8px 8px 12px;transition:.16s;}
+  .exampro-ai-inputbox:focus-within{border-color:rgba(107,138,235,.7);box-shadow:0 0 0 3px rgba(107,138,235,.09);}
+  .exampro-ai-input{flex:1;resize:none;max-height:120px;min-height:24px;background:transparent;border:none;outline:none;color:var(--paper);font:13px/1.5 'Inter',sans-serif;padding:4px 0;}
+  .exampro-ai-input::placeholder{color:var(--muted);}
+  .exampro-ai-send{width:38px;height:38px;display:flex;align-items:center;justify-content:center;border:none;border-radius:11px;background:var(--periwinkle);color:#0B1430;font-weight:900;cursor:pointer;font-size:16px;flex:0 0 auto;transition:.15s;}
+  .exampro-ai-send:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  .exampro-ai-send:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+  .exampro-ai-foot{font-size:9.8px;color:var(--muted);margin-top:7px;text-align:center;line-height:1.4;}
+  .exampro-ai-status{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(107,138,235,.35);background:rgba(107,138,235,.10);color:#C8D4FF;border-radius:999px;padding:5px 9px;font:600 9.5px/1.2 'Space Mono',monospace;white-space:nowrap;}
+  .exampro-ai-status.busy{color:#FFD38F;border-color:rgba(232,163,61,.38);background:rgba(232,163,61,.09);}
+  .exampro-ai-status.err{color:#FF9E91;border-color:rgba(226,96,79,.38);background:rgba(226,96,79,.09);}
+  @media(max-width:620px){
+    .exampro-ai-panel{padding:10px 10px 12px;}
+    .exampro-ai-chat{height:calc(100dvh - 430px);min-height:230px;max-height:430px;}
+    .exampro-ai-msg{max-width:96%;}
+    .exampro-ai-clear{display:none;}
+  }
+
+
 /* ===== Cheatsheet compact responsive columns — 2026-08-07 =====
    Goal: no horizontal table scrollbar; use available width for text-heavy columns. */
 #tab-cheatsheet .cs-table-scroll{
@@ -2002,8 +2055,8 @@
       <div class="askme-brand">
         <div class="askme-logo" aria-hidden="true">💬</div>
         <div>
-          <div class="askme-title">AskME <span style="font-family:Space Mono,monospace;font-size:10px;color:var(--teal);vertical-align:middle">v3.6</span></div>
-          <div class="askme-subtitle">Chatbot materi <b>ANT PMP Exam Preparation 2026-v8</b>. Smart Plus mencari, merangkum, dan menampilkan gambar halaman sumber langsung di browser dalam Bahasa Indonesia.</div>
+          <div class="askme-title">AskME <span style="font-family:Space Mono,monospace;font-size:10px;color:var(--teal);vertical-align:middle">v4.0</span></div>
+          <div class="askme-subtitle">Asisten belajar <b>PMP &amp; CAPM</b> dengan dua mode: AI Chat generatif untuk penjelasan bebas dan Smart Plus untuk jawaban berbasis materi ANT beserta halaman sumber.</div>
         </div>
       </div>
       <div class="askme-status" id="askme-status"><span class="askme-status-dot"></span><span id="askme-status-text">Menyiapkan materi…</span></div>
@@ -2013,10 +2066,36 @@
 
     <div class="askme-modebar" id="askme-modebar">
       <span class="askme-mode-label">Mode jawaban</span>
-      <button class="askme-mode-btn active" id="askme-mode-smart" type="button">⚡ Smart Plus</button>
-      <span class="askme-mode-info" id="askme-mode-info">Jawaban berbasis materi ANT, tanpa unduhan model dan tanpa API berbayar.</span>
+      <button class="askme-mode-btn" id="askme-mode-smart" type="button">⚡ Smart Plus</button>
+      <button class="askme-mode-btn active" id="askme-mode-ai" type="button">🤖 AI Chat</button>
+      <span class="askme-mode-info" id="askme-mode-info">AI generatif untuk menjelaskan, membandingkan, memberi contoh, dan menjawab pertanyaan lanjutan seputar PMP/CAPM.</span>
     </div>
-    <div class="askme-ai-notice"><strong>Smart Plus</strong> langsung siap, gratis, dan privat. AskME memahami singkatan, pertanyaan lanjutan, hubungan input-output, serta menampilkan halaman sumber. Setiap istilah baru memulai topik baru agar jawaban tidak tercampur percakapan sebelumnya. Analisis halaman menggunakan teks/OCR lokal; tidak ada unduhan model AI.</div>
+    <div class="askme-ai-notice" id="askme-smart-notice"><strong>Smart Plus</strong> langsung siap, gratis, dan privat. AskME memahami singkatan, pertanyaan lanjutan, hubungan input-output, serta menampilkan halaman sumber. Setiap istilah baru memulai topik baru agar jawaban tidak tercampur percakapan sebelumnya. Analisis halaman menggunakan teks/OCR lokal; tidak ada unduhan model AI.</div>
+
+    <div class="exampro-ai-panel" id="exampro-ai-panel">
+      <div class="exampro-ai-notice"><strong>AI Chat</strong> menggunakan AI generatif untuk menjelaskan konsep PMP/CAPM dengan bahasa bebas, membuat perbandingan, contoh situasional, mnemonic, dan membantu memahami alasan jawaban. Jawaban AI dapat melampaui materi ANT; untuk keputusan ujian, tetap prioritaskan sumber resmi PMI dan materi rujukanmu.</div>
+      <div class="exampro-ai-toolbar">
+        <div class="exampro-ai-suggestions" id="exampro-ai-suggestions">
+          <button class="exampro-ai-chip" type="button" data-ai-question="Jelaskan perbedaan risk appetite, risk threshold, dan risk tolerance dengan contoh proyek">Risk appetite vs threshold</button>
+          <button class="exampro-ai-chip" type="button" data-ai-question="Jelaskan perbedaan WPD, WPI, dan WPR dengan alur sederhana">WPD vs WPI vs WPR</button>
+          <button class="exampro-ai-chip" type="button" data-ai-question="Kapan memilih resource leveling dibanding resource smoothing pada soal PMP?">Leveling vs Smoothing</button>
+          <button class="exampro-ai-chip" type="button" data-ai-question="Buat mnemonic singkat untuk respons risiko ancaman dan peluang">Mnemonic respons risiko</button>
+          <button class="exampro-ai-chip" type="button" data-ai-question="Jelaskan bagaimana membedakan servant leadership dan directive leadership dalam soal situasional PMP">Servant vs directive</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+          <span class="exampro-ai-status" id="exampro-ai-status">● AI siap</span>
+          <button class="exampro-ai-clear" id="exampro-ai-clear" type="button">Hapus chat AI</button>
+        </div>
+      </div>
+      <div class="exampro-ai-chat" id="exampro-ai-chat" role="log" aria-live="polite" aria-label="Percakapan AskME AI"></div>
+      <div class="exampro-ai-compose">
+        <div class="exampro-ai-inputbox">
+          <textarea class="exampro-ai-input" id="exampro-ai-input" rows="1" placeholder="Tanyakan konsep PMP/CAPM, alasan jawaban, perbandingan, contoh, atau mnemonic…" aria-label="Pertanyaan untuk AskME AI"></textarea>
+          <button class="exampro-ai-send" id="exampro-ai-send" type="button" aria-label="Kirim ke AI" title="Kirim">➤</button>
+        </div>
+        <div class="exampro-ai-foot">Enter untuk mengirim · Shift+Enter untuk baris baru · Riwayat AI disimpan lokal di browser ini.</div>
+      </div>
+    </div>
 
     <div class="askme-tools" id="askme-tools">
       <div class="askme-chip-row" aria-label="Contoh pertanyaan AskME">
@@ -20512,6 +20591,101 @@ document.addEventListener('DOMContentLoaded',()=>{
 </script>
 
 <script src="data/askme/askme-v3.js?v=3.6.0"></script>
+<script>
+/* AskME AI Chat — isolated add-on; does not replace Smart Plus. */
+(function(){
+  'use strict';
+  const AI_WORKER_URL='https://pmp-askme-proxy.ristya-onlineshop.workers.dev';
+  const PMP_SUBJECT='PMI Project Management Professional (PMP) dan Certified Associate in Project Management (CAPM), termasuk PMBOK Guide, PMI Exam Content Outline, predictive/waterfall, agile/adaptive, hybrid, people, process, business environment, project performance domains, tailoring, models-methods-artifacts, risk, schedule, cost, quality, resource, stakeholder, communication, procurement, governance, change management, earned value, dan soal situasional ujian PMP/CAPM';
+  const CHAT_KEY='exampro_askme_ai_chat_v1';
+  const MODE_KEY='exampro_askme_mode_v1';
+  let messages=[], history=[], busy=false;
+
+  const $=id=>document.getElementById(id);
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const nl=s=>esc(s).replace(/\n/g,'<br>');
+
+  function setStatus(text,state){
+    const el=$('exampro-ai-status'); if(!el)return;
+    el.textContent=text; el.classList.remove('busy','err'); if(state)el.classList.add(state);
+  }
+  function load(){
+    try{const x=JSON.parse(localStorage.getItem(CHAT_KEY)||'[]');messages=Array.isArray(x)?x.slice(-40):[]}catch(_){messages=[]}
+  }
+  function save(){try{localStorage.setItem(CHAT_KEY,JSON.stringify(messages.slice(-40)))}catch(_){}}
+  function render(){
+    const box=$('exampro-ai-chat'); if(!box)return;
+    if(!messages.length){
+      box.innerHTML='<div class="exampro-ai-msg bot"><div class="exampro-ai-avatar">🤖</div><div class="exampro-ai-bubble"><div class="exampro-ai-answer-title">AskME AI</div>Tanyakan apa saja seputar PMP/CAPM. Saya bisa menjelaskan konsep, membandingkan pilihan, membuat contoh situasional, mnemonic, atau membantu memahami mengapa suatu opsi lebih tepat.<div class="exampro-ai-note">AI bersifat generatif. Gunakan Smart Plus bila kamu ingin jawaban yang ditambatkan langsung ke materi ANT dan halaman sumber.</div></div></div>';
+    } else {
+      box.innerHTML=messages.map(m=>{
+        if(m.pending)return '<div class="exampro-ai-msg bot"><div class="exampro-ai-avatar">🤖</div><div class="exampro-ai-bubble"><span class="exampro-ai-thinking"><span></span><span></span><span></span></span></div></div>';
+        const user=m.role==='user';
+        return '<div class="exampro-ai-msg '+(user?'user':'bot')+'"><div class="exampro-ai-avatar">'+(user?'👤':'🤖')+'</div><div class="exampro-ai-bubble">'+(user?nl(m.text):'<div class="exampro-ai-answer-title">Jawaban AI</div>'+nl(m.text)+'<div class="exampro-ai-note">Jawaban AI generatif (Llama 3.3 via Groq). Bisa melampaui materi ANT; cek kembali ke sumber resmi PMI bila ada perbedaan.</div>')+'</div></div>';
+      }).join('');
+    }
+    box.scrollTop=box.scrollHeight;
+  }
+  function clearChat(){
+    if(!confirm('Hapus semua riwayat AskME AI di perangkat ini?'))return;
+    messages=[];history=[];try{localStorage.removeItem(CHAT_KEY)}catch(_){};render();
+  }
+  async function askAI(q){
+    if(busy)return; busy=true; setStatus('● AI menjawab…','busy');
+    messages.push({role:'bot',pending:true}); save(); render();
+    const pendingIndex=messages.length-1;
+    try{
+      const res=await fetch(AI_WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,history:history.slice(-6),subject:PMP_SUBJECT})});
+      if(!res.ok){
+        let msg='Layanan AI sedang sibuk (kode '+res.status+').';
+        try{const j=await res.json();if(j&&j.error)msg=j.error}catch(_){}
+        throw new Error(msg);
+      }
+      const data=await res.json(); if(data&&data.error)throw new Error(data.error);
+      const answer=String((data&&data.answer)||'Maaf, AI tidak memberikan jawaban.').trim();
+      messages[pendingIndex]={role:'bot',text:answer};
+      history.push({role:'user',content:q}); history.push({role:'assistant',content:answer.slice(0,1800)});
+      setStatus('● AI siap','');
+    }catch(err){
+      messages[pendingIndex]={role:'bot',text:'Tidak dapat terhubung ke AI. '+String((err&&err.message)||err)+' Coba lagi atau gunakan Smart Plus yang bekerja dari basis materi lokal.'};
+      setStatus('● AI tidak terhubung','err');
+    }finally{busy=false;save();render();}
+  }
+  function submit(){
+    const input=$('exampro-ai-input'); if(!input||busy)return;
+    const q=String(input.value||'').trim(); if(!q)return;
+    input.value=''; input.style.height='auto';
+    messages.push({role:'user',text:q}); save(); render(); askAI(q);
+  }
+  function setMode(mode,persist=true){
+    const shell=document.querySelector('#tab-askme .askme-shell');
+    const smart=$('askme-mode-smart'), ai=$('askme-mode-ai'), info=$('askme-mode-info');
+    const isAI=mode==='ai';
+    if(shell)shell.classList.toggle('exampro-ai-mode',isAI);
+    if(smart)smart.classList.toggle('active',!isAI);
+    if(ai)ai.classList.toggle('active',isAI);
+    if(info)info.textContent=isAI
+      ?'AI generatif untuk menjelaskan, membandingkan, memberi contoh, dan menjawab pertanyaan lanjutan seputar PMP/CAPM.'
+      :'Jawaban berbasis materi ANT, tanpa unduhan model dan tanpa API berbayar.';
+    if(persist){try{localStorage.setItem(MODE_KEY,isAI?'ai':'smart')}catch(_){}}
+    if(isAI){render();setTimeout(()=>{const x=$('exampro-ai-input');if(x)x.focus()},0)}
+  }
+  function init(){
+    if(!$('askme-mode-ai')||!$('exampro-ai-panel'))return;
+    load();render();
+    $('askme-mode-ai').addEventListener('click',()=>setMode('ai'));
+    $('askme-mode-smart').addEventListener('click',()=>setMode('smart'));
+    $('exampro-ai-send').addEventListener('click',submit);
+    $('exampro-ai-clear').addEventListener('click',clearChat);
+    $('exampro-ai-input').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();submit()}});
+    $('exampro-ai-input').addEventListener('input',e=>{e.target.style.height='auto';e.target.style.height=Math.min(e.target.scrollHeight,120)+'px'});
+    document.querySelectorAll('[data-ai-question]').forEach(b=>b.addEventListener('click',()=>{const i=$('exampro-ai-input');if(i){i.value=b.dataset.aiQuestion||b.textContent;submit()}}));
+    let preferred='ai'; try{preferred=localStorage.getItem(MODE_KEY)||'ai'}catch(_){}
+    setMode(preferred==='smart'?'smart':'ai',false);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
 
 <footer style="text-align:center;padding:18px 12px 24px;font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);">
   © 2026 Atitya Pritasari. All rights reserved.
