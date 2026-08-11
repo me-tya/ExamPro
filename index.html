@@ -20336,6 +20336,31 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeQuestionEditor
     }
   };
 
+  function resetLocalDeckStateOnSignOut(){
+    // "Local" (logged-out) should always show the untouched, complete deck catalog —
+    // any account-specific customization (hidden/edited built-in decks, imported custom
+    // decks) only applies while signed into that account. Since everything here was
+    // already flushed to the cloud before sign-out, nothing is lost: it reappears
+    // automatically the next time this account signs back in (see applyCloudSnapshot /
+    // applyCloudDeckDoc, which pull cloud data down whenever the local copy is missing).
+    applyingRemote = true;
+    try{
+      rawRemove(BUILTIN_DECK_OVERRIDES_KEY);
+      safeParseArray(localStorage.getItem(CUSTOM_DECKS_KEY)).forEach(function(d){
+        if(d && d.id) rawRemove(CUSTOM_PROGRESS_PREFIX + d.id);
+      });
+      rawRemove(CUSTOM_DECKS_KEY);
+      rawRemove(DECK_TIMES_KEY);
+      rawRemove(DECK_HASH_KEY);
+      const times = readLocalTimes();
+      delete times[BUILTIN_DECK_OVERRIDES_KEY];
+      writeLocalTimes(times);
+    } finally {
+      applyingRemote = false;
+    }
+    scheduleDeckReload();
+  }
+
   function setupAuthListener(){
     auth.onAuthStateChanged(function(user){
       if(user){
@@ -20364,11 +20389,13 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeQuestionEditor
         startCustomDeckSync(user.uid);
         syncCustomDeckList();
       } else {
+        const wasSignedIn = !!currentUid;
         stopRealtimeSync();
         stopCustomDeckSync();
         currentUid = null;
         updateAccountUI(null);
         setBadge('Local', 'var(--muted)');
+        if(wasSignedIn) resetLocalDeckStateOnSignOut();
       }
     });
   }
