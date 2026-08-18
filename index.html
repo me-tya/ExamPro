@@ -13791,7 +13791,7 @@ function createPMPQuiz(cfg){
   <div class="score-strip" style="margin-bottom:5px;">
     <span class="pill">Answered: <b data-r="answered">0</b>/<span data-r="total">${GRADABLE_COUNT}</span></span>
     <span class="pill">✅ <span class="ok" data-r="correct">0</span></span>
-    <span class="pill">❌ <span class="no" data-r="wrong">0</span></span>
+    <span class="pill" data-r="wrong-pill" onclick="startGlobalRetry('${id}')" style="cursor:pointer;" title="Retake incorrect questions">❌ <span class="no" data-r="wrong">0</span></span>
     <span class="pill">🎯 Accuracy: <b data-r="pct-acc">—</b></span>
     <span class="pill">📈 Score: <b data-r="pct-prog">0%</b></span>
   </div>
