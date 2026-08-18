@@ -1841,7 +1841,7 @@
 <div class="dash-stat-row">
 <div class="dash-stat"><div class="dash-stat-num" id="dash-total-answered">0</div><div class="dash-stat-label">Questions Answered</div></div>
 <div class="dash-stat"><div class="dash-stat-num ok" id="dash-total-correct">0</div><div class="dash-stat-label">Correct</div></div>
-<div class="dash-stat clickable" id="dash-wrong-card" onclick="openRetryPicker(PMP_OVERVIEW_IDS.filter(id=>id!=='pmpsims'),'PMP')" title="Click to choose a deck and retry incorrect questions">
+<div class="dash-stat clickable" id="dash-wrong-card" onclick="openRetryPicker(PMP_OVERVIEW_IDS,'PMP')" title="Click to choose a deck and retry incorrect questions">
 <div class="dash-stat-num no" id="dash-total-wrong">0</div>
 <div class="dash-stat-label">Incorrect</div>
 <div class="dash-stat-hint" id="dash-wrong-hint">— click to retry</div>
@@ -14388,7 +14388,8 @@ const ID_LABELS=Object.fromEntries([PMP_SIMS_CONFIG,...SET_CONFIG].map(c=>[c.id,
 let rpPool=[];
 function openRetryPicker(poolIds,scopeLabel){
   SET_CONFIG.forEach(cfg=>{if(!quizInstances[cfg.id])quizInstances[cfg.id]=createPMPQuiz(cfg);});
-  rpPool=poolIds.filter(id=>id!=='pmpsims'&&quizInstances[id]);
+  if(poolIds.includes('pmpsims')&&!quizInstances['pmpsims'])quizInstances['pmpsims']=createPMPQuiz(PMP_SIMS_CONFIG);
+  rpPool=poolIds.filter(id=>quizInstances[id]);
   const sel=document.getElementById('rp-select');
   sel.innerHTML='';
   const totalWrong=rpPool.reduce((s,id)=>s+quizInstances[id].getWrongQuestions().length,0);
@@ -14421,9 +14422,10 @@ function confirmRetryPicker(){
 function startGlobalRetry(filterSetId){
   // Ensure all quiz instances are initialized before accessing stats
   SET_CONFIG.forEach(cfg=>{if(!quizInstances[cfg.id])quizInstances[cfg.id]=createPMPQuiz(cfg);});
+  if(!quizInstances['pmpsims'])quizInstances['pmpsims']=createPMPQuiz(PMP_SIMS_CONFIG);
   // filterSetId: optional — a single set id, an array of set ids, or omitted (defaults to all PMP sets)
   const allWrong=[];
-  const sids=Array.isArray(filterSetId)?filterSetId:(filterSetId?[filterSetId]:PMP_OVERVIEW_IDS.filter(sid=>sid!=='pmpsims'));
+  const sids=Array.isArray(filterSetId)?filterSetId:(filterSetId?[filterSetId]:PMP_OVERVIEW_IDS);
   sids.forEach(sid=>{
     const inst=quizInstances[sid];
     if(!inst)return;
@@ -14440,10 +14442,10 @@ function startGlobalRetry(filterSetId){
     hint:new Array(allWrong.length).fill(false),
   };
   const cnt=allWrong.length;
-  const sets=[...new Set(allWrong.map(x=>x.setId))].map(s=>s.replace('q','Q').replace('capm','CAPM ')).join(', ');
+  const sets=[...new Set(allWrong.map(x=>x.setId))].map(s=>ID_LABELS[s]||s.replace('q','Q').replace('capm','CAPM ')).join(', ');
   const isSingle=typeof filterSetId==='string';
   const headerLabel=isSingle
-    ?'🔁 Retry '+filterSetId.replace('q','Q')+' — '+cnt+' Incorrect'
+    ?'🔁 Retry '+(ID_LABELS[filterSetId]||filterSetId.replace('q','Q'))+' — '+cnt+' Incorrect'
     :'🔁 Cross-Set Retry — '+cnt+' Incorrect (from: '+sets+')';
   document.getElementById('gr-header').textContent=headerLabel;
   document.getElementById('gr-stat-total').textContent=cnt;
@@ -15130,7 +15132,7 @@ function refreshReview(){
       <div class="rv-cluster-stat-grid">
         <div class="rv-cluster-stat"><div class="rv-cluster-stat-num">${pmpStat.answered}</div><div class="rv-cluster-stat-label">Answered</div></div>
         <div class="rv-cluster-stat"><div class="rv-cluster-stat-num ok">${pmpStat.correct}</div><div class="rv-cluster-stat-label">Correct</div></div>
-        <div class="rv-cluster-stat" style="cursor:pointer;" onclick="openRetryPicker(PMP_OVERVIEW_IDS.filter(id=>id!=='pmpsims'),'PMP')" title="Click to choose a deck and retry incorrect questions"><div class="rv-cluster-stat-num no">${pmpStat.wrong}</div><div class="rv-cluster-stat-label">Still Incorrect</div></div>
+        <div class="rv-cluster-stat" style="cursor:pointer;" onclick="openRetryPicker(PMP_OVERVIEW_IDS,'PMP')" title="Click to choose a deck and retry incorrect questions"><div class="rv-cluster-stat-num no">${pmpStat.wrong}</div><div class="rv-cluster-stat-label">Still Incorrect</div></div>
         <div class="rv-cluster-stat"><div class="rv-cluster-stat-num" style="color:${COL(pmpStat.pct)}">${pmpStat.pct}%</div><div class="rv-cluster-stat-label">Accuracy</div></div>
       </div>
     </div>
