@@ -12480,7 +12480,7 @@ QDATA.andrew=[{"n":1,"q":"A company is developing a new mobile banking app with 
 QDATA.andrew.forEach(q=>{if(!q.hint)q.hint=generateImportedHint(q.q,q.exp,q.opts,q.ans);});
 // Auto-generate hints for the ANDREW deck the same way the RITA deck does.
 QDATA.andrew.forEach(q=>{if(!q.hint)q.hint=generateImportedHint(q.q,q.exp,q.opts,q.ans);});
-const PMP_SIMS_CONFIG={"id":"pmpsims","label":"Mock Exam","title":"Chapter 16 — Full Length Mock Exam","storageKey":"pmp_ch16_full_length_180","range":" / 180","footnote":"180 questions · 240 minutes recommended · includes case studies, multi-response, a burndown chart, and matching questions.","intro":"Chapter 16 — Full Length Mock Exam\nQuestions and Complete Answer Key\nSource: PMP Exam Prep Simplified, Andrew Ramdayal (2026)\n\nWell, here we are at the end. I hope you have learned a lot, and I hope you are ready for this exam. This mock exam is designed to simulate the actual PMP exam. Here is what you can expect.\n\nThe PMP exam has 180 questions, and you will have 240 minutes to complete it. You will see standard multiple-choice, multiple-response (choose two or more) matching, graphic-based, and case study questions. This mock exam includes all of these question types, so nothing will surprise you.\n\nEvery question comes from one of three domains: People, Process, and Business Environment. Study all three. Predictive, agile, and hybrid questions are mixed throughout the exam, so be prepared to switch your mindset from one question to the next.\n\nGive yourself two 10-minute breaks. Take your first break after the case study section. Take your second break after approximately the midpoint of the remaining questions. The breaks do not count against your 240 minutes. One important rule: once you begin a break, you cannot return to the previous section, so review your answers before starting the break, not afterward.\n\nTreat this mock exam like the real thing. Find a quiet place, set a timer for 240 minutes, and do not check your answers until you have finished. Never leave a question blank. There is no penalty for an incorrect answer, so make an educated guess. Remember the PMP Mindset: the correct answer is usually the one where the project manager is proactive, communicates effectively, engages stakeholders, and addresses the root cause.\n\nAfterward, read the explanation for every question, even the ones you answered correctly. The reasoning behind the answer is what you are really being tested on. If you struggle with a particular topic, review that chapter before exam day. PMI does not publish a fixed passing score. Instead, your performance is evaluated across the three domains, so aim to perform well in all of them.\n\nThis mock exam is also included in the eLearning course that accompanies this study guide. You can take it here in the book or complete it online through the eLearning course.\n\nYou have put in the work. Take a deep breath, trust your preparation, and begin when you are ready. Good luck..","disableRetry":true};
+const PMP_SIMS_CONFIG={"id":"pmpsims","label":"Mock Exam","title":"Chapter 16 — Full Length Mock Exam","storageKey":"pmp_ch16_full_length_180","range":" / 180","footnote":"180 questions · 240 minutes recommended · includes case studies, multi-response, a burndown chart, and matching questions.","intro":"Chapter 16 — Full Length Mock Exam\nQuestions and Complete Answer Key\nSource: PMP Exam Prep Simplified, Andrew Ramdayal (2026)\n\nWell, here we are at the end. I hope you have learned a lot, and I hope you are ready for this exam. This mock exam is designed to simulate the actual PMP exam. Here is what you can expect.\n\nThe PMP exam has 180 questions, and you will have 240 minutes to complete it. You will see standard multiple-choice, multiple-response (choose two or more) matching, graphic-based, and case study questions. This mock exam includes all of these question types, so nothing will surprise you.\n\nEvery question comes from one of three domains: People, Process, and Business Environment. Study all three. Predictive, agile, and hybrid questions are mixed throughout the exam, so be prepared to switch your mindset from one question to the next.\n\nGive yourself two 10-minute breaks. Take your first break after the case study section. Take your second break after approximately the midpoint of the remaining questions. The breaks do not count against your 240 minutes. One important rule: once you begin a break, you cannot return to the previous section, so review your answers before starting the break, not afterward.\n\nTreat this mock exam like the real thing. Find a quiet place, set a timer for 240 minutes, and do not check your answers until you have finished. Never leave a question blank. There is no penalty for an incorrect answer, so make an educated guess. Remember the PMP Mindset: the correct answer is usually the one where the project manager is proactive, communicates effectively, engages stakeholders, and addresses the root cause.\n\nAfterward, read the explanation for every question, even the ones you answered correctly. The reasoning behind the answer is what you are really being tested on. If you struggle with a particular topic, review that chapter before exam day. PMI does not publish a fixed passing score. Instead, your performance is evaluated across the three domains, so aim to perform well in all of them.\n\nThis mock exam is also included in the eLearning course that accompanies this study guide. You can take it here in the book or complete it online through the eLearning course.\n\nYou have put in the work. Take a deep breath, trust your preparation, and begin when you are ready. Good luck..","disableRetry":false};
 const SET_CONFIG=[
   {id:'q1',label:'PMP 1',  title:'PMP Topic Questions 1',storageKey:'pmp_q1_100',  range:' / 100',footnote:'Q#16 & Q#25 have special notes in the hint.'},
   {id:'q2',label:'PMP 2',title:'PMP Topic Questions 2',storageKey:'pmp_q101_200',range:' / 200',footnote:'All 100 questions are now gradable.'},
@@ -13702,7 +13702,19 @@ function switchExamView(view){
 
 const SUB_TO_GROUP={q1:'pmp',q2:'pmp',q3:'pmp',q4:'pmp',pmpmock16:'pmp',pmp6:'pmp',pmp7:'pmp',pmp8:'pmp',rita:'pmp',andrew:'pmp',pmpsims:'pmp',capm1:'capm',capm2:'capm',capm3:'capm',capm4:'capm'};
 const GROUP_SUBS={pmp:['q1','q2','q3','q4','pmpmock16','pmp6','pmp7','pmp8','rita','andrew','pmpsims'],capm:['capm1','capm2','capm3','capm4']};
-let activeSubTab={pmp:'q1',capm:'capm1'};
+const ACTIVE_SUBTAB_KEY='pmp_lastActiveSubTab';
+function loadActiveSubTab(){
+  const defaults={pmp:'q1',capm:'capm1'};
+  try{
+    const saved=JSON.parse(localStorage.getItem(ACTIVE_SUBTAB_KEY)||'null');
+    if(saved&&typeof saved==='object')return{...defaults,...saved};
+  }catch(e){}
+  return defaults;
+}
+function saveActiveSubTab(){
+  try{localStorage.setItem(ACTIVE_SUBTAB_KEY,JSON.stringify(activeSubTab));}catch(e){}
+}
+let activeSubTab=loadActiveSubTab();
 
 function switchTab(id){
   // Direct calls to a sub-id (e.g. switchTab('q2') from Overview cards / Review links)
@@ -13729,7 +13741,14 @@ function switchTab(id){
     initExamTab();
   } else if(id==='pmp'||id==='capm'){
     // Ensure the currently-selected sub-tab within this group is initialized & displayed
-    switchSubTab(id,activeSubTab[id]);
+    let wantSub=activeSubTab[id];
+    const info=typeof getDeckInfo==='function'?getDeckInfo(wantSub):null;
+    if(!info||info.deleted||info.group!==id){
+      wantSub=id==='capm'?'capm1':'q1';
+      activeSubTab[id]=wantSub;
+      saveActiveSubTab();
+    }
+    switchSubTab(id,wantSub);
   } else if(id==='cheatsheet'){
     setTimeout(updateCheatsheetStickyMetrics,0);
   }
@@ -13750,6 +13769,7 @@ function switchSubTab(group,subId){
   );
   if(btn)btn.classList.add('active');
   activeSubTab[group]=subId;
+  saveActiveSubTab();
   // Lazy-init quiz instance on first visit to this sub-tab
   if(!quizInstances[subId]){
     const cfg=subId==='pmpsims'?PMP_SIMS_CONFIG:SET_CONFIG.find(c=>c.id===subId);
