@@ -1841,7 +1841,7 @@
 <div class="dash-stat-row">
 <div class="dash-stat"><div class="dash-stat-num" id="dash-total-answered">0</div><div class="dash-stat-label">Questions Answered</div></div>
 <div class="dash-stat"><div class="dash-stat-num ok" id="dash-total-correct">0</div><div class="dash-stat-label">Correct</div></div>
-<div class="dash-stat clickable" id="dash-wrong-card" onclick="startGlobalRetry()" title="Click to retry incorrect questions">
+<div class="dash-stat clickable" id="dash-wrong-card" onclick="openRetryPicker(PMP_OVERVIEW_IDS.filter(id=>id!=='pmpsims'),'PMP')" title="Click to choose a deck and retry incorrect questions">
 <div class="dash-stat-num no" id="dash-total-wrong">0</div>
 <div class="dash-stat-label">Incorrect</div>
 <div class="dash-stat-hint" id="dash-wrong-hint">— click to retry</div>
@@ -1984,7 +1984,7 @@
 <div class="dash-stat-row">
 <div class="dash-stat"><div class="dash-stat-num" id="dash-capm-answered">0</div><div class="dash-stat-label">Questions Answered</div></div>
 <div class="dash-stat"><div class="dash-stat-num ok" id="dash-capm-correct">0</div><div class="dash-stat-label">Correct</div></div>
-<div class="dash-stat clickable" id="dash-capm-wrong-card" onclick="startGlobalRetry(['capm1','capm2','capm3','capm4'])" title="Click to retry incorrect questions">
+<div class="dash-stat clickable" id="dash-capm-wrong-card" onclick="openRetryPicker(CAPM_OVERVIEW_IDS,'CAPM')" title="Click to choose a deck and retry incorrect questions">
 <div class="dash-stat-num no" id="dash-capm-wrong">0</div>
 <div class="dash-stat-label">Incorrect</div>
 <div class="dash-stat-hint" id="dash-capm-wrong-hint">— click to retry</div>
@@ -14364,6 +14364,40 @@ function createPMPQuiz(cfg){
 // ─── GLOBAL RETRY ENGINE ──────────────────────────────────────────────────
 let gRetry=null;
 
+const ID_LABELS=Object.fromEntries([PMP_SIMS_CONFIG,...SET_CONFIG].map(c=>[c.id,c.label]));
+let rpPool=[];
+function openRetryPicker(poolIds,scopeLabel){
+  SET_CONFIG.forEach(cfg=>{if(!quizInstances[cfg.id])quizInstances[cfg.id]=createPMPQuiz(cfg);});
+  rpPool=poolIds.filter(id=>id!=='pmpsims'&&quizInstances[id]);
+  const sel=document.getElementById('rp-select');
+  sel.innerHTML='';
+  const totalWrong=rpPool.reduce((s,id)=>s+quizInstances[id].getWrongQuestions().length,0);
+  const allOpt=document.createElement('option');
+  allOpt.value='__all__';
+  allOpt.textContent='All '+scopeLabel+' decks ('+totalWrong+' incorrect)';
+  sel.appendChild(allOpt);
+  rpPool.forEach(id=>{
+    const wrongCount=quizInstances[id].getWrongQuestions().length;
+    const opt=document.createElement('option');
+    opt.value=id;
+    opt.textContent=(ID_LABELS[id]||id)+' ('+wrongCount+' incorrect)';
+    if(wrongCount===0)opt.disabled=true;
+    sel.appendChild(opt);
+  });
+  document.getElementById('rp-title').textContent='🔁 Retry Incorrect — '+scopeLabel;
+  document.getElementById('rp-empty-msg').style.display=totalWrong===0?'block':'none';
+  document.getElementById('rp-confirm-btn').style.display=totalWrong===0?'none':'block';
+  document.getElementById('rp-overlay').style.display='flex';
+}
+function closeRetryPicker(){
+  document.getElementById('rp-overlay').style.display='none';
+}
+function confirmRetryPicker(){
+  const val=document.getElementById('rp-select').value;
+  closeRetryPicker();
+  if(val==='__all__'){startGlobalRetry(rpPool);}
+  else{startGlobalRetry(val);}
+}
 function startGlobalRetry(filterSetId){
   // Ensure all quiz instances are initialized before accessing stats
   SET_CONFIG.forEach(cfg=>{if(!quizInstances[cfg.id])quizInstances[cfg.id]=createPMPQuiz(cfg);});
@@ -15076,7 +15110,7 @@ function refreshReview(){
       <div class="rv-cluster-stat-grid">
         <div class="rv-cluster-stat"><div class="rv-cluster-stat-num">${pmpStat.answered}</div><div class="rv-cluster-stat-label">Answered</div></div>
         <div class="rv-cluster-stat"><div class="rv-cluster-stat-num ok">${pmpStat.correct}</div><div class="rv-cluster-stat-label">Correct</div></div>
-        <div class="rv-cluster-stat"><div class="rv-cluster-stat-num no">${pmpStat.wrong}</div><div class="rv-cluster-stat-label">Still Incorrect</div></div>
+        <div class="rv-cluster-stat" style="cursor:pointer;" onclick="openRetryPicker(PMP_OVERVIEW_IDS.filter(id=>id!=='pmpsims'),'PMP')" title="Click to choose a deck and retry incorrect questions"><div class="rv-cluster-stat-num no">${pmpStat.wrong}</div><div class="rv-cluster-stat-label">Still Incorrect</div></div>
         <div class="rv-cluster-stat"><div class="rv-cluster-stat-num" style="color:${COL(pmpStat.pct)}">${pmpStat.pct}%</div><div class="rv-cluster-stat-label">Accuracy</div></div>
       </div>
     </div>
@@ -15085,7 +15119,7 @@ function refreshReview(){
       <div class="rv-cluster-stat-grid">
         <div class="rv-cluster-stat"><div class="rv-cluster-stat-num">${capmStat.answered}</div><div class="rv-cluster-stat-label">Answered</div></div>
         <div class="rv-cluster-stat"><div class="rv-cluster-stat-num ok">${capmStat.correct}</div><div class="rv-cluster-stat-label">Correct</div></div>
-        <div class="rv-cluster-stat"><div class="rv-cluster-stat-num no">${capmStat.wrong}</div><div class="rv-cluster-stat-label">Still Incorrect</div></div>
+        <div class="rv-cluster-stat" style="cursor:pointer;" onclick="openRetryPicker(CAPM_OVERVIEW_IDS,'CAPM')" title="Click to choose a deck and retry incorrect questions"><div class="rv-cluster-stat-num no">${capmStat.wrong}</div><div class="rv-cluster-stat-label">Still Incorrect</div></div>
         <div class="rv-cluster-stat"><div class="rv-cluster-stat-num" style="color:${COL(capmStat.pct)}">${capmStat.pct}%</div><div class="rv-cluster-stat-label">Accuracy</div></div>
       </div>
     </div>
@@ -20900,5 +20934,17 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 
 <!-- BUILD: RITA_PMI_DECK_MANAGER_INTEGRATED_2026-08-08 -->
+<div id="rp-overlay" style="display:none;position:fixed;inset:0;background:rgba(8,12,28,.72);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--navy-2);border:1px solid var(--line);border-radius:var(--radius);padding:24px;max-width:440px;width:100%;box-shadow:0 24px 70px rgba(0,0,0,.55);">
+    <div id="rp-title" style="font-family:'Space Mono',monospace;font-size:14.5px;font-weight:700;color:var(--paper);margin-bottom:16px;">🔁 Retry Incorrect</div>
+    <label style="display:block;font-size:12px;color:var(--muted);margin-bottom:7px;">Choose which deck to retry:</label>
+    <select id="rp-select" style="width:100%;padding:11px 12px;border-radius:9px;border:1px solid var(--line);background:var(--navy);color:var(--ink);font-family:'Inter';font-size:13.5px;margin-bottom:10px;"></select>
+    <p id="rp-empty-msg" style="display:none;color:var(--teal);font-family:'Space Mono',monospace;font-size:12px;font-weight:700;margin:6px 0 16px;">✅ No incorrect questions in this scope. Great job!</p>
+    <div style="display:flex;gap:10px;margin-top:12px;">
+      <button onclick="closeRetryPicker()" style="flex:1;padding:12px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--muted);font-weight:700;font-family:'Inter';cursor:pointer;">Cancel</button>
+      <button id="rp-confirm-btn" onclick="confirmRetryPicker()" style="flex:1;padding:12px;border-radius:10px;border:none;background:var(--teal);color:#0f1e16;font-weight:700;font-family:'Inter';cursor:pointer;">🔁 Start Retry</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
