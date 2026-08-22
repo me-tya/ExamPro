@@ -81,7 +81,11 @@
   .score-strip b{color:var(--amber);}
   .ok{color:var(--teal);font-weight:700;} .warn{color:var(--warn);font-weight:700;} .no{color:var(--coral);font-weight:700;}
   .saved-pill{background:rgba(63,182,138,.15);border:1px solid rgba(63,182,138,.35);border-radius:999px;padding:5px 11px;color:var(--teal);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.04em;}
-  .retry-mode-bar{display:none;margin-top:5px;background:rgba(63,182,138,.12);border:1px solid rgba(63,182,138,.3);border-radius:999px;padding:5px 14px;font-family:'Space Mono',monospace;font-size:11px;color:var(--teal);text-align:center;}
+  .retry-mode-bar{display:none;margin-top:5px;background:rgba(63,182,138,.12);border:1px solid rgba(63,182,138,.3);border-radius:999px;padding:5px 7px 5px 14px;font-family:'Space Mono',monospace;font-size:11px;color:var(--teal);align-items:center;justify-content:space-between;gap:10px;}
+  .retry-mode-label{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .retry-exit-btn{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;gap:5px;background:rgba(226,96,79,.10);color:var(--coral);border:1px solid rgba(226,96,79,.38);border-radius:999px;padding:4px 10px;font-family:'Inter',sans-serif;font-size:10.5px;font-weight:700;cursor:pointer;transition:all .15s;}
+  .retry-exit-btn:hover{background:rgba(226,96,79,.22);border-color:var(--coral);}
+  @media(max-width:420px){.retry-mode-bar{padding-left:10px;gap:6px}.retry-mode-label{font-size:10px}.retry-exit-btn{padding:4px 8px;font-size:10px;}}
   .card{background:var(--paper);color:#20243A;border-radius:var(--radius);padding:22px 20px 18px;box-shadow:0 18px 40px -18px rgba(0,0,0,.55);margin-top:12px;}
   .tear{height:0;border-top:2px dashed var(--paper-dim);margin:0 -20px 15px;position:relative;}
   .tear::before,.tear::after{content:"";position:absolute;top:-7px;width:14px;height:14px;background:var(--navy);border-radius:50%;}
@@ -13822,7 +13826,7 @@ function createPMPQuiz(cfg){
   <div class="score-strip pmp-utility-strip"><span class="saved-pill" data-r="saved-banner">💾 No progress yet</span>
     ${showPmpSearch?'<button class="pmp-search-trigger" type="button" data-pmp-search-open-btn="1" aria-haspopup="dialog" title="Search Questions (Ctrl/Cmd + K)">🔎 <span class="pmp-search-trigger-long">Search Questions</span><span class="pmp-search-trigger-short" style="display:none;">Search</span></button>':''}
     <button class="tab-reset-btn" data-r="tab-reset-btn">🔄 Reset Set</button></div>
-  <div class="retry-mode-bar" data-r="retry-bar"></div>
+  <div class="retry-mode-bar" data-r="retry-bar"><span class="retry-mode-label" data-r="retry-label"></span><button class="retry-exit-btn" data-r="retry-exit" type="button" title="Exit Retry Mode and return to this deck">✕ Exit Retry</button></div>
   <div class="card" data-r="quiz-card">
     <div class="tear"></div>
     <div class="q-meta">
@@ -13862,7 +13866,7 @@ function createPMPQuiz(cfg){
   const E={
     ticket:$('ticket'),answered:$('answered'),correct:$('correct'),wrong:$('wrong'),wrongPill:$('wrong-pill'),
     pctAcc:$('pct-acc'),pctProg:$('pct-prog'),total:$('total'),
-    savedBnr:$('saved-banner'),retryBar:$('retry-bar'),
+    savedBnr:$('saved-banner'),retryBar:$('retry-bar'),retryLabel:$('retry-label'),retryExit:$('retry-exit'),
     card:$('quiz-card'),qMeta:$('q-meta'),multiTag:$('multi-tag'),infoTag:$('info-tag'),
     caseWrap:$('case-wrap'),caseTitle:$('case-title'),caseText:$('case-text'),
     qText:$('q-text'),questionImageWrap:$('question-image-wrap'),questionImage:$('question-image'),optsWrap:$('opts-wrap'),infoWrap:$('info-card-wrap'),
@@ -13874,6 +13878,7 @@ function createPMPQuiz(cfg){
   E.hintBtn.onclick=toggleHint; E.prevBtn.onclick=goPrev; E.nextBtn.onclick=goNext;
   E.checkBtn.onclick=checkStructuredAnswer;
   if(E.wrongPill) E.wrongPill.onclick=()=>startRetry();
+  if(E.retryExit) E.retryExit.onclick=()=>exitRetry();
   if(E.tabResetBtn) E.tabResetBtn.onclick=()=>confirmReset();
 
   function pad(n){return String(n).padStart(3,'0');}
@@ -14152,8 +14157,8 @@ function createPMPQuiz(cfg){
   }
   function render(){
     const q=QUESTIONS[current];
-    if(E.retryBar)E.retryBar.style.display=isRetryMode?'block':'none';
-    if(isRetryMode)E.retryBar.textContent='🔁 RETRY MODE · Question '+(current+1)+'/'+QUESTIONS.length;
+    if(E.retryBar)E.retryBar.style.display=isRetryMode?'flex':'none';
+    if(isRetryMode&&E.retryLabel)E.retryLabel.textContent='🔁 RETRY MODE · Question '+(current+1)+'/'+QUESTIONS.length;
     if(E.ticket)E.ticket.textContent=pad(q.n)+range;if(E.qMeta)E.qMeta.textContent='Question #'+q.n;
     if(E.multiTag)E.multiTag.style.display=(q.multi||q.matching)?'inline-block':'none';
     if(q.multi)E.multiTag.textContent='SELECT '+(q.pick===2?'TWO':'THREE')+' ANSWERS';
@@ -14268,7 +14273,14 @@ function createPMPQuiz(cfg){
       const tagged=Object.assign({},q);tagged._bankIdx=bankIndex;return tagged;
     });
     if(wrongQs.length===0){alert('No incorrect questions! 🎉');return;}
-    if(!isRetryMode)savedMainState={userAnswers:userAnswers.slice(),userChecked:userChecked.slice(),userToggles:userToggles.map(a=>[...a]),current};
+    if(!isRetryMode)savedMainState={
+      userAnswers:userAnswers.slice(),
+      userChecked:userChecked.slice(),
+      userToggles:userToggles.map(a=>[...a]),
+      infoViewed:infoViewed.slice(),
+      current,
+      wasSummary:!!(E.summary&&E.summary.classList.contains('show'))
+    };
     QUESTIONS=wrongQs;
     userAnswers=new Array(wrongQs.length).fill(null);userChecked=new Array(wrongQs.length).fill(false);
     userToggles=new Array(wrongQs.length).fill(null).map(()=>[]);
@@ -14277,6 +14289,37 @@ function createPMPQuiz(cfg){
     if(E.summary)E.summary.classList.remove('show');if(E.card)E.card.style.display='block';
     buildJumpGrid();updateStats();render();
   }
+  function exitRetry(){
+    if(!isRetryMode)return;
+    // Retry answers are already written to retryOverrides as the user answers.
+    // Persist them, then restore the untouched main-deck state and the view the user came from.
+    savePerSetRetryProgress();
+    const returnToSummary=!!(savedMainState&&savedMainState.wasSummary);
+    QUESTIONS=QUESTIONS_BANK;
+    if(savedMainState){
+      userAnswers=savedMainState.userAnswers;
+      userChecked=savedMainState.userChecked;
+      userToggles=savedMainState.userToggles;
+      infoViewed=savedMainState.infoViewed||new Array(QUESTIONS.length).fill(false);
+      current=Math.max(0,Math.min(QUESTIONS.length-1,savedMainState.current||0));
+    }
+    savedMainState=null;
+    isRetryMode=false;
+    hintShown=new Array(QUESTIONS.length).fill(false);
+    buildJumpGrid();
+    updateStats();
+    refreshSavedBanner();
+    if(E.retryBar)E.retryBar.style.display='none';
+    if(returnToSummary){
+      showSummary();
+    }else{
+      if(E.summary)E.summary.classList.remove('show');
+      if(E.card)E.card.style.display='block';
+      render();
+    }
+    if(typeof refreshDashboard==='function')refreshDashboard();
+  }
+
   function backToMainSummary(){
     if(savedMainState){
       try{localStorage.setItem(storageKey,JSON.stringify({
@@ -14286,9 +14329,9 @@ function createPMPQuiz(cfg){
       }));}catch(e){}
     }
     QUESTIONS=QUESTIONS_BANK;
-    if(savedMainState){userAnswers=savedMainState.userAnswers;userChecked=savedMainState.userChecked;userToggles=savedMainState.userToggles;current=savedMainState.current;}
+    if(savedMainState){userAnswers=savedMainState.userAnswers;userChecked=savedMainState.userChecked;userToggles=savedMainState.userToggles;infoViewed=savedMainState.infoViewed||new Array(QUESTIONS.length).fill(false);current=savedMainState.current;}
     savedMainState=null;
-    hintShown=new Array(QUESTIONS.length).fill(false);infoViewed=new Array(QUESTIONS.length).fill(false);
+    hintShown=new Array(QUESTIONS.length).fill(false);
     isRetryMode=false;buildJumpGrid();updateStats();refreshSavedBanner();showSummary();
   }
   function confirmReset(){
