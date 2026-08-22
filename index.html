@@ -74,6 +74,10 @@
   .q-ticket .value{font-size:21px;color:var(--paper);font-weight:700;}
   .score-strip{display:flex;gap:7px;flex-wrap:wrap;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--muted);margin-bottom:5px;}
   .score-strip .pill{background:var(--navy-3);border:1px solid var(--line);border-radius:999px;padding:5px 11px;color:var(--ink);}
+  .score-strip .retry-incorrect-pill{font:inherit;line-height:inherit;cursor:pointer;transition:background .15s,border-color .15s,transform .1s;}
+  .score-strip .retry-incorrect-pill:hover:not(:disabled),.score-strip .retry-incorrect-pill:focus-visible{background:rgba(226,96,79,.12);border-color:rgba(226,96,79,.7);outline:none;}
+  .score-strip .retry-incorrect-pill:active:not(:disabled){transform:translateY(1px);}
+  .score-strip .retry-incorrect-pill:disabled{cursor:default;opacity:.72;}
   .score-strip b{color:var(--amber);}
   .ok{color:var(--teal);font-weight:700;} .warn{color:var(--warn);font-weight:700;} .no{color:var(--coral);font-weight:700;}
   .saved-pill{background:rgba(63,182,138,.15);border:1px solid rgba(63,182,138,.35);border-radius:999px;padding:5px 11px;color:var(--teal);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.04em;}
@@ -13811,7 +13815,7 @@ function createPMPQuiz(cfg){
   <div class="score-strip" style="margin-bottom:5px;">
     <span class="pill">Answered: <b data-r="answered">0</b>/<span data-r="total">${GRADABLE_COUNT}</span></span>
     <span class="pill">✅ <span class="ok" data-r="correct">0</span></span>
-    <span class="pill" data-r="wrong-pill" onclick="switchTab('overview');startGlobalRetry('${id}')" style="cursor:pointer;" title="Retake incorrect questions">❌ <span class="no" data-r="wrong">0</span></span>
+    <button class="pill retry-incorrect-pill" data-r="wrong-pill" type="button" title="Retry incorrect questions in this deck">❌ <span class="no" data-r="wrong">0</span></button>
     <span class="pill">🎯 Accuracy: <b data-r="pct-acc">—</b></span>
     <span class="pill">📈 Score: <b data-r="pct-prog">0%</b></span>
   </div>
@@ -13856,7 +13860,7 @@ function createPMPQuiz(cfg){
 
   const $=r=>wrap.querySelector(`[data-r="${r}"]`);
   const E={
-    ticket:$('ticket'),answered:$('answered'),correct:$('correct'),wrong:$('wrong'),
+    ticket:$('ticket'),answered:$('answered'),correct:$('correct'),wrong:$('wrong'),wrongPill:$('wrong-pill'),
     pctAcc:$('pct-acc'),pctProg:$('pct-prog'),total:$('total'),
     savedBnr:$('saved-banner'),retryBar:$('retry-bar'),
     card:$('quiz-card'),qMeta:$('q-meta'),multiTag:$('multi-tag'),infoTag:$('info-tag'),
@@ -13869,6 +13873,7 @@ function createPMPQuiz(cfg){
   };
   E.hintBtn.onclick=toggleHint; E.prevBtn.onclick=goPrev; E.nextBtn.onclick=goNext;
   E.checkBtn.onclick=checkStructuredAnswer;
+  if(E.wrongPill) E.wrongPill.onclick=()=>startRetry();
   if(E.tabResetBtn) E.tabResetBtn.onclick=()=>confirmReset();
 
   function pad(n){return String(n).padStart(3,'0');}
@@ -13978,10 +13983,18 @@ function createPMPQuiz(cfg){
     let answered=0,correct=0,wrong=0;
     QUESTIONS.forEach((_,i)=>{if(QUESTIONS[i].info)return;
       if(isAnsweredIdx(i)){answered++;if(isCorrectIdx(i))correct++;else wrong++;}});
-    if(E.answered)E.answered.textContent=answered; if(E.correct)E.correct.textContent=correct; if(E.wrong)E.wrong.textContent=wrong;
+    const gradable=isRetryMode?QUESTIONS.filter(q=>!q.info).length:GRADABLE_COUNT;
+    if(E.answered)E.answered.textContent=answered;
+    if(E.correct)E.correct.textContent=correct;
+    if(E.wrong)E.wrong.textContent=wrong;
+    if(E.total)E.total.textContent=gradable;
+    if(E.wrongPill){
+      const canRetry=!disableRetry&&wrong>0;
+      E.wrongPill.disabled=!canRetry;
+      E.wrongPill.title=canRetry?'Retry '+wrong+' incorrect question'+(wrong===1?'':'s')+' in this deck':'No incorrect questions to retry';
+    }
     const pctAcc=answered>0?Math.round(correct/answered*100):null;
-    const gradable=isRetryMode?QUESTIONS_BANK.filter(q=>!q.info).length:GRADABLE_COUNT;
-    const pctProg=Math.round(correct/gradable*100);
+    const pctProg=gradable>0?Math.round(correct/gradable*100):0;
     if(E.pctAcc)E.pctAcc.textContent=pctAcc!==null?pctAcc+'%':'—';
     if(E.pctProg)E.pctProg.textContent=pctProg+'%';
     E.pctAcc.className=pctAcc===null?'':pctAcc>=70?'ok':pctAcc>=50?'warn':'no';
@@ -14249,13 +14262,11 @@ function createPMPQuiz(cfg){
     }));}catch(e){}
   }
   function startRetry(){
-    const sAs=savedMainState?savedMainState.userAnswers:userAnswers;
-    const sCs=savedMainState?savedMainState.userChecked:userChecked;
-    const wrongQs=QUESTIONS_BANK.map((q,bankIdx)=>{
-      if(q.info||!sAs[bankIdx])return null;
-      if(_chkAns(q,sAs[bankIdx],Array.isArray(sCs)?sCs[bankIdx]:false))return null;
-      const tagged=Object.assign({},q);tagged._bankIdx=bankIdx;return tagged;
-    }).filter(q=>q!==null);
+    if(disableRetry)return;
+    // Use effective results, so questions already corrected by a previous retry are not queued again.
+    const wrongQs=getWrongQuestions().map(({question:q,bankIndex})=>{
+      const tagged=Object.assign({},q);tagged._bankIdx=bankIndex;return tagged;
+    });
     if(wrongQs.length===0){alert('No incorrect questions! 🎉');return;}
     if(!isRetryMode)savedMainState={userAnswers:userAnswers.slice(),userChecked:userChecked.slice(),userToggles:userToggles.map(a=>[...a]),current};
     QUESTIONS=wrongQs;
@@ -14371,8 +14382,8 @@ function createPMPQuiz(cfg){
     render();
   }
 
-  // Redirect per-set retry to Global Retry panel in Overview (same mechanism)
-  window['__RETRY_'+id]=()=>{if(disableRetry)return;switchTab('overview');startGlobalRetry(id);};
+  // Per-deck retry stays in the deck where the user clicked Incorrect/Retry.
+  window['__RETRY_'+id]=()=>{if(disableRetry)return;startRetry();};
   window['__BACK_'+id]=backToMainSummary;
   window['__EXPORT_'+id]=exportCSV;
   window['__RESET_'+id]=confirmReset;
