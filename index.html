@@ -361,6 +361,14 @@
 
   /* ─── REVIEW: SARAN PERBAIKAN (repeatedly incorrect questions) ─── */
   .rv-repair-wrap{margin-top:14px;}
+  .rv-repair-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;background:none;border:0;border-bottom:1px solid var(--line);padding:0 0 7px;margin-bottom:10px;color:inherit;cursor:pointer;text-align:left;}
+  .rv-repair-toggle:hover .rv-repair-toggle-title{color:var(--paper);}
+  .rv-repair-toggle-title{font-family:'Space Mono',monospace;font-size:11px;color:var(--amber);letter-spacing:.14em;text-transform:uppercase;transition:color .15s;}
+  .rv-repair-toggle-meta{display:flex;align-items:center;gap:7px;flex:0 0 auto;}
+  .rv-repair-toggle-count{font-family:'Space Mono',monospace;font-size:9.5px;color:var(--coral);background:rgba(226,96,79,.12);border:1px solid rgba(226,96,79,.3);border-radius:999px;padding:3px 7px;white-space:nowrap;}
+  .rv-repair-toggle-icon{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);width:14px;text-align:center;}
+  .rv-repair-body{display:none;}
+  .rv-repair-body.open{display:block;}
   .rv-repair-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:9px;padding:10px 12px;background:rgba(226,96,79,.08);border:1px solid rgba(226,96,79,.28);border-radius:10px;}
   .rv-repair-summary strong{color:var(--paper);font-size:13px;}
   .rv-repair-summary span{font-size:11px;color:var(--muted);}
@@ -15336,9 +15344,30 @@ function rvRenderRepeatedWrongAdvice(sid,analysis){
         <div class="rv-repair-action"><button class="rv-repair-open" type="button" onclick="openReviewQuestion('${String(sid).replace(/'/g,"\\'")}',${x.bankIndex})">Buka soal →</button></div>
       </div>`;
     }).join('');
-  return `<div class="rv-section rv-repair-wrap"><div class="rv-title">🛠️ Saran Perbaikan</div>
-    <div class="rv-repair-summary"><strong>${repeated.length} soal perlu perhatian khusus</strong><span>Muncul ketika satu soal sudah salah minimal 2×, termasuk setelah retake. Riwayat tetap ditampilkan walau kemudian berhasil dikoreksi.</span></div>
-    ${cards}</div>`;
+  const repairOpen=rvRepairOpenState[sid]===true;
+  const safeSid=String(sid).replace(/'/g,"\\'");
+  return `<div class="rv-section rv-repair-wrap">
+    <button class="rv-repair-toggle" type="button" onclick="toggleRepairAdvice('${safeSid}')" aria-expanded="${repairOpen?'true':'false'}" aria-controls="rv-repair-body-${rvEscape(sid)}">
+      <span class="rv-repair-toggle-title">🛠️ Saran Perbaikan</span>
+      <span class="rv-repair-toggle-meta"><span class="rv-repair-toggle-count">${repeated.length} soal</span><span class="rv-repair-toggle-icon" id="rv-repair-icon-${rvEscape(sid)}">${repairOpen?'▲':'▼'}</span></span>
+    </button>
+    <div class="rv-repair-body${repairOpen?' open':''}" id="rv-repair-body-${rvEscape(sid)}">
+      <div class="rv-repair-summary"><strong>${repeated.length} soal perlu perhatian khusus</strong><span>Muncul ketika satu soal sudah salah minimal 2×, termasuk setelah retake. Riwayat tetap ditampilkan walau kemudian berhasil dikoreksi.</span></div>
+      ${cards}
+    </div>
+  </div>`;
+}
+const rvRepairOpenState={};
+function toggleRepairAdvice(sid){
+  const body=document.getElementById('rv-repair-body-'+sid);
+  const icon=document.getElementById('rv-repair-icon-'+sid);
+  if(!body)return;
+  const open=!body.classList.contains('open');
+  body.classList.toggle('open',open);
+  rvRepairOpenState[sid]=open;
+  if(icon)icon.textContent=open?'▲':'▼';
+  const btn=body.previousElementSibling;
+  if(btn&&btn.classList.contains('rv-repair-toggle'))btn.setAttribute('aria-expanded',open?'true':'false');
 }
 function openReviewQuestion(sid,bankIndex){
   const cfg=sid==='pmpsims'?PMP_SIMS_CONFIG:SET_CONFIG.find(c=>c.id===sid);
