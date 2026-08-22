@@ -359,6 +359,34 @@
   .rv-cluster-stat-num{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;}
   .rv-cluster-stat-label{font-size:9.5px;color:var(--muted);margin-top:2px;letter-spacing:.02em;}
 
+  /* ─── REVIEW: SARAN PERBAIKAN (repeatedly incorrect questions) ─── */
+  .rv-repair-wrap{margin-top:14px;}
+  .rv-repair-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:9px;padding:10px 12px;background:rgba(226,96,79,.08);border:1px solid rgba(226,96,79,.28);border-radius:10px;}
+  .rv-repair-summary strong{color:var(--paper);font-size:13px;}
+  .rv-repair-summary span{font-size:11px;color:var(--muted);}
+  .rv-repair-card{background:var(--paper);color:#20243A;border:1px solid #E2D6B5;border-left:5px solid var(--coral);border-radius:11px;padding:14px 15px;margin-bottom:10px;box-shadow:0 8px 20px -18px rgba(0,0,0,.55);}
+  .rv-repair-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:9px;}
+  .rv-repair-qno{font-family:'Space Mono',monospace;font-size:10.5px;color:#8B6B2F;letter-spacing:.06em;text-transform:uppercase;}
+  .rv-repair-badges{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;}
+  .rv-repair-badge{display:inline-flex;align-items:center;border-radius:999px;padding:3px 8px;font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;white-space:nowrap;}
+  .rv-repair-badge.repeat{background:#FCEAE7;color:#B6402F;border:1px solid #E8B4AC;}
+  .rv-repair-badge.fixed{background:#E9F8F1;color:#1E7A55;border:1px solid #B7E1CF;}
+  .rv-repair-badge.still{background:#FFF1D8;color:#8B5C08;border:1px solid #E8C985;}
+  .rv-repair-question{font-family:'Source Serif 4',serif;font-size:14.5px;line-height:1.55;color:#1B1F33;white-space:pre-line;margin-bottom:10px;}
+  .rv-repair-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px;}
+  .rv-repair-box{background:#FFFCF3;border:1px solid #DDD3B7;border-radius:8px;padding:9px 10px;min-width:0;}
+  .rv-repair-box.wrong{background:#FFF3F0;border-color:#E9C2BB;}
+  .rv-repair-box.correct{background:#F0F9F4;border-color:#BFDCCF;}
+  .rv-repair-label{font-family:'Space Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;color:#6E6246;margin-bottom:5px;}
+  .rv-repair-answer{font-size:12px;line-height:1.5;color:#262A3D;word-break:break-word;}
+  .rv-repair-reason{font-size:12.5px;line-height:1.55;background:#F4F0E5;border-radius:8px;padding:9px 10px;margin-bottom:8px;color:#303447;}
+  .rv-repair-reason b{color:#6B4C11;}
+  .rv-repair-keywords{font-size:11.5px;line-height:1.45;color:#4A5068;padding:8px 10px;background:#EEF2FA;border-left:3px solid #6B8AEB;border-radius:0 7px 7px 0;margin-bottom:9px;}
+  .rv-repair-action{display:flex;justify-content:flex-end;}
+  .rv-repair-open{border:1px solid #B8AA86;background:#FFF8E8;color:#5B4A24;border-radius:999px;padding:6px 10px;font-family:'Inter';font-size:11px;font-weight:700;cursor:pointer;}
+  .rv-repair-open:hover{background:#F5ECD6;border-color:#8B6B2F;}
+  @media(max-width:560px){.rv-repair-grid{grid-template-columns:1fr;}.rv-repair-head{flex-direction:column;}.rv-repair-badges{justify-content:flex-start;}}
+
 
   /* ─── CHEATSHEET ─── */
   .cs-jump{background:var(--navy-3);color:var(--amber);border:1px solid rgba(232,163,61,.3);cursor:pointer;
@@ -13803,6 +13831,7 @@ function createPMPQuiz(cfg){
   let hintShown=new Array(questions.length).fill(false);
   let infoViewed=new Array(questions.length).fill(false);
   let retryOverrides={};  // {bankIndex:{ans,chk}} — global retry answers, separate from bank state
+  let attemptHistory={}; // {bankIndex:[{ans,chk,correct,mode,at}]} — preserves repeated mistakes across retakes
 
   wrap.innerHTML=`
   ${intro?'<div class="sims-intro">'+escapeHTML(intro)+'</div>':''}
@@ -13887,6 +13916,46 @@ function createPMPQuiz(cfg){
   function matchEqual(q,ans,checked){if(!checked||!ans)return false;return Object.keys(q.ans).every(k=>ans[k]===q.ans[k]);}
   function answerEqual(q,ans,checked){if(q.matching)return matchEqual(q,ans,checked);if(q.multi)return checked&&(ans||[]).slice().sort().join(',')===q.ans.slice().sort().join(',');return ans===q.ans;}
   function answerDisplay(q){if(q.matching)return Object.keys(q.ans).map(k=>k+' → '+q.ans[k]).join(' · ');if(q.multi)return q.ans.slice().sort().join(' & ');return q.ans;}
+
+
+  function cloneAttemptAnswer(ans){
+    if(ans===null||ans===undefined)return ans;
+    try{return JSON.parse(JSON.stringify(ans));}catch(_){return ans;}
+  }
+  function recordAttempt(bankIndex,ans,chk,mode){
+    const q=QUESTIONS_BANK[bankIndex];
+    if(!q||q.info||ans===null||ans===undefined)return;
+    const finalized=(q.multi||q.matching)?!!chk:!!ans;
+    if(!finalized)return;
+    const key=String(bankIndex);
+    if(!Array.isArray(attemptHistory[key]))attemptHistory[key]=[];
+    attemptHistory[key].push({
+      ans:cloneAttemptAnswer(ans),
+      chk:!!chk,
+      correct:answerEqual(q,ans,chk),
+      mode:mode||'main',
+      at:Date.now()
+    });
+    // Keep storage bounded while retaining enough history to identify repeated mistakes.
+    if(attemptHistory[key].length>20)attemptHistory[key]=attemptHistory[key].slice(-20);
+  }
+  function migrateLegacyAttemptHistory(){
+    // Older ExamPro versions kept only the original answer + latest retry override.
+    // Reconstruct the minimum observable history so existing users immediately get
+    // Saran Perbaikan when the original answer and the saved retake are both wrong.
+    attemptHistory={};
+    QUESTIONS_BANK.forEach((q,i)=>{
+      if(!q||q.info)return;
+      const mainAns=userAnswers[i],mainChk=userChecked[i];
+      const mainFinal=(q.multi||q.matching)?!!mainChk:!!mainAns;
+      if(mainFinal)recordAttempt(i,mainAns,mainChk,'legacy-main');
+      const ro=retryOverrides[i];
+      if(ro!==undefined){
+        const retryFinal=(q.multi||q.matching)?!!ro.chk:!!ro.ans;
+        if(retryFinal)recordAttempt(i,ro.ans,ro.chk,'legacy-retry');
+      }
+    });
+  }
 
   // Hints for PMP Sims are generated from the question context so they guide
   // the learner without exposing the answer letter or the exact correct option.
@@ -14042,9 +14111,13 @@ function createPMPQuiz(cfg){
     if(userAnswers[current])return;
     userAnswers[current]=letter;
     if(isRetryMode&&QUESTIONS[current]._bankIdx!==undefined){
-      retryOverrides[QUESTIONS[current]._bankIdx]={ans:letter,chk:false};
+      const bankIdx=QUESTIONS[current]._bankIdx;
+      retryOverrides[bankIdx]={ans:letter,chk:false};
+      recordAttempt(bankIdx,letter,false,'retry');
       savePerSetRetryProgress();
       if(typeof refreshDashboard==='function')refreshDashboard();
+    }else{
+      recordAttempt(current,letter,false,'main');
     }
     render();updateStats();updateJumpGrid();
     if(!isRetryMode)saveProgress();
@@ -14068,8 +14141,11 @@ function createPMPQuiz(cfg){
     }
     if(isRetryMode&&q._bankIdx!==undefined){
       retryOverrides[q._bankIdx]={ans:userAnswers[current],chk:true};
+      recordAttempt(q._bankIdx,userAnswers[current],true,'retry');
       savePerSetRetryProgress();
       if(typeof refreshDashboard==='function')refreshDashboard();
+    }else{
+      recordAttempt(current,userAnswers[current],true,'main');
     }
     render();updateStats();updateJumpGrid();
     if(!isRetryMode)saveProgress();
@@ -14213,7 +14289,7 @@ function createPMPQuiz(cfg){
   }
   function saveProgress(){
     if(isRetryMode)return;
-    try{localStorage.setItem(storageKey,JSON.stringify({userAnswers,userChecked,userToggles,infoViewed,retryOverrides,savedAt:new Date().toISOString()}));}catch(e){}
+    try{localStorage.setItem(storageKey,JSON.stringify({userAnswers,userChecked,userToggles,infoViewed,retryOverrides,attemptHistory,savedAt:new Date().toISOString()}));}catch(e){}
     refreshSavedBanner();
   }
   function loadProgress(){
@@ -14225,6 +14301,13 @@ function createPMPQuiz(cfg){
       if(d.userToggles)userToggles=d.userToggles;
       if(d.infoViewed)infoViewed=d.infoViewed;
       if(d.retryOverrides)retryOverrides=d.retryOverrides; // restore retry answers
+      if(d.attemptHistory&&typeof d.attemptHistory==='object'){
+        attemptHistory=d.attemptHistory;
+      }else{
+        migrateLegacyAttemptHistory();
+        // Persist the reconstructed minimum history without changing answers/scores.
+        try{localStorage.setItem(storageKey,JSON.stringify({userAnswers,userChecked,userToggles,infoViewed,retryOverrides,attemptHistory,savedAt:d.savedAt||new Date().toISOString()}));}catch(_){}
+      }
       return true;
     }catch(e){return false;}
   }
@@ -14262,7 +14345,7 @@ function createPMPQuiz(cfg){
     if(!savedMainState)return;
     try{localStorage.setItem(storageKey,JSON.stringify({
       userAnswers:savedMainState.userAnswers,userChecked:savedMainState.userChecked,
-      userToggles:savedMainState.userToggles,infoViewed,retryOverrides,
+      userToggles:savedMainState.userToggles,infoViewed,retryOverrides,attemptHistory,
       savedAt:new Date().toISOString()
     }));}catch(e){}
   }
@@ -14324,7 +14407,7 @@ function createPMPQuiz(cfg){
     if(savedMainState){
       try{localStorage.setItem(storageKey,JSON.stringify({
         userAnswers:savedMainState.userAnswers,userChecked:savedMainState.userChecked,
-        userToggles:savedMainState.userToggles,infoViewed,retryOverrides,
+        userToggles:savedMainState.userToggles,infoViewed,retryOverrides,attemptHistory,
         savedAt:new Date().toISOString()
       }));}catch(e){}
     }
@@ -14339,6 +14422,7 @@ function createPMPQuiz(cfg){
     try{localStorage.removeItem(storageKey);}catch(e){}
     QUESTIONS=QUESTIONS_BANK;isRetryMode=false;savedMainState=null;
     retryOverrides={};
+    attemptHistory={};
     userAnswers=new Array(QUESTIONS.length).fill(null);userChecked=new Array(QUESTIONS.length).fill(false);
     userToggles=new Array(QUESTIONS.length).fill(null).map(()=>[]);
     hintShown=new Array(QUESTIONS.length).fill(false);infoViewed=new Array(QUESTIONS.length).fill(false);
@@ -14359,6 +14443,9 @@ function createPMPQuiz(cfg){
         return answerEqual(q,bAns[i],bChk[i]);
       })(),
       isEffectiveCorrect:isCorrectEffective(i),
+      attempts:Array.isArray(attemptHistory[String(i)])?attemptHistory[String(i)].slice():[],
+      wrongAttemptCount:Array.isArray(attemptHistory[String(i)])?attemptHistory[String(i)].filter(a=>a&&a.correct===false).length:0,
+      lastWrongAttempt:(()=>{const h=Array.isArray(attemptHistory[String(i)])?attemptHistory[String(i)]:[];for(let j=h.length-1;j>=0;j--)if(h[j]&&h[j].correct===false)return h[j];return null;})(),
     }));
   }
 
@@ -14397,7 +14484,8 @@ function createPMPQuiz(cfg){
   // Original Q1-100 bank answers are NEVER modified by global retry
   function updateAnswer(bankIndex,newAnswer,newChecked){
     retryOverrides[bankIndex]={ans:newAnswer,chk:newChecked||false};
-    saveProgress();    // saves both userAnswers (original) + retryOverrides
+    recordAttempt(bankIndex,newAnswer,newChecked||false,'global-retry');
+    saveProgress();    // saves original answers + retryOverrides + attempt history
     refreshSavedBanner();
   }
 
@@ -15129,6 +15217,138 @@ const ECO_STUDY_TIPS = {
   },
 };
 
+
+// ── REVIEW: Saran Perbaikan for questions missed at least twice ─────────────
+function rvEscape(value){
+  return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function rvAnswerText(q,ans){
+  if(ans===null||ans===undefined)return '—';
+  if(q&&q.matching&&ans&&typeof ans==='object'&&!Array.isArray(ans)){
+    return Object.keys(ans).map(k=>'<b>'+rvEscape(k)+'</b> → '+rvEscape(ans[k])).join('<br>');
+  }
+  if(Array.isArray(ans)){
+    return ans.map(letter=>'<b>'+rvEscape(letter)+'</b> — '+rvEscape((q.opts||{})[letter]||'')).join('<br>');
+  }
+  const key=String(ans);
+  return '<b>'+rvEscape(key)+'</b> — '+rvEscape((q&&q.opts&&q.opts[key])||'');
+}
+function rvCorrectAnswerText(q){
+  return rvAnswerText(q,q? q.ans:null);
+}
+function rvRepairConcept(q){
+  const t=((q&&q.q)||'')+' '+JSON.stringify((q&&q.opts)||{})+' '+((q&&q.exp)||'')+' '+((q&&q.hint)||'');
+  const txt=t.toLowerCase();
+  if(/change request|change control|scope change|baseline|approved change|integrated change/.test(txt))return{
+    keywords:'change request • analisis dampak • baseline • approval • integrated change control',
+    principle:'Jangan langsung menjalankan perubahan. Nilai dampaknya terhadap scope, jadwal, biaya, risiko, dan manfaat, lalu gunakan mekanisme persetujuan perubahan yang berlaku.'};
+  if(/agile|scrum|sprint|product owner|backlog|definition of done|kanban|self.organiz|servant/.test(txt))return{
+    keywords:'agile mindset • Product Owner • self-managing team • backlog • Definition of Done • impediment',
+    principle:'Jaga akuntabilitas agile: Product Owner memprioritaskan nilai, tim mengelola cara kerja, dan PM/servant leader memfasilitasi serta menghilangkan hambatan—bukan mengambil alih pekerjaan tim.'};
+  if(/risk|uncertain|probability|contingency|mitigat|avoid|transfer|accept|issue log|workaround/.test(txt))return{
+    keywords:'risk vs issue • probability/impact • response strategy • owner • residual/secondary risk',
+    principle:'Bedakan risiko yang belum terjadi dari issue yang sudah terjadi. Pilih respons sesuai jenis ancaman/peluang, ownership, dan kondisi aktual; setelah respons diterapkan, risiko sisa tetap dipantau.'};
+  if(/stakeholder|sponsor|engagement|communicat|conflict|resistant|power.?interest/.test(txt))return{
+    keywords:'stakeholder engagement • kebutuhan/ekspektasi • komunikasi dua arah • root cause • collaborate',
+    principle:'Pahami kepentingan dan akar masalah stakeholder terlebih dahulu. Pilih komunikasi yang memungkinkan klarifikasi dan kolaborasi sebelum eskalasi atau tindakan sepihak.'};
+  if(/quality|defect|acceptance criteria|definition of done|inspection|audit|testing|root cause|control chart/.test(txt))return{
+    keywords:'acceptance criteria • Definition of Done • QA vs QC • defect • root cause',
+    principle:'Gunakan kriteria mutu yang disepakati. Pastikan apakah masalahnya ada pada proses atau hasil, cari akar penyebab, lalu lakukan koreksi dan pencegahan yang sesuai.'};
+  if(/procure|contract|vendor|supplier|seller|fixed.?price|cost.?reimburs|time and material|outsourc/.test(txt))return{
+    keywords:'procurement • kontrak • buyer/seller risk • formal amendment • vendor governance',
+    principle:'Keputusan pengadaan harus mengikuti kontrak, pembagian risiko, dan tata kelola procurement. Perubahan kontrak tidak dilakukan secara informal.'};
+  if(/earned value|\bcpi\b|\bspi\b|\beac\b|\betc\b|\bev\b|\bpv\b|\bac\b|budget|cost variance/.test(txt))return{
+    keywords:'EV • PV • AC • CPI • SPI • EAC • interpretasi kinerja',
+    principle:'Tentukan dulu indikator yang ditanya, gunakan rumus yang tepat, lalu tafsirkan hasilnya. Jangan memilih tindakan sebelum memahami apakah masalah utamanya biaya, jadwal, atau keduanya.'};
+  if(/critical path|float|slack|crash|fast track|schedule|velocity|burndown|burnup/.test(txt))return{
+    keywords:'critical path • float • crashing • fast tracking • velocity • burndown/burnup',
+    principle:'Identifikasi sumber deviasi jadwal dan constraint yang relevan terlebih dahulu. Teknik percepatan dipilih berdasarkan dampak biaya, risiko, dependency, dan pendekatan delivery.'};
+  if(/scope|wbs|requirement|gold plating|scope creep|traceability|acceptance/.test(txt))return{
+    keywords:'requirements • scope • WBS • RTM • acceptance criteria • scope creep',
+    principle:'Kembalikan keputusan ke kebutuhan dan acceptance criteria yang disepakati. Fitur atau pekerjaan tambahan tanpa persetujuan bukan otomatis nilai tambah.'};
+  if(/team member|resource|conflict|coach|mentor|leadership|tuckman|forming|storming|norming|performing|morale/.test(txt))return{
+    keywords:'servant leadership • coaching • conflict resolution • resource management • Tuckman',
+    principle:'Cari akar masalah tim dan gunakan coaching/kolaborasi sebelum mengganti orang atau mengeskalasi. Sesuaikan gaya kepemimpinan dengan kebutuhan dan kematangan tim.'};
+  if(/compliance|regulat|governance|business value|benefit|strategy|portfolio|pmo/.test(txt))return{
+    keywords:'business value • compliance • governance • benefits • strategic alignment',
+    principle:'Nilai proyek tidak hanya diukur dari selesai tepat waktu/biaya. Pastikan keputusan tetap patuh, selaras strategi, dan mendukung outcome serta manfaat yang diharapkan.'};
+  if(/what should .* do first|what should .* first|first action|initial action/.test(txt))return{
+    keywords:'FIRST • assess before act • review plan/data • root cause • proper authority',
+    principle:'Untuk soal FIRST, utamakan memahami fakta, meninjau artefak/kriteria yang relevan, dan mencari akar masalah sebelum melakukan tindakan korektif, eskalasi, atau perubahan.'};
+  if(/what should .* do next|what should .* next|next action/.test(txt))return{
+    keywords:'NEXT • urutan proses • tindakan sebelumnya • langkah berikutnya',
+    principle:'Untuk soal NEXT, identifikasi apa yang sudah dilakukan dalam skenario, lalu pilih langkah proses yang secara logis dan tata kelola datang sesudahnya.'};
+  const cat=categorizeQ(q||{}),pd=categorizePerformanceDomain(q||{});
+  return{
+    keywords:pd+' • '+cat.eco+' • '+cat.ka+' • root cause • value',
+    principle:'Baca kata kerja pada pertanyaan, identifikasi domain dan akar masalah, lalu pilih tindakan yang paling proaktif, sesuai kewenangan, dan menjaga value. Hindari jawaban yang terlalu cepat bertindak tanpa analisis.'};
+}
+function rvWhyWrong(q,wrongAns,concept){
+  let text='';
+  if(Array.isArray(wrongAns))text=wrongAns.map(x=>(q.opts||{})[x]||'').join(' ');
+  else if(q&&q.matching&&wrongAns&&typeof wrongAns==='object')text=Object.values(wrongAns).join(' ');
+  else text=(q&&q.opts&&q.opts[String(wrongAns)])||'';
+  const low=text.toLowerCase();
+  const prompt=((q&&q.q)||'').toLowerCase();
+  if(/immediately|promptly|directly|without (approval|analysis|review)|skip|bypass/.test(low))return 'Pilihan ini terlalu cepat mengeksekusi tindakan sebelum analisis atau persetujuan yang diperlukan. Pada soal PMP/CAPM, tindakan yang proaktif tetap harus mengikuti urutan proses dan governance.';
+  if(/escalat|senior management|sponsor.*resolve|report.*management/.test(low))return 'Pilihan ini terlalu cepat mengeskalasi. Eskalasi dipakai ketika kewenangan PM/tim memang tidak cukup atau setelah upaya memahami dan menyelesaikan masalah pada level yang tepat dilakukan.';
+  if(/fire|replace|remove|terminate.*team|reassign/.test(low))return 'Pilihan ini langsung mengganti atau memindahkan orang tanpa membuktikan akar masalah. PMI umumnya mengutamakan klarifikasi, coaching, kolaborasi, dan perbaikan sistem kerja terlebih dahulu.';
+  if(/wait|defer|postpone|later|ignore|no action|do nothing/.test(low))return 'Pilihan ini terlalu pasif atau menunda penanganan. Project manager diharapkan proaktif mengklarifikasi kondisi dan menangani risiko/issue pada waktunya.';
+  if(/always|never|guarantee|eliminate|without loss|all risk/.test(low))return 'Pilihan ini menggunakan asumsi yang terlalu absolut. Soal PMI biasanya menilai keputusan berbasis konteks, risiko, value, dan tata kelola—bukan janji bahwa sesuatu selalu/ tidak pernah terjadi.';
+  if(/first/.test(prompt)&&!/review|assess|analy|understand|identify|check|meet|discuss|determine/.test(low))return 'Pilihan ini mungkin dapat dilakukan kemudian, tetapi bukan langkah pertama. Soal FIRST biasanya menguji assessment/understanding sebelum action.';
+  return 'Pilihan tersebut tampak masuk akal, tetapi tidak paling kuat terhadap prinsip utama yang diuji. Fokuskan keputusan pada: '+concept.principle;
+}
+function rvRenderRepeatedWrongAdvice(sid,analysis){
+  const repeated=(analysis||[]).filter(x=>!x.question.info&&Number(x.wrongAttemptCount||0)>=2);
+  if(!repeated.length)return '';
+  const cards=repeated
+    .sort((a,b)=>(b.wrongAttemptCount||0)-(a.wrongAttemptCount||0)||a.bankIndex-b.bankIndex)
+    .map(x=>{
+      const q=x.question,history=Array.isArray(x.attempts)?x.attempts:[];
+      const wrongs=history.filter(a=>a&&a.correct===false);
+      const lastWrong=x.lastWrongAttempt||wrongs[wrongs.length-1]||null;
+      const concept=rvRepairConcept(q);
+      const uniqueWrong=[];
+      wrongs.forEach(a=>{
+        const sig=JSON.stringify(a.ans);
+        if(!uniqueWrong.some(u=>u.sig===sig))uniqueWrong.push({sig,ans:a.ans});
+      });
+      const wrongHtml=uniqueWrong.slice(-3).map((u,idx)=>'<div style="margin-bottom:'+(idx===uniqueWrong.slice(-3).length-1?'0':'5px')+';">'+rvAnswerText(q,u.ans)+'</div>').join('');
+      const status=x.isEffectiveCorrect
+        ?'<span class="rv-repair-badge fixed">✓ sudah terkoreksi</span>'
+        :'<span class="rv-repair-badge still">⚠ masih salah</span>';
+      const why=rvWhyWrong(q,lastWrong?lastWrong.ans:null,concept);
+      const correct=q&&q.opts&&typeof q.ans==='string'?((q.opts[q.ans]||'').trim()):'';
+      const should='Jawaban yang benar adalah <b>'+rvCorrectAnswerText(q)+'</b>. '+concept.principle+(correct?' Intinya, opsi benar paling sesuai dengan tindakan/keputusan yang dinyatakan pada pilihan tersebut.':'');
+      return `<div class="rv-repair-card">
+        <div class="rv-repair-head">
+          <div><div class="rv-repair-qno">${rvEscape(ID_LABELS[sid]||sid)} · Soal #${rvEscape(q.n)}</div></div>
+          <div class="rv-repair-badges"><span class="rv-repair-badge repeat">❌ salah ${x.wrongAttemptCount}×</span>${status}</div>
+        </div>
+        <div class="rv-repair-question">${rvEscape(q.q||'')}</div>
+        <div class="rv-repair-grid">
+          <div class="rv-repair-box wrong"><div class="rv-repair-label">Jawaban salah yang pernah dipilih</div><div class="rv-repair-answer">${wrongHtml||'—'}</div></div>
+          <div class="rv-repair-box correct"><div class="rv-repair-label">Jawaban yang seharusnya</div><div class="rv-repair-answer">${rvCorrectAnswerText(q)}</div></div>
+        </div>
+        <div class="rv-repair-reason"><b>Kenapa jawabanmu salah:</b> ${rvEscape(why)}</div>
+        <div class="rv-repair-reason"><b>Seharusnya bagaimana:</b> ${should}</div>
+        <div class="rv-repair-keywords"><b>Kata kunci agar tidak terjebak lagi:</b> ${rvEscape(concept.keywords)}</div>
+        <div class="rv-repair-action"><button class="rv-repair-open" type="button" onclick="openReviewQuestion('${String(sid).replace(/'/g,"\\'")}',${x.bankIndex})">Buka soal →</button></div>
+      </div>`;
+    }).join('');
+  return `<div class="rv-section rv-repair-wrap"><div class="rv-title">🛠️ Saran Perbaikan</div>
+    <div class="rv-repair-summary"><strong>${repeated.length} soal perlu perhatian khusus</strong><span>Muncul ketika satu soal sudah salah minimal 2×, termasuk setelah retake. Riwayat tetap ditampilkan walau kemudian berhasil dikoreksi.</span></div>
+    ${cards}</div>`;
+}
+function openReviewQuestion(sid,bankIndex){
+  const cfg=sid==='pmpsims'?PMP_SIMS_CONFIG:SET_CONFIG.find(c=>c.id===sid);
+  if(!cfg)return;
+  switchTab(cfg.group||(String(sid).startsWith('capm')?'capm':'pmp'));
+  switchSubTab(cfg.group||(String(sid).startsWith('capm')?'capm':'pmp'),sid);
+  const inst=quizInstances[sid];
+  if(inst&&typeof inst.goToQuestion==='function')inst.goToQuestion(bankIndex);
+}
+
 // ── REVIEW: Toggle set panel ────────────────────────────────────────────────
 function toggleSetPanel(sid){
   const body=document.getElementById('rv-body-'+sid);
@@ -15155,7 +15375,7 @@ function refreshReview(){
     return inst&&inst.getFullAnalysis().some(x=>x.isAnswered&&!x.question.info);
   });
   const reviewNotice=anyAnswered
-    ? '<div style="font-size:12px;color:var(--muted);margin-bottom:14px;padding:8px 12px;background:rgba(232,163,61,.06);border-radius:8px;border-left:3px solid var(--amber);">💡 Klik setiap set soal untuk melihat detail analisis kekuatan &amp; kelemahan kamu. Tips perbaikan <b>hanya muncul untuk area yang akurasinya &lt;70%</b>.</div>'
+    ? '<div style="font-size:12px;color:var(--muted);margin-bottom:14px;padding:8px 12px;background:rgba(232,163,61,.06);border-radius:8px;border-left:3px solid var(--amber);">💡 Klik setiap set soal untuk melihat analisis. <b>Saran Perbaikan</b> otomatis menangkap soal yang salah minimal 2× (termasuk setelah retake), sedangkan tips area muncul ketika akurasi domain &lt;70%.</div>'
     : '<div style="font-size:12px;color:var(--muted);margin-bottom:14px;padding:8px 12px;background:rgba(107,138,235,.08);border-radius:8px;border-left:3px solid var(--periwinkle);">📊 Belum ada soal yang dijawab. Seluruh set tetap ditampilkan agar kamu dapat melihat struktur Review; analisis personal akan muncul setelah ada progres.</div>';
 
   const COL=p=>p>=80?'var(--teal)':p>=60?'var(--warn)':'var(--coral)';
@@ -15275,6 +15495,8 @@ function refreshReview(){
       </div>`;
 
       // Improvement tips for weak PMBOK 8 Performance Domains.
+      body+=rvRenderRepeatedWrongAdvice(sid,analysis);
+
       if(weak.length>0){
         body+=`<div class="rv-section"><div class="rv-title">🎯 Tips Perbaikan Performance Domain</div>`;
         weak.forEach(({pd,pct,c,t})=>{
@@ -15419,6 +15641,8 @@ function refreshReview(){
           ${weak.length>0?weak.slice(0,4).map(x=>`<div class="rv-hl-item"><span style="color:var(--coral);font-family:Space Mono,monospace;font-size:11px;">${x.pct}%</span> ${KA_EMOJI[x.ka]||''} ${x.ka} <span style="color:var(--muted);font-size:11px;">(${x.c}/${x.t})</span></div>`).join(''):'<div class="rv-hl-item" style="color:var(--teal);">Semua area sudah ≥70%! 🎉</div>'}
         </div>
       </div>`;
+
+      body+=rvRenderRepeatedWrongAdvice(sid,analysis);
 
       if(weak.length>0){
         body+=`<div class="rv-section"><div class="rv-title">🎯 Tips Perbaikan Untuk Area yang Lemah</div>`;
