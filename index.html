@@ -1253,9 +1253,10 @@
   .exampro-ai-richtext strong{color:var(--paper);font-weight:800;}
   .exampro-ai-richtext code{background:rgba(255,255,255,.09);border-radius:5px;padding:1px 5px;color:var(--amber);font-family:'Space Mono',monospace;font-size:.92em;}
   .exampro-ai-table-wrap{max-width:100%;margin:8px 0 12px;overflow-x:auto;border:1px solid var(--line);border-radius:10px;}
-  .exampro-ai-richtext table{width:100%;min-width:520px;border-collapse:collapse;background:rgba(8,16,38,.34);font-size:12px;line-height:1.5;}
+  .exampro-ai-richtext table{width:100%;min-width:720px;table-layout:fixed;border-collapse:collapse;background:rgba(8,16,38,.34);font-size:12px;line-height:1.5;}
   .exampro-ai-richtext th{background:rgba(107,138,235,.16);color:var(--paper);font-weight:800;text-align:left;}
-  .exampro-ai-richtext th,.exampro-ai-richtext td{padding:9px 10px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);vertical-align:top;}
+  .exampro-ai-richtext th,.exampro-ai-richtext td{padding:9px 10px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);vertical-align:top;word-break:normal;overflow-wrap:break-word;hyphens:none;}
+  .exampro-ai-richtext th:first-child,.exampro-ai-richtext td:first-child{width:18%;min-width:130px;}
   .exampro-ai-richtext th:last-child,.exampro-ai-richtext td:last-child{border-right:0;}
   .exampro-ai-richtext tbody tr:last-child td{border-bottom:0;}
   .exampro-ai-richtext tbody tr:nth-child(even){background:rgba(255,255,255,.025);}
