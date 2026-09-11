@@ -20808,6 +20808,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const nl=s=>esc(s).replace(/\n/g,'<br>');
   function renderAIText(value){
     const inline=text=>esc(text)
+      .replace(/&lt;br\s*\/?&gt;/gi,'<br>')
       .replace(/`([^`]+)`/g,'<code>$1</code>')
       .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
       .replace(/__([^_]+)__/g,'<strong>$1</strong>')
@@ -20817,11 +20818,16 @@ document.addEventListener('DOMContentLoaded',()=>{
     const flushParagraph=()=>{if(paragraph.length){html+='<p>'+paragraph.map(inline).join('<br>')+'</p>';paragraph=[];}};
     const closeList=()=>{if(listType){html+='</'+listType+'>';listType='';}};
     const splitRow=row=>row.trim().replace(/^\||\|$/g,'').split('|').map(cell=>cell.trim());
+    const isTableSeparator=row=>{
+      if(!row||!row.includes('|'))return false;
+      const cells=splitRow(row);
+      return cells.length>=2&&cells.every(cell=>/^:?-{2,}:?$/.test(cell.replace(/\s/g,'')));
+    };
     for(let i=0;i<lines.length;i++){
       const raw=lines[i];
       const line=raw.trim();
       const next=(lines[i+1]||'').trim();
-      if(line.includes('|')&&/^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?$/.test(next)){
+      if(line.includes('|')&&isTableSeparator(next)){
         flushParagraph();closeList();
         const headers=splitRow(line);i+=2;const rows=[];
         while(i<lines.length&&lines[i].trim().includes('|')){rows.push(splitRow(lines[i]));i++;}
